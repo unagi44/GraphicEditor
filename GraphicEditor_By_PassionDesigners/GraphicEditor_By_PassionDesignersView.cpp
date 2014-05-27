@@ -2,6 +2,7 @@
 // public of Passion Designers
 // GraphicEditor program
 // 2010253009 이계연
+// 2010253026 박현태
 //**************************************************************************************************************
 // GraphicEditor_By_PassionDesignersView.cpp : CGraphicEditor_By_PassionDesignersView 클래스의 구현
 //
