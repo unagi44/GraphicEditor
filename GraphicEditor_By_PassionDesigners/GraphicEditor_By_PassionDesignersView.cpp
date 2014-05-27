@@ -33,6 +33,9 @@ BEGIN_MESSAGE_MAP(CGraphicEditor_By_PassionDesignersView, CScrollView)
 	ON_COMMAND(ID_FILE_PRINT_PREVIEW, &CGraphicEditor_By_PassionDesignersView::OnFilePrintPreview)
 	ON_WM_CONTEXTMENU()
 	ON_WM_RBUTTONUP()
+	ON_WM_LBUTTONDOWN()
+	ON_WM_LBUTTONUP()
+	ON_WM_MOUSEMOVE()
 END_MESSAGE_MAP()
 
 // CGraphicEditor_By_PassionDesignersView 생성/소멸
@@ -57,7 +60,7 @@ BOOL CGraphicEditor_By_PassionDesignersView::PreCreateWindow(CREATESTRUCT& cs)
 
 // CGraphicEditor_By_PassionDesignersView 그리기
 
-void CGraphicEditor_By_PassionDesignersView::OnDraw(CDC* /*pDC*/)
+void CGraphicEditor_By_PassionDesignersView::OnDraw(CDC* pDC)
 {
 	CGraphicEditor_By_PassionDesignersDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
@@ -140,3 +143,27 @@ CGraphicEditor_By_PassionDesignersDoc* CGraphicEditor_By_PassionDesignersView::G
 
 
 // CGraphicEditor_By_PassionDesignersView 메시지 처리기
+
+
+void CGraphicEditor_By_PassionDesignersView::OnLButtonDown(UINT nFlags, CPoint point)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+
+	CScrollView::OnLButtonDown(nFlags, point);
+}
+
+
+void CGraphicEditor_By_PassionDesignersView::OnLButtonUp(UINT nFlags, CPoint point)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+
+	CScrollView::OnLButtonUp(nFlags, point);
+}
+
+
+void CGraphicEditor_By_PassionDesignersView::OnMouseMove(UINT nFlags, CPoint point)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+
+	CScrollView::OnMouseMove(nFlags, point);
+}

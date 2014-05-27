@@ -1,3 +1,9 @@
+//**************************************************************************************************************
+// public of Passion Designers
+// GraphicEditor program
+// 2010253009 이계연
+// 2010253026 박현태
+//**************************************************************************************************************
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
 // Used by GraphicEditor_By_PassionDesigners.rc

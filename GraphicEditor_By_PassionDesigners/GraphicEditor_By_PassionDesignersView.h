@@ -1,4 +1,9 @@
-
+//**************************************************************************************************************
+// public of Passion Designers
+// GraphicEditor program
+// 2010253009 이계연
+// 2010253026 박현태
+//**************************************************************************************************************
 // GraphicEditor_By_PassionDesignersView.h : CGraphicEditor_By_PassionDesignersView 클래스의 인터페이스
 //
 
@@ -44,6 +49,10 @@ protected:
 	afx_msg void OnRButtonUp(UINT nFlags, CPoint point);
 	afx_msg void OnContextMenu(CWnd* pWnd, CPoint point);
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
+	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 };
 
 #ifndef _DEBUG  // GraphicEditor_By_PassionDesignersView.cpp의 디버그 버전
