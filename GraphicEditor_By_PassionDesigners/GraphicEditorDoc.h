@@ -4,25 +4,22 @@
 // 2010253009 이계연
 // 2010253026 박현태
 //**************************************************************************************************************
-// GraphicEditor_By_PassionDesignersDoc.h : CGraphicEditor_By_PassionDesignersDoc 클래스의 인터페이스
+// GraphicEditorDoc.h : CGraphicEditorDoc 클래스의 인터페이스
 //
 
 
 #pragma once
 
-
-class CGraphicEditor_By_PassionDesignersDoc : public CDocument
+class CGraphicEditorDoc : public CDocument
 {
 protected: // serialization에서만 만들어집니다.
-	CGraphicEditor_By_PassionDesignersDoc();
-	DECLARE_DYNCREATE(CGraphicEditor_By_PassionDesignersDoc)
+	CGraphicEditorDoc();
+	DECLARE_DYNCREATE(CGraphicEditorDoc)
 
 // 특성입니다.
 public:
-
 // 작업입니다.
 public:
-
 // 재정의입니다.
 public:
 	virtual BOOL OnNewDocument();
@@ -34,7 +31,7 @@ public:
 
 // 구현입니다.
 public:
-	virtual ~CGraphicEditor_By_PassionDesignersDoc();
+	virtual ~CGraphicEditorDoc();
 #ifdef _DEBUG
 	virtual void AssertValid() const;
 	virtual void Dump(CDumpContext& dc) const;

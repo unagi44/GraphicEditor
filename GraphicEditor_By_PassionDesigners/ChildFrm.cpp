@@ -8,7 +8,7 @@
 //
 
 #include "stdafx.h"
-#include "GraphicEditor_By_PassionDesigners.h"
+#include "GraphicEditor.h"
 
 #include "ChildFrm.h"
 
@@ -18,9 +18,9 @@
 
 // CChildFrame
 
-IMPLEMENT_DYNCREATE(CChildFrame, CMDIChildWndEx)
+IMPLEMENT_DYNCREATE(CChildFrame, CMDIChildWnd)
 
-BEGIN_MESSAGE_MAP(CChildFrame, CMDIChildWndEx)
+BEGIN_MESSAGE_MAP(CChildFrame, CMDIChildWnd)
 END_MESSAGE_MAP()
 
 // CChildFrame 생성/소멸
@@ -38,7 +38,7 @@ CChildFrame::~CChildFrame()
 BOOL CChildFrame::PreCreateWindow(CREATESTRUCT& cs)
 {
 	// TODO: CREATESTRUCT cs를 수정하여 여기에서 Window 클래스 또는 스타일을 수정합니다.
-	if( !CMDIChildWndEx::PreCreateWindow(cs) )
+	if( !CMDIChildWnd::PreCreateWindow(cs) )
 		return FALSE;
 
 	return TRUE;
@@ -49,12 +49,12 @@ BOOL CChildFrame::PreCreateWindow(CREATESTRUCT& cs)
 #ifdef _DEBUG
 void CChildFrame::AssertValid() const
 {
-	CMDIChildWndEx::AssertValid();
+	CMDIChildWnd::AssertValid();
 }
 
 void CChildFrame::Dump(CDumpContext& dc) const
 {
-	CMDIChildWndEx::Dump(dc);
+	CMDIChildWnd::Dump(dc);
 }
 #endif //_DEBUG
 

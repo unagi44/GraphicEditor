@@ -4,21 +4,21 @@
 // 2010253009 이계연
 // 2010253026 박현태
 //**************************************************************************************************************
-// GraphicEditor_By_PassionDesignersView.h : CGraphicEditor_By_PassionDesignersView 클래스의 인터페이스
+// GraphicEditorView.h : CGraphicEditorView 클래스의 인터페이스
 //
 
 #pragma once
 
 
-class CGraphicEditor_By_PassionDesignersView : public CScrollView
+class CGraphicEditorView : public CScrollView
 {
 protected: // serialization에서만 만들어집니다.
-	CGraphicEditor_By_PassionDesignersView();
-	DECLARE_DYNCREATE(CGraphicEditor_By_PassionDesignersView)
+	CGraphicEditorView();
+	DECLARE_DYNCREATE(CGraphicEditorView)
 
 // 특성입니다.
 public:
-	CGraphicEditor_By_PassionDesignersDoc* GetDocument() const;
+	CGraphicEditorDoc* GetDocument() const;
 
 // 작업입니다.
 public:
@@ -35,7 +35,7 @@ protected:
 
 // 구현입니다.
 public:
-	virtual ~CGraphicEditor_By_PassionDesignersView();
+	virtual ~CGraphicEditorView();
 #ifdef _DEBUG
 	virtual void AssertValid() const;
 	virtual void Dump(CDumpContext& dc) const;
@@ -45,18 +45,16 @@ protected:
 
 // 생성된 메시지 맵 함수
 protected:
-	afx_msg void OnFilePrintPreview();
-	afx_msg void OnRButtonUp(UINT nFlags, CPoint point);
-	afx_msg void OnContextMenu(CWnd* pWnd, CPoint point);
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
-	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
+	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
+	afx_msg void OnDrawline();
 };
 
-#ifndef _DEBUG  // GraphicEditor_By_PassionDesignersView.cpp의 디버그 버전
-inline CGraphicEditor_By_PassionDesignersDoc* CGraphicEditor_By_PassionDesignersView::GetDocument() const
-   { return reinterpret_cast<CGraphicEditor_By_PassionDesignersDoc*>(m_pDocument); }
+#ifndef _DEBUG  // GraphicEditorView.cpp의 디버그 버전
+inline CGraphicEditorDoc* CGraphicEditorView::GetDocument() const
+   { return reinterpret_cast<CGraphicEditorDoc*>(m_pDocument); }
 #endif
 

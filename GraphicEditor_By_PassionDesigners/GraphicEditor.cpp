@@ -4,42 +4,40 @@
 // 2010253009 이계연
 // 2010253026 박현태
 //**************************************************************************************************************
-// GraphicEditor_By_PassionDesigners.cpp : 응용 프로그램에 대한 클래스 동작을 정의합니다.
+// GraphicEditor.cpp : 응용 프로그램에 대한 클래스 동작을 정의합니다.
 //
 
 #include "stdafx.h"
 #include "afxwinappex.h"
 #include "afxdialogex.h"
-#include "GraphicEditor_By_PassionDesigners.h"
+#include "GraphicEditor.h"
 #include "MainFrm.h"
 
 #include "ChildFrm.h"
-#include "GraphicEditor_By_PassionDesignersDoc.h"
-#include "GraphicEditor_By_PassionDesignersView.h"
+#include "GraphicEditorDoc.h"
+#include "GraphicEditorView.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
 
-// CGraphicEditor_By_PassionDesignersApp
+// CGraphicEditorApp
 
-BEGIN_MESSAGE_MAP(CGraphicEditor_By_PassionDesignersApp, CWinAppEx)
-	ON_COMMAND(ID_APP_ABOUT, &CGraphicEditor_By_PassionDesignersApp::OnAppAbout)
+BEGIN_MESSAGE_MAP(CGraphicEditorApp, CWinApp)
+	ON_COMMAND(ID_APP_ABOUT, &CGraphicEditorApp::OnAppAbout)
 	// 표준 파일을 기초로 하는 문서 명령입니다.
-	ON_COMMAND(ID_FILE_NEW, &CWinAppEx::OnFileNew)
-	ON_COMMAND(ID_FILE_OPEN, &CWinAppEx::OnFileOpen)
+	ON_COMMAND(ID_FILE_NEW, &CWinApp::OnFileNew)
+	ON_COMMAND(ID_FILE_OPEN, &CWinApp::OnFileOpen)
 	// 표준 인쇄 설정 명령입니다.
-	ON_COMMAND(ID_FILE_PRINT_SETUP, &CWinAppEx::OnFilePrintSetup)
+	ON_COMMAND(ID_FILE_PRINT_SETUP, &CWinApp::OnFilePrintSetup)
 END_MESSAGE_MAP()
 
 
-// CGraphicEditor_By_PassionDesignersApp 생성
+// CGraphicEditorApp 생성
 
-CGraphicEditor_By_PassionDesignersApp::CGraphicEditor_By_PassionDesignersApp()
+CGraphicEditorApp::CGraphicEditorApp()
 {
-	m_bHiColorIcons = TRUE;
-
 	// 다시 시작 관리자 지원
 	m_dwRestartManagerSupportFlags = AFX_RESTART_MANAGER_SUPPORT_ALL_ASPECTS;
 #ifdef _MANAGED
@@ -51,20 +49,20 @@ CGraphicEditor_By_PassionDesignersApp::CGraphicEditor_By_PassionDesignersApp()
 
 	// TODO: 아래 응용 프로그램 ID 문자열을 고유 ID 문자열로 바꾸십시오(권장).
 	// 문자열에 대한 서식: CompanyName.ProductName.SubProduct.VersionInformation
-	SetAppID(_T("GraphicEditor_By_PassionDesigners.AppID.NoVersion"));
+	SetAppID(_T("GraphicEditor.AppID.NoVersion"));
 
 	// TODO: 여기에 생성 코드를 추가합니다.
 	// InitInstance에 모든 중요한 초기화 작업을 배치합니다.
 }
 
-// 유일한 CGraphicEditor_By_PassionDesignersApp 개체입니다.
+// 유일한 CGraphicEditorApp 개체입니다.
 
-CGraphicEditor_By_PassionDesignersApp theApp;
+CGraphicEditorApp theApp;
 
 
-// CGraphicEditor_By_PassionDesignersApp 초기화
+// CGraphicEditorApp 초기화
 
-BOOL CGraphicEditor_By_PassionDesignersApp::InitInstance()
+BOOL CGraphicEditorApp::InitInstance()
 {
 	// 응용 프로그램 매니페스트가 ComCtl32.dll 버전 6 이상을 사용하여 비주얼 스타일을
 	// 사용하도록 지정하는 경우, Windows XP 상에서 반드시 InitCommonControlsEx()가 필요합니다. 
@@ -76,7 +74,7 @@ BOOL CGraphicEditor_By_PassionDesignersApp::InitInstance()
 	InitCtrls.dwICC = ICC_WIN95_CLASSES;
 	InitCommonControlsEx(&InitCtrls);
 
-	CWinAppEx::InitInstance();
+	CWinApp::InitInstance();
 
 
 	// OLE 라이브러리를 초기화합니다.
@@ -104,23 +102,13 @@ BOOL CGraphicEditor_By_PassionDesignersApp::InitInstance()
 	LoadStdProfileSettings(4);  // MRU를 포함하여 표준 INI 파일 옵션을 로드합니다.
 
 
-	InitContextMenuManager();
-
-	InitKeyboardManager();
-
-	InitTooltipManager();
-	CMFCToolTipInfo ttParams;
-	ttParams.m_bVislManagerTheme = TRUE;
-	theApp.GetTooltipManager()->SetTooltipParams(AFX_TOOLTIP_TYPE_ALL,
-		RUNTIME_CLASS(CMFCToolTipCtrl), &ttParams);
-
 	// 응용 프로그램의 문서 템플릿을 등록합니다. 문서 템플릿은
 	//  문서, 프레임 창 및 뷰 사이의 연결 역할을 합니다.
 	CMultiDocTemplate* pDocTemplate;
-	pDocTemplate = new CMultiDocTemplate(IDR_GraphicEditor_BTYPE,
-		RUNTIME_CLASS(CGraphicEditor_By_PassionDesignersDoc),
+	pDocTemplate = new CMultiDocTemplate(IDR_GraphicEditorTYPE,
+		RUNTIME_CLASS(CGraphicEditorDoc),
 		RUNTIME_CLASS(CChildFrame), // 사용자 지정 MDI 자식 프레임입니다.
-		RUNTIME_CLASS(CGraphicEditor_By_PassionDesignersView));
+		RUNTIME_CLASS(CGraphicEditorView));
 	if (!pDocTemplate)
 		return FALSE;
 	AddDocTemplate(pDocTemplate);
@@ -153,15 +141,15 @@ BOOL CGraphicEditor_By_PassionDesignersApp::InitInstance()
 	return TRUE;
 }
 
-int CGraphicEditor_By_PassionDesignersApp::ExitInstance()
+int CGraphicEditorApp::ExitInstance()
 {
 	//TODO: 추가한 추가 리소스를 처리합니다.
 	AfxOleTerm(FALSE);
 
-	return CWinAppEx::ExitInstance();
+	return CWinApp::ExitInstance();
 }
 
-// CGraphicEditor_By_PassionDesignersApp 메시지 처리기
+// CGraphicEditorApp 메시지 처리기
 
 
 // 응용 프로그램 정보에 사용되는 CAboutDlg 대화 상자입니다.
@@ -195,32 +183,13 @@ BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
 END_MESSAGE_MAP()
 
 // 대화 상자를 실행하기 위한 응용 프로그램 명령입니다.
-void CGraphicEditor_By_PassionDesignersApp::OnAppAbout()
+void CGraphicEditorApp::OnAppAbout()
 {
 	CAboutDlg aboutDlg;
 	aboutDlg.DoModal();
 }
 
-// CGraphicEditor_By_PassionDesignersApp 사용자 지정 로드/저장 메서드
-
-void CGraphicEditor_By_PassionDesignersApp::PreLoadState()
-{
-	BOOL bNameValid;
-	CString strName;
-	bNameValid = strName.LoadString(IDS_EDIT_MENU);
-	ASSERT(bNameValid);
-	GetContextMenuManager()->AddMenu(strName, IDR_POPUP_EDIT);
-}
-
-void CGraphicEditor_By_PassionDesignersApp::LoadCustomState()
-{
-}
-
-void CGraphicEditor_By_PassionDesignersApp::SaveCustomState()
-{
-}
-
-// CGraphicEditor_By_PassionDesignersApp 메시지 처리기
+// CGraphicEditorApp 메시지 처리기
 
 
 

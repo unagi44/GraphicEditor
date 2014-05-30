@@ -9,7 +9,7 @@
 
 #pragma once
 
-class CChildFrame : public CMDIChildWndEx
+class CChildFrame : public CMDIChildWnd
 {
 	DECLARE_DYNCREATE(CChildFrame)
 public:

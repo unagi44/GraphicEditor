@@ -4,7 +4,7 @@
 // 2010253009 이계연
 // 2010253026 박현태
 //**************************************************************************************************************
-// GraphicEditor_By_PassionDesigners.h : GraphicEditor_By_PassionDesigners 응용 프로그램에 대한 주 헤더 파일
+// GraphicEditor.h : GraphicEditor 응용 프로그램에 대한 주 헤더 파일
 //
 #pragma once
 
@@ -15,14 +15,14 @@
 #include "resource.h"       // 주 기호입니다.
 
 
-// CGraphicEditor_By_PassionDesignersApp:
-// 이 클래스의 구현에 대해서는 GraphicEditor_By_PassionDesigners.cpp을 참조하십시오.
+// CGraphicEditorApp:
+// 이 클래스의 구현에 대해서는 GraphicEditor.cpp을 참조하십시오.
 //
 
-class CGraphicEditor_By_PassionDesignersApp : public CWinAppEx
+class CGraphicEditorApp : public CWinApp
 {
 public:
-	CGraphicEditor_By_PassionDesignersApp();
+	CGraphicEditorApp();
 
 
 // 재정의입니다.
@@ -31,15 +31,8 @@ public:
 	virtual int ExitInstance();
 
 // 구현입니다.
-	UINT  m_nAppLook;
-	BOOL  m_bHiColorIcons;
-
-	virtual void PreLoadState();
-	virtual void LoadCustomState();
-	virtual void SaveCustomState();
-
 	afx_msg void OnAppAbout();
 	DECLARE_MESSAGE_MAP()
 };
 
-extern CGraphicEditor_By_PassionDesignersApp theApp;
+extern CGraphicEditorApp theApp;

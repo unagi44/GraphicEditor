@@ -4,17 +4,17 @@
 // 2010253009 이계연
 // 2010253026 박현태
 //**************************************************************************************************************
-// GraphicEditor_By_PassionDesignersDoc.cpp : CGraphicEditor_By_PassionDesignersDoc 클래스의 구현
+// GraphicEditorDoc.cpp : CGraphicEditorDoc 클래스의 구현
 //
 
 #include "stdafx.h"
 // SHARED_HANDLERS는 미리 보기, 축소판 그림 및 검색 필터 처리기를 구현하는 ATL 프로젝트에서 정의할 수 있으며
 // 해당 프로젝트와 문서 코드를 공유하도록 해 줍니다.
 #ifndef SHARED_HANDLERS
-#include "GraphicEditor_By_PassionDesigners.h"
+#include "GraphicEditor.h"
 #endif
 
-#include "GraphicEditor_By_PassionDesignersDoc.h"
+#include "GraphicEditorDoc.h"
 
 #include <propkey.h>
 
@@ -22,27 +22,26 @@
 #define new DEBUG_NEW
 #endif
 
-// CGraphicEditor_By_PassionDesignersDoc
+// CGraphicEditorDoc
 
-IMPLEMENT_DYNCREATE(CGraphicEditor_By_PassionDesignersDoc, CDocument)
+IMPLEMENT_DYNCREATE(CGraphicEditorDoc, CDocument)
 
-BEGIN_MESSAGE_MAP(CGraphicEditor_By_PassionDesignersDoc, CDocument)
+BEGIN_MESSAGE_MAP(CGraphicEditorDoc, CDocument)
 END_MESSAGE_MAP()
 
 
-// CGraphicEditor_By_PassionDesignersDoc 생성/소멸
+// CGraphicEditorDoc 생성/소멸
 
-CGraphicEditor_By_PassionDesignersDoc::CGraphicEditor_By_PassionDesignersDoc()
+CGraphicEditorDoc::CGraphicEditorDoc()
 {
 	// TODO: 여기에 일회성 생성 코드를 추가합니다.
-
 }
 
-CGraphicEditor_By_PassionDesignersDoc::~CGraphicEditor_By_PassionDesignersDoc()
+CGraphicEditorDoc::~CGraphicEditorDoc()
 {
 }
 
-BOOL CGraphicEditor_By_PassionDesignersDoc::OnNewDocument()
+BOOL CGraphicEditorDoc::OnNewDocument()
 {
 	if (!CDocument::OnNewDocument())
 		return FALSE;
@@ -56,10 +55,11 @@ BOOL CGraphicEditor_By_PassionDesignersDoc::OnNewDocument()
 
 
 
-// CGraphicEditor_By_PassionDesignersDoc serialization
+// CGraphicEditorDoc serialization
 
-void CGraphicEditor_By_PassionDesignersDoc::Serialize(CArchive& ar)
+void CGraphicEditorDoc::Serialize(CArchive& ar)
 {
+	// 그린 모든 객체들을 저장, 불러오기를 가능하게 합니다.
 	if (ar.IsStoring())
 	{
 		// TODO: 여기에 저장 코드를 추가합니다.
@@ -73,7 +73,7 @@ void CGraphicEditor_By_PassionDesignersDoc::Serialize(CArchive& ar)
 #ifdef SHARED_HANDLERS
 
 // 축소판 그림을 지원합니다.
-void CGraphicEditor_By_PassionDesignersDoc::OnDrawThumbnail(CDC& dc, LPRECT lprcBounds)
+void CGraphicEditorDoc::OnDrawThumbnail(CDC& dc, LPRECT lprcBounds)
 {
 	// 문서의 데이터를 그리려면 이 코드를 수정하십시오.
 	dc.FillSolidRect(lprcBounds, RGB(255, 255, 255));
@@ -94,7 +94,7 @@ void CGraphicEditor_By_PassionDesignersDoc::OnDrawThumbnail(CDC& dc, LPRECT lprc
 }
 
 // 검색 처리기를 지원합니다.
-void CGraphicEditor_By_PassionDesignersDoc::InitializeSearchContent()
+void CGraphicEditorDoc::InitializeSearchContent()
 {
 	CString strSearchContent;
 	// 문서의 데이터에서 검색 콘텐츠를 설정합니다.
@@ -104,7 +104,7 @@ void CGraphicEditor_By_PassionDesignersDoc::InitializeSearchContent()
 	SetSearchContent(strSearchContent);
 }
 
-void CGraphicEditor_By_PassionDesignersDoc::SetSearchContent(const CString& value)
+void CGraphicEditorDoc::SetSearchContent(const CString& value)
 {
 	if (value.IsEmpty())
 	{
@@ -124,19 +124,19 @@ void CGraphicEditor_By_PassionDesignersDoc::SetSearchContent(const CString& valu
 
 #endif // SHARED_HANDLERS
 
-// CGraphicEditor_By_PassionDesignersDoc 진단
+// CGraphicEditorDoc 진단
 
 #ifdef _DEBUG
-void CGraphicEditor_By_PassionDesignersDoc::AssertValid() const
+void CGraphicEditorDoc::AssertValid() const
 {
 	CDocument::AssertValid();
 }
 
-void CGraphicEditor_By_PassionDesignersDoc::Dump(CDumpContext& dc) const
+void CGraphicEditorDoc::Dump(CDumpContext& dc) const
 {
 	CDocument::Dump(dc);
 }
 #endif //_DEBUG
 
 
-// CGraphicEditor_By_PassionDesignersDoc 명령
+// CGraphicEditorDoc 명령

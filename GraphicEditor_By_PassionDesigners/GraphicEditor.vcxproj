@@ -11,8 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{9CDAF6C9-D59F-4E63-8D30-C3363E52D24D}</ProjectGuid>
-    <RootNamespace>GraphicEditor_By_PassionDesigners</RootNamespace>
+    <ProjectGuid>{3C82BC03-7857-44F6-A103-A27EB431C126}</ProjectGuid>
+    <RootNamespace>GraphicEditor</RootNamespace>
     <Keyword>MFCProj</Keyword>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -95,18 +95,18 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
-    <None Include="res\GraphicEditor_By_PassionDesigners.ico" />
-    <None Include="res\GraphicEditor_By_PassionDesigners.rc2" />
-    <None Include="res\GraphicEditor_By_PassionDesignersDoc.ico" />
+    <None Include="res\GraphicEditor.ico" />
+    <None Include="res\GraphicEditor.rc2" />
+    <None Include="res\GraphicEditorDoc.ico" />
+    <None Include="res\images.bmp" />
     <None Include="res\Toolbar.bmp" />
-    <None Include="res\Toolbar256.bmp" />
-    <None Include="UserImages.bmp" />
+    <None Include="res\toolbar1.bmp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChildFrm.h" />
-    <ClInclude Include="GraphicEditor_By_PassionDesigners.h" />
-    <ClInclude Include="GraphicEditor_By_PassionDesignersDoc.h" />
-    <ClInclude Include="GraphicEditor_By_PassionDesignersView.h" />
+    <ClInclude Include="GraphicEditor.h" />
+    <ClInclude Include="GraphicEditorDoc.h" />
+    <ClInclude Include="GraphicEditorView.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
@@ -114,9 +114,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ChildFrm.cpp" />
-    <ClCompile Include="GraphicEditor_By_PassionDesigners.cpp" />
-    <ClCompile Include="GraphicEditor_By_PassionDesignersDoc.cpp" />
-    <ClCompile Include="GraphicEditor_By_PassionDesignersView.cpp" />
+    <ClCompile Include="GraphicEditor.cpp" />
+    <ClCompile Include="GraphicEditorDoc.cpp" />
+    <ClCompile Include="GraphicEditorView.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -124,14 +124,14 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="GraphicEditor_By_PassionDesigners.rc" />
+    <ResourceCompile Include="GraphicEditor.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties RESOURCE_FILE="GraphicEditor_By_PassionDesigners.rc" />
+      <UserProperties RESOURCE_FILE="GraphicEditor.rc" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>
