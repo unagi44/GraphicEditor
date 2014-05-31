@@ -75,6 +75,8 @@ void CGraphicEditorDoc::Serialize(CArchive& ar)
 		}
 
 		E_Ellipse.Serialize (ar) ;	// 원 그리기 배열 저장
+		R_Color.Serialize (ar) ;	// 사각형의 각 생상 정보 저장
+		E_Color.Serialize (ar) ;	// 원의 각 생상 정보 저장
 	}
 	else
 	{
@@ -90,7 +92,9 @@ void CGraphicEditorDoc::Serialize(CArchive& ar)
 			ar >> P_Poly.GetAt (i).P_Color ;
 		}
 
-		E_Ellipse.Serialize (ar) ;	// 원 그리기 배열 저장
+		E_Ellipse.Serialize (ar) ;	// 원 그리기 배열 불러오기
+		R_Color.Serialize (ar) ;	// 사각형의 각 생상 정보 불러오기
+		E_Color.Serialize (ar) ;	// 사각형의 각 생상 정보 불러오기
 	}
 }
 
