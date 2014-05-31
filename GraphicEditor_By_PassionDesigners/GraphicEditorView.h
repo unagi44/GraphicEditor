@@ -6,6 +6,8 @@
 //**************************************************************************************************************
 // GraphicEditorView.h : CGraphicEditorView 클래스의 인터페이스
 //
+#include "CLine.h"	// 선을 그리기 위한 헤더파일 참조
+#include "CPolyLine.h"	// PolyLine을 그리기 위한 헤더파일 참조
 
 #pragma once
 
@@ -19,6 +21,34 @@ protected: // serialization에서만 만들어집니다.
 // 특성입니다.
 public:
 	CGraphicEditorDoc* GetDocument() const;
+	CRect ChangeRect ;
+	char IsNormal ;
+
+	// 선 그리기에 필요한 변수들
+	CLine L_Insert ;
+	int L_Current ;
+	char L_IsDraw ;
+	char L_CanMove ;
+
+	// 상자 그리기에 필요한 변수들
+	CRect R_Rect ;
+	int R_Current ;
+	char R_IsDraw ;
+	char R_CanMove ;
+
+	// PolyLine 그리기에 필요한 변수들
+	CPolyLine P_Insert ;
+	CPoint P_PointStart ;
+	CPoint P_PointLast ;
+	int P_ChangeSkeleton ;
+	int P_Current ;
+	int P_CurrentPoint ;
+	char P_IsDraw ;
+	char P_CanMove ;
+	char P_DrawContinue ;
+	char P_IsContinue ;
+	char P_IsStart ;
+	char P_IsMove ;
 
 // 작업입니다.
 public:
@@ -51,6 +81,9 @@ public:
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 	afx_msg void OnDrawline();
+	afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);
+	afx_msg void OnDrawrec();
+	afx_msg void OnDrawpoly();
 };
 
 #ifndef _DEBUG  // GraphicEditorView.cpp의 디버그 버전

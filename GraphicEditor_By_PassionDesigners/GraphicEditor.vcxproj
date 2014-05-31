@@ -104,6 +104,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChildFrm.h" />
+    <ClInclude Include="CLine.h" />
+    <ClInclude Include="CPolyLine.h" />
     <ClInclude Include="GraphicEditor.h" />
     <ClInclude Include="GraphicEditorDoc.h" />
     <ClInclude Include="GraphicEditorView.h" />
@@ -114,6 +116,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ChildFrm.cpp" />
+    <ClCompile Include="CLine.cpp" />
+    <ClCompile Include="CPolyLine.cpp" />
     <ClCompile Include="GraphicEditor.cpp" />
     <ClCompile Include="GraphicEditorDoc.cpp" />
     <ClCompile Include="GraphicEditorView.cpp" />

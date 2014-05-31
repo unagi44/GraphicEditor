@@ -6,7 +6,8 @@
 //**************************************************************************************************************
 // GraphicEditorDoc.h : CGraphicEditorDoc 클래스의 인터페이스
 //
-
+#include "CLine.h"	// 선을 그리기 위한 헤더파일 참조
+#include "CPolyLine.h"	// PolyLine을 그리기 위한 헤더파일 참조
 
 #pragma once
 
@@ -18,6 +19,9 @@ protected: // serialization에서만 만들어집니다.
 
 // 특성입니다.
 public:
+	CArray < CLine, CLine& > L_Line ;	// 선 그리기 배열
+	CArray < CRect, CRect& > R_Rec ;	// 상자 그리기 배열
+	CArray < CPolyLine, CPolyLine& > P_Poly ;	// PolyLine 그리기 배열
 // 작업입니다.
 public:
 // 재정의입니다.
