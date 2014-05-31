@@ -27,7 +27,9 @@ public:
 // 작업입니다.
 public:
 	CArray < int, int > R_Color ;
+	CArray < int, int > R_FillColor ;
 	CArray < int, int > E_Color ;
+	CArray < int, int > E_FillColor ;
 // 재정의입니다.
 public:
 	virtual BOOL OnNewDocument();

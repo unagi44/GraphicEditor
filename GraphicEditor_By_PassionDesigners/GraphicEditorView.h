@@ -24,7 +24,9 @@ public:
 	CRect ChangeRect ;
 	char IsNormal ;
 	COLORREF m_Color ;
+	COLORREF m_FillColor ;
 	char m_IsColor ;
+	char m_IsFillColor ;
 
 	// 선 그리기에 필요한 변수들
 	CLine L_Insert ;
@@ -95,6 +97,8 @@ public:
 	afx_msg void OnDrawellipse();
 	afx_msg void OnSelectobject();
 	afx_msg void OnChangecolor();
+	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
+	afx_msg void OnChangefillcolor();
 };
 
 #ifndef _DEBUG  // GraphicEditorView.cpp의 디버그 버전

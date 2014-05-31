@@ -41,6 +41,8 @@ BEGIN_MESSAGE_MAP(CGraphicEditorView, CScrollView)
 	ON_COMMAND(ID_DrawEllipse, &CGraphicEditorView::OnDrawellipse)
 	ON_COMMAND(ID_SelectObject, &CGraphicEditorView::OnSelectobject)
 	ON_COMMAND(ID_ChangeColor, &CGraphicEditorView::OnChangecolor)
+	ON_WM_LBUTTONDBLCLK()
+	ON_COMMAND(ID_ChangeFillColor, &CGraphicEditorView::OnChangefillcolor)
 END_MESSAGE_MAP()
 
 // CGraphicEditorView 생성/소멸
@@ -51,6 +53,7 @@ CGraphicEditorView::CGraphicEditorView()
 
 	IsNormal = 'o' ;
 	m_IsColor = 'x' ;
+	m_IsFillColor = 'x' ;
 
 	// 선 그리기에 필요한 변수들 초기화
 	L_IsDraw = 'x' ;
@@ -122,17 +125,47 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 
 	// 그린 상자를 모두 화면에 띄웁니다.
 	for ( int i = 0 ; i < pDoc -> R_Rec.GetCount () ; i++ ) {
-		// 색상을 가지지 않았을 경우의 출력
+		// 선 색을 가지지 않았을 경우의 출력
 		if ( pDoc -> R_Color.GetAt (i) == RGB (0,0,0) ) {
-			pDC -> SelectStockObject ( NULL_BRUSH ) ;
-			pDC -> Rectangle ( pDoc -> R_Rec [i].left, pDoc -> R_Rec [i].top, pDoc -> R_Rec [i].right, pDoc -> R_Rec [i].bottom ) ;
+
+			// 채우기 색상을 가지지 않았을 경우의 출력
+			if ( pDoc -> R_FillColor.GetAt (i) == RGB (0,0,0) ) {
+				pDC -> SelectStockObject ( NULL_BRUSH ) ;
+				pDC -> Rectangle ( pDoc -> R_Rec [i].left, pDoc -> R_Rec [i].top, pDoc -> R_Rec [i].right, pDoc -> R_Rec [i].bottom ) ;
+			}
+			// 채우기 색상을 가졌을 경우의 출력
+			else {
+				CBrush brush;
+				brush.CreateSolidBrush( pDoc -> R_FillColor.GetAt (i) ) ;
+				CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+				pDC -> Rectangle ( pDoc -> R_Rec [i].left, pDoc -> R_Rec [i].top, pDoc -> R_Rec [i].right, pDoc -> R_Rec [i].bottom ) ;
+				pDC -> SelectObject ( oldBrush ) ;
+			}
 		}
-		// 특정 색상을 가졌을 경우의 출력
+		// 특정 선 색상을 가졌을 경우의 출력
 		else {
-			CBrush brush ( pDoc -> R_Color.GetAt (i) ) ;
-			CBrush *paint = pDC -> SelectObject ( &brush ) ;
-			pDC -> Rectangle ( pDoc -> R_Rec [i].left, pDoc -> R_Rec [i].top, pDoc -> R_Rec [i].right, pDoc -> R_Rec [i].bottom ) ;
-			pDC ->SelectObject ( paint ) ;
+			
+			// 채우기 색상을 가지지 않았을 경우의 출력
+			if ( pDoc -> R_FillColor.GetAt (i) == RGB (0,0,0) ) {
+				CPen pen;
+				pen.CreatePen( PS_SOLID, 1, pDoc ->R_Color.GetAt (i) ) ;
+				CPen* oldPen = pDC->SelectObject( &pen ) ;
+				pDC -> SelectStockObject ( NULL_BRUSH ) ;
+				pDC -> Rectangle ( pDoc -> R_Rec [i].left, pDoc -> R_Rec [i].top, pDoc -> R_Rec [i].right, pDoc -> R_Rec [i].bottom ) ;
+				pDC ->SelectObject ( oldPen ) ;
+			}
+			// 채우기 색상을 가졌을 경우의 출력
+			else {
+				CPen pen;
+				pen.CreatePen( PS_SOLID, 1, pDoc ->R_Color.GetAt (i) ) ;
+				CPen* oldPen = pDC->SelectObject( &pen ) ;
+				CBrush brush;
+				brush.CreateSolidBrush( pDoc -> R_FillColor.GetAt (i) ) ;
+				CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+				pDC -> Rectangle ( pDoc -> R_Rec [i].left, pDoc -> R_Rec [i].top, pDoc -> R_Rec [i].right, pDoc -> R_Rec [i].bottom ) ;
+				pDC -> SelectObject ( oldPen ) ;
+				pDC -> SelectObject ( oldBrush ) ;
+			}
 		}
 	}
 	
@@ -149,23 +182,6 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 				pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
 				pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
 				pDC->SelectObject(Draw_Pen);
-
-				// 현재 그리고 있는 PolyLine의 Skeleton을 보여줍니다.
-				if ( i == pDoc -> P_Poly.GetCount () - 1 && P_IsDraw == 'o' && P_Insert.Poly_point.GetCount () != 0 ) {
-					ChangeRect.left = pDoc -> P_Poly.GetAt (i).Poly_point.GetAt (j).x - 3 ;
-					ChangeRect.right = pDoc -> P_Poly.GetAt (i).Poly_point.GetAt (j).x + 3 ;
-					ChangeRect.top = pDoc -> P_Poly.GetAt (i).Poly_point.GetAt (j).y - 3 ;
-					ChangeRect.bottom = pDoc -> P_Poly.GetAt (i).Poly_point.GetAt (j).y + 3 ;
-
-					pDC -> Rectangle ( ChangeRect ) ;
-
-					ChangeRect.left = pDoc -> P_Poly.GetAt (i).Poly_point.GetAt (j+1).x - 3 ;
-					ChangeRect.right = pDoc -> P_Poly.GetAt (i).Poly_point.GetAt (j+1).x + 3 ;
-					ChangeRect.top = pDoc -> P_Poly.GetAt (i).Poly_point.GetAt (j+1).y - 3 ;
-					ChangeRect.bottom = pDoc -> P_Poly.GetAt (i).Poly_point.GetAt (j+1).y + 3 ;
-
-					pDC -> Rectangle ( ChangeRect ) ;
-				}
 			}
 			// PolyLine이 지정된 색상을 가졌을 경우의 출력
 			else {
@@ -176,23 +192,23 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 				pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
 				pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
 				pDC->SelectObject(Draw_Pen);
+			}
 
-				// 현재 그리고 있는 PolyLine의 Skeleton을 보여줍니다.
-				if ( i == pDoc -> P_Poly.GetCount () - 1 && P_IsDraw == 'o' && P_Insert.Poly_point.GetCount () != 0 ) {
-					ChangeRect.left = pDoc -> P_Poly.GetAt (i).Poly_point.GetAt (j).x - 3 ;
-					ChangeRect.right = pDoc -> P_Poly.GetAt (i).Poly_point.GetAt (j).x + 3 ;
-					ChangeRect.top = pDoc -> P_Poly.GetAt (i).Poly_point.GetAt (j).y - 3 ;
-					ChangeRect.bottom = pDoc -> P_Poly.GetAt (i).Poly_point.GetAt (j).y + 3 ;
+			// 현재 그리고 있는 PolyLine의 Skeleton을 보여줍니다.
+			if ( i == pDoc -> P_Poly.GetCount () - 1 && P_IsDraw == 'o' && P_Insert.Poly_point.GetCount () != 0 && P_CanMove == 'o' ) {
+				ChangeRect.left = pDoc -> P_Poly.GetAt (i).Poly_point.GetAt (j).x - 3 ;
+				ChangeRect.right = pDoc -> P_Poly.GetAt (i).Poly_point.GetAt (j).x + 3 ;
+				ChangeRect.top = pDoc -> P_Poly.GetAt (i).Poly_point.GetAt (j).y - 3 ;
+				ChangeRect.bottom = pDoc -> P_Poly.GetAt (i).Poly_point.GetAt (j).y + 3 ;
 
-					pDC -> Rectangle ( ChangeRect ) ;
+				pDC -> Rectangle ( ChangeRect ) ;
 
-					ChangeRect.left = pDoc -> P_Poly.GetAt (i).Poly_point.GetAt (j+1).x - 3 ;
-					ChangeRect.right = pDoc -> P_Poly.GetAt (i).Poly_point.GetAt (j+1).x + 3 ;
-					ChangeRect.top = pDoc -> P_Poly.GetAt (i).Poly_point.GetAt (j+1).y - 3 ;
-					ChangeRect.bottom = pDoc -> P_Poly.GetAt (i).Poly_point.GetAt (j+1).y + 3 ;
+				ChangeRect.left = pDoc -> P_Poly.GetAt (i).Poly_point.GetAt (j+1).x - 3 ;
+				ChangeRect.right = pDoc -> P_Poly.GetAt (i).Poly_point.GetAt (j+1).x + 3 ;
+				ChangeRect.top = pDoc -> P_Poly.GetAt (i).Poly_point.GetAt (j+1).y - 3 ;
+				ChangeRect.bottom = pDoc -> P_Poly.GetAt (i).Poly_point.GetAt (j+1).y + 3 ;
 
-					pDC -> Rectangle ( ChangeRect ) ;
-				}
+				pDC -> Rectangle ( ChangeRect ) ;
 			}
 		}
 	}
@@ -200,17 +216,44 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 	// 그린 원을 모두 화면에 띄웁니다.
 	for ( int i = 0 ; i < pDoc -> E_Ellipse.GetCount () ; i++ ) {
 
-		// 색상을 가지지 않았을 경우의 출력
+		// 선 색을 가지지 않았을 경우의 출력
 		if ( pDoc -> E_Color.GetAt (i) == RGB (0,0,0) ) {
-			pDC -> SelectStockObject ( NULL_BRUSH ) ;
-			pDC -> Ellipse ( pDoc -> E_Ellipse [i].left, pDoc -> E_Ellipse [i].top, pDoc -> E_Ellipse [i].right, pDoc -> E_Ellipse [i].bottom ) ;
+			// 채우기 색상을 가지지 않았을 경우의 출력
+			if ( pDoc -> E_FillColor.GetAt (i) == RGB (0,0,0) ) {
+				pDC -> SelectStockObject ( NULL_BRUSH ) ;
+				pDC -> Ellipse ( pDoc -> E_Ellipse [i].left, pDoc -> E_Ellipse [i].top, pDoc -> E_Ellipse [i].right, pDoc -> E_Ellipse [i].bottom ) ;
+			}
+			// 채우기 색상을 가졌을 경우의 출력
+			else {
+				CBrush brush;
+				brush.CreateSolidBrush( pDoc -> E_FillColor.GetAt (i) ) ;
+				CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+				pDC -> Ellipse ( pDoc -> E_Ellipse [i].left, pDoc -> E_Ellipse [i].top, pDoc -> E_Ellipse [i].right, pDoc -> E_Ellipse [i].bottom ) ;
+				pDC -> SelectObject ( oldBrush ) ;
+			}
 		}
-		// 특정 색상을 가졌을 경우의 출력
+		// 특정 선 색상을 가졌을 경우의 출력
 		else {
-			CBrush brush ( pDoc -> E_Color.GetAt (i) ) ;
-			CBrush *paint = pDC -> SelectObject ( &brush ) ;
-			pDC -> Ellipse ( pDoc -> E_Ellipse [i].left, pDoc -> E_Ellipse [i].top, pDoc -> E_Ellipse [i].right, pDoc -> E_Ellipse [i].bottom ) ;
-			pDC ->SelectObject ( paint ) ;
+			// 채우기 색상을 가지지 않았을 경우의 출력
+			if ( pDoc -> E_FillColor.GetAt (i) == RGB (0,0,0) ) {
+				CPen pen;
+				pen.CreatePen( PS_SOLID, 1, pDoc ->E_Color.GetAt (i) ) ;
+				CPen* oldPen = pDC->SelectObject( &pen ) ;
+				pDC -> Ellipse ( pDoc -> E_Ellipse [i].left, pDoc -> E_Ellipse [i].top, pDoc -> E_Ellipse [i].right, pDoc -> E_Ellipse [i].bottom ) ;
+				pDC -> SelectObject ( oldPen ) ;
+			}
+			// 채우기 색상을 가졌을 경우의 출력
+			else {
+				CPen pen;
+				pen.CreatePen( PS_SOLID, 1, pDoc ->E_Color.GetAt (i) ) ;
+				CPen* oldPen = pDC->SelectObject( &pen ) ;
+				CBrush brush;
+				brush.CreateSolidBrush( pDoc -> E_FillColor.GetAt (i) ) ;
+				CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+				pDC -> Ellipse ( pDoc -> E_Ellipse [i].left, pDoc -> E_Ellipse [i].top, pDoc -> E_Ellipse [i].right, pDoc -> E_Ellipse [i].bottom ) ;
+				pDC -> SelectObject ( oldPen ) ;
+				pDC -> SelectObject ( oldBrush ) ;
+			}
 		}
 
 		// 만약 원을 그리고 있는 상태라면 테두리 직사각형을 그려줍니다.
@@ -343,6 +386,11 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 			pDoc -> R_Color.Add ( m_Color ) ;
 		else if ( m_IsColor == 'x' )
 			pDoc -> R_Color.Add ( RGB(0,0,0) ) ;
+
+		if ( m_IsFillColor == 'o' )
+			pDoc -> R_FillColor.Add ( m_FillColor ) ;
+		else if ( m_IsFillColor == 'x' )
+			pDoc -> R_FillColor.Add ( RGB(0,0,0) ) ;
 	}
 	// PolyLine을 계속해서 그리는 경우
 	else if ( P_IsContinue == 'o') {
@@ -367,16 +415,6 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 						P_CurrentPoint++ ;
 
 					P_CanMove = 'o' ;
-			}
-			// PolyLine의 범위내에서 벗어나면 그대로 끝낸다.
-			else if ( P_Insert.Poly_point.GetAt ( P_CurrentPoint ) != point ) {
-				P_CanMove = 'x' ;
-				P_IsDraw = 'x' ;
-				IsNormal = 'o' ;
-				P_Insert.Poly_point.RemoveAll () ;
-				P_IsContinue = 'x' ;
-				m_IsColor = 'x' ;
-				Invalidate () ;
 			}
 		}
 		// PolyLine의 Skeleton이 3개 이상인 경우
@@ -411,16 +449,6 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 					P_Insert.Poly_point.GetAt ( P_CurrentPoint ).y >= point.y - 8) ) {
 						P_CanMove = 'o' ;
 						P_CurrentPoint++ ;
-				}
-				// PolyLine의 범위내에서 벗어나면 그대로 끝낸다.
-				else if ( P_Insert.Poly_point.GetAt ( P_CurrentPoint ) != point ) {
-					P_CanMove = 'x' ;
-					P_IsDraw = 'x' ;
-					IsNormal = 'o' ;
-					P_Insert.Poly_point.RemoveAll () ;
-					P_IsContinue = 'x' ;
-					m_IsColor = 'x' ;
-					Invalidate () ;
 				}
 			}
 		}
@@ -459,6 +487,11 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 		// 색상을 선택하지 않고 그렸을 경우 표준 색상 기억.
 		else if ( m_IsColor == 'x' )
 			pDoc -> E_Color.Add (RGB(0,0,0)) ;
+
+		if ( m_IsFillColor == 'o' )
+			pDoc -> E_FillColor.Add ( m_FillColor ) ;
+		else if ( m_IsFillColor == 'x' )
+			pDoc -> E_FillColor.Add ( RGB(0,0,0) ) ;
 	}
 
 	CScrollView::OnLButtonDown(nFlags, point);
@@ -480,6 +513,11 @@ void CGraphicEditorView::OnMouseMove(UINT nFlags, CPoint point)
 			L_Insert.L_Color = m_Color ;
 		else
 			L_Insert.L_Color = RGB (0,0,0) ;
+
+		if ( m_IsFillColor == 'o' )
+			L_Insert.L_FillColor = m_Color ;
+		else
+			L_Insert.L_FillColor = RGB (0,0,0) ;
 
 		pDoc->L_Line.SetAt ( L_Current, L_Insert ) ;
 		Invalidate () ;
@@ -581,6 +619,7 @@ void CGraphicEditorView::OnLButtonUp(UINT nFlags, CPoint point)
 		L_CanMove = 'x' ;
 		IsNormal = 'o' ;
 		m_IsColor = 'x' ;
+		m_IsFillColor = 'x' ;
 	}
 	// 상자를 그리다 클릭을 땐 경우
 	else if ( R_IsDraw == 'o' ) {
@@ -604,6 +643,7 @@ void CGraphicEditorView::OnLButtonUp(UINT nFlags, CPoint point)
 		R_CanMove = 'x' ;
 		IsNormal = 'o' ;
 		m_IsColor = 'x' ;
+		m_IsFillColor = 'x' ;
 	}
 	// PolyLine을 그리다 클릭을 땐 경우
 	else if ( P_IsDraw == 'o' ) {
@@ -616,6 +656,7 @@ void CGraphicEditorView::OnLButtonUp(UINT nFlags, CPoint point)
 			P_IsDraw = 'x' ;
 			IsNormal = 'o' ;
 			m_IsColor = 'x' ;
+			m_IsFillColor = 'x' ;
 		}
 		// 같은 좌표에 클릭, 땐 경우가 아니라면 그리기 모드
 		else {
@@ -665,6 +706,7 @@ void CGraphicEditorView::OnLButtonUp(UINT nFlags, CPoint point)
 		E_CanMove = 'x' ;
 		IsNormal = 'o' ;
 		m_IsColor = 'x' ;
+		m_IsFillColor = 'x' ;
 	}
 
 	CScrollView::OnLButtonUp(nFlags, point);
@@ -840,5 +882,41 @@ void CGraphicEditorView::OnChangecolor()
 	{
 		m_Color = dlgColor.GetColor();
 		m_IsColor = 'o' ;
+	}
+}
+
+
+void CGraphicEditorView::OnLButtonDblClk(UINT nFlags, CPoint point)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+
+	// 더블 클릭할 경우 PolyLine을 끝낸다.
+	if ( P_IsDraw == 'o' ) {
+		P_CanMove = 'x' ;
+		P_IsDraw = 'x' ;
+		IsNormal = 'o' ;
+		P_Insert.Poly_point.RemoveAll () ;
+		P_ChangeSkeleton = 0 ;
+		P_IsContinue = 'x' ;
+		m_IsColor = 'x' ;
+		m_IsFillColor = 'x' ;
+		P_DrawContinue = 'x' ;
+		P_IsStart = 'x' ;
+		P_IsMove = 'x' ;
+
+		Invalidate () ;
+	}
+
+	CScrollView::OnLButtonDblClk(nFlags, point);
+}
+
+void CGraphicEditorView::OnChangefillcolor()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	CColorDialog dlgColor(0, CC_FULLOPEN, NULL);
+	if( dlgColor.DoModal() == IDOK )
+	{
+		m_FillColor = dlgColor.GetColor();
+		m_IsFillColor = 'o' ;
 	}
 }
