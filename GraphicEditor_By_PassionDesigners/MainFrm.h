@@ -34,8 +34,9 @@ public:
 #endif
 
 protected:  // 컨트롤 모음이 포함된 멤버입니다.
-	CToolBar          m_wndToolBar ;
-	CToolBar		  m_DrawBar ;
+	CToolBar          m_wndToolBar ;		// 기본 툴바
+	CToolBar		  m_DrawBar ;			// 그리기 모드 툴바
+	CToolBar		  m_ChangeStatusBar ;	// 도형의 상태를 조정하는 툴바
 	CStatusBar        m_wndStatusBar;
 
 // 생성된 메시지 맵 함수

@@ -23,6 +23,8 @@ public:
 	CGraphicEditorDoc* GetDocument() const;
 	CRect ChangeRect ;
 	char IsNormal ;
+	COLORREF m_Color ;
+	char m_IsColor ;
 
 	// 선 그리기에 필요한 변수들
 	CLine L_Insert ;
@@ -92,6 +94,7 @@ public:
 	afx_msg void OnDrawpoly();
 	afx_msg void OnDrawellipse();
 	afx_msg void OnSelectobject();
+	afx_msg void OnChangecolor();
 };
 
 #ifndef _DEBUG  // GraphicEditorView.cpp의 디버그 버전

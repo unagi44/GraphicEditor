@@ -48,6 +48,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (CMDIFrameWnd::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
+	// 기본 툴바 생성
 	if (!m_wndToolBar.CreateEx(this, TBSTYLE_FLAT, WS_CHILD | WS_VISIBLE | CBRS_TOP | CBRS_GRIPPER | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC) ||
 		!m_wndToolBar.LoadToolBar(IDR_MAINFRAME))
 	{
@@ -55,6 +56,15 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;      // 만들지 못했습니다.
 	}
 	
+	// 도형 상태 조정 툴바 생성
+	if (!m_ChangeStatusBar.CreateEx(this, TBSTYLE_FLAT, WS_CHILD | WS_VISIBLE | CBRS_LEFT | CBRS_GRIPPER | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC) ||
+		!m_ChangeStatusBar.LoadToolBar(IDR_ChangeStatusBar))
+	{
+		TRACE0("도구 모음을 만들지 못했습니다.\n");
+		return -1;      // 만들지 못했습니다.
+	} 
+	
+	// 그리기 모드 툴바 생성
 	if (!m_DrawBar.CreateEx(this, TBSTYLE_FLAT, WS_CHILD | WS_VISIBLE | CBRS_LEFT | CBRS_GRIPPER | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC) ||
 		!m_DrawBar.LoadToolBar(IDR_DrawToolBar))
 	{

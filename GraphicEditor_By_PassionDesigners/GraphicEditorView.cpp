@@ -40,6 +40,7 @@ BEGIN_MESSAGE_MAP(CGraphicEditorView, CScrollView)
 	ON_COMMAND(ID_DrawPoly, &CGraphicEditorView::OnDrawpoly)
 	ON_COMMAND(ID_DrawEllipse, &CGraphicEditorView::OnDrawellipse)
 	ON_COMMAND(ID_SelectObject, &CGraphicEditorView::OnSelectobject)
+	ON_COMMAND(ID_ChangeColor, &CGraphicEditorView::OnChangecolor)
 END_MESSAGE_MAP()
 
 // CGraphicEditorView 생성/소멸
@@ -49,6 +50,7 @@ CGraphicEditorView::CGraphicEditorView()
 	// TODO: 여기에 생성 코드를 추가합니다.
 
 	IsNormal = 'o' ;
+	m_IsColor = 'x' ;
 
 	// 선 그리기에 필요한 변수들 초기화
 	L_IsDraw = 'x' ;
@@ -96,13 +98,24 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 	
 	// 그린 선을 모두 화면에 띄웁니다.
 	for ( int i = 0 ; i < pDoc -> L_Line.GetCount () ; i++ ) {
-		CPen pen ( PS_SOLID, 1, RGB (0, 0, 0) );
-		CPen *Draw_Pen = pDC -> SelectObject(&pen);
-		L_Insert.Start = pDoc -> L_Line.GetAt (i).Start ;
-		L_Insert.Last = pDoc -> L_Line.GetAt (i).Last ;
-		pDC -> MoveTo ( L_Insert.Start ) ;	// 선의 시작위치
-		pDC -> LineTo ( L_Insert.Last ) ;	// 선의 종착점
-		pDC->SelectObject(Draw_Pen);
+		if ( pDoc -> L_Line.GetAt (i).L_Color == RGB (0,0,0) ) {
+			CPen pen ( PS_SOLID, 1, RGB (255, 0, 0) ) ;
+			CPen *Draw_Pen = pDC -> SelectObject(&pen);
+			L_Insert.Start = pDoc -> L_Line.GetAt (i).Start ;
+			L_Insert.Last = pDoc -> L_Line.GetAt (i).Last ;
+			pDC -> MoveTo ( L_Insert.Start ) ;	// 선의 시작위치
+			pDC -> LineTo ( L_Insert.Last ) ;	// 선의 종착점
+			pDC->SelectObject(Draw_Pen);
+		}
+		else {
+			CPen pen ( PS_SOLID, 1, pDoc -> L_Line.GetAt (i).L_Color ) ;
+			CPen *Draw_Pen = pDC -> SelectObject(&pen);
+			L_Insert.Start = pDoc -> L_Line.GetAt (i).Start ;
+			L_Insert.Last = pDoc -> L_Line.GetAt (i).Last ;
+			pDC -> MoveTo ( L_Insert.Start ) ;	// 선의 시작위치
+			pDC -> LineTo ( L_Insert.Last ) ;	// 선의 종착점
+			pDC->SelectObject(Draw_Pen);
+		}
 	}
 
 	// 그린 상자를 모두 화면에 띄웁니다.
@@ -304,6 +317,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 				IsNormal = 'o' ;
 				P_Insert.Poly_point.RemoveAll () ;
 				P_IsContinue = 'x' ;
+				m_IsColor = 'x' ;
 				Invalidate () ;
 			}
 		}
@@ -347,6 +361,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 					IsNormal = 'o' ;
 					P_Insert.Poly_point.RemoveAll () ;
 					P_IsContinue = 'x' ;
+					m_IsColor = 'x' ;
 					Invalidate () ;
 				}
 			}
@@ -389,6 +404,11 @@ void CGraphicEditorView::OnMouseMove(UINT nFlags, CPoint point)
 	// 선 그리기 선택후 드래그 하는 경우
 	if ( L_CanMove == 'o' ) {
 		L_Insert.Last = point ;
+		if ( m_IsColor == 'o' )
+			L_Insert.L_Color = m_Color ;
+		else
+			L_Insert.L_Color = RGB (0,0,0) ;
+
 		pDoc->L_Line.SetAt ( L_Current, L_Insert ) ;
 		Invalidate () ;
 	}
@@ -478,11 +498,17 @@ void CGraphicEditorView::OnLButtonUp(UINT nFlags, CPoint point)
 	// 선을 그리다 클릭을 땐 경우
 	if ( L_IsDraw == 'o' ) {
 		L_Insert.Last = point ;
+		if ( m_IsColor == 'o' )
+			L_Insert.L_Color = m_Color ;
+		else
+			L_Insert.L_Color = RGB (0,0,0) ;
+
 		pDoc->L_Line.SetAt ( L_Current, L_Insert ) ;
 		Invalidate (false) ;
 		L_IsDraw = 'x' ;
 		L_CanMove = 'x' ;
 		IsNormal = 'o' ;
+		m_IsColor = 'x' ;
 	}
 	// 상자를 그리다 클릭을 땐 경우
 	else if ( R_IsDraw == 'o' ) {
@@ -505,6 +531,7 @@ void CGraphicEditorView::OnLButtonUp(UINT nFlags, CPoint point)
 		R_IsDraw = 'x' ;
 		R_CanMove = 'x' ;
 		IsNormal = 'o' ;
+		m_IsColor = 'x' ;
 	}
 	// PolyLine을 그리다 클릭을 땐 경우
 	else if ( P_IsDraw == 'o' ) {
@@ -516,6 +543,7 @@ void CGraphicEditorView::OnLButtonUp(UINT nFlags, CPoint point)
 			P_IsContinue = 'x' ;
 			P_IsDraw = 'x' ;
 			IsNormal = 'o' ;
+			m_IsColor = 'x' ;
 		}
 		// 같은 좌표에 클릭, 땐 경우가 아니라면 그리기 모드
 		else {
@@ -564,6 +592,7 @@ void CGraphicEditorView::OnLButtonUp(UINT nFlags, CPoint point)
 		E_IsDraw = 'x' ;
 		E_CanMove = 'x' ;
 		IsNormal = 'o' ;
+		m_IsColor = 'x' ;
 	}
 
 	CScrollView::OnLButtonUp(nFlags, point);
@@ -729,4 +758,15 @@ void CGraphicEditorView::OnSelectobject()
 	//IsNormal = 'x' ;
 
 	Invalidate (false) ;
+}
+
+void CGraphicEditorView::OnChangecolor()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	CColorDialog dlgColor(0, CC_FULLOPEN, NULL);
+	if( dlgColor.DoModal() == IDOK )
+	{
+		m_Color = dlgColor.GetColor();
+		m_IsColor = 'o' ;
+	}
 }

@@ -71,6 +71,7 @@ void CGraphicEditorDoc::Serialize(CArchive& ar)
 		ar << CPolyCount ;
 		for ( int i = 0 ; i < P_Poly.GetCount () ; i++ ) {
 			P_Poly.GetAt (i).Poly_point.Serialize (ar) ;
+			ar << P_Poly.GetAt (i).P_Color ;
 		}
 
 		E_Ellipse.Serialize (ar) ;	// 원 그리기 배열 저장
@@ -86,6 +87,7 @@ void CGraphicEditorDoc::Serialize(CArchive& ar)
 		P_Poly.SetSize ( CPolyCount ) ;
 		for ( int i = 0 ; i < CPolyCount ; i++ ) {
 			P_Poly.GetAt (i).Poly_point.Serialize (ar) ;
+			ar >> P_Poly.GetAt (i).P_Color ;
 		}
 
 		E_Ellipse.Serialize (ar) ;	// 원 그리기 배열 저장
