@@ -38,6 +38,8 @@ BEGIN_MESSAGE_MAP(CGraphicEditorView, CScrollView)
 	ON_WM_SETCURSOR()
 	ON_COMMAND(ID_DrawRec, &CGraphicEditorView::OnDrawrec)
 	ON_COMMAND(ID_DrawPoly, &CGraphicEditorView::OnDrawpoly)
+	ON_COMMAND(ID_DrawEllipse, &CGraphicEditorView::OnDrawellipse)
+	ON_COMMAND(ID_SelectObject, &CGraphicEditorView::OnSelectobject)
 END_MESSAGE_MAP()
 
 // CGraphicEditorView 생성/소멸
@@ -65,6 +67,10 @@ CGraphicEditorView::CGraphicEditorView()
 	P_IsStart = 'x' ;
 	P_IsMove = 'x' ;
 	P_ChangeSkeleton = 0 ;
+
+	// 원 그리기에 필요한 변수들 초기화
+	E_IsDraw = 'x' ;
+	E_CanMove = 'x' ;
 }
 
 CGraphicEditorView::~CGraphicEditorView()
@@ -87,7 +93,7 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 	ASSERT_VALID(pDoc);
 	if (!pDoc)
 		return;
-
+	
 	// 그린 선을 모두 화면에 띄웁니다.
 	for ( int i = 0 ; i < pDoc -> L_Line.GetCount () ; i++ ) {
 		CPen pen ( PS_SOLID, 1, RGB (0, 0, 0) );
@@ -133,6 +139,55 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 
 				pDC -> Rectangle ( ChangeRect ) ;
 			}
+		}
+	}
+
+	// 그린 원을 모두 화면에 띄웁니다.
+	for ( int i = 0 ; i < pDoc -> E_Ellipse.GetCount () ; i++ ) {
+		pDC -> SelectStockObject ( NULL_BRUSH ) ;
+		pDC -> Ellipse ( pDoc -> E_Ellipse [i].left, pDoc -> E_Ellipse [i].top, pDoc -> E_Ellipse [i].right, pDoc -> E_Ellipse [i].bottom ) ;
+
+		// 만약 원을 그리고 있는 상태라면 테두리 직사각형을 그려줍니다.
+		if ( pDoc -> E_Ellipse.GetCount () - 1 == i && E_CanMove == 'o' ) {
+			CPen pen ( PS_DOT, 1.8, RGB (100, 100, 255) );
+			CPen *Draw_Pen = pDC -> SelectObject(&pen);
+			P_PointStart.x = pDoc -> E_Ellipse.GetAt (i).left  ;
+			P_PointStart.y = pDoc -> E_Ellipse.GetAt (i).top  ;
+			P_PointLast.x = pDoc -> E_Ellipse.GetAt (i).right ;
+			P_PointLast.y = pDoc -> E_Ellipse.GetAt (i).top ;
+			pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+			pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+			pDC->SelectObject(Draw_Pen);
+
+			CPen pen2 ( PS_DOT, 1.8, RGB (100, 100, 255) );
+			CPen *Draw_Pen2 = pDC -> SelectObject(&pen);
+			P_PointStart.x = pDoc -> E_Ellipse.GetAt (i).left  ;
+			P_PointStart.y = pDoc -> E_Ellipse.GetAt (i).top  ;
+			P_PointLast.x = pDoc -> E_Ellipse.GetAt (i).left ;
+			P_PointLast.y = pDoc -> E_Ellipse.GetAt (i).bottom ;
+			pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+			pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+			pDC->SelectObject(Draw_Pen2);
+
+			CPen pen3 ( PS_DOT, 1.8, RGB (100, 100, 255) );
+			CPen *Draw_Pen3 = pDC -> SelectObject(&pen);
+			P_PointStart.x = pDoc -> E_Ellipse.GetAt (i).left  ;
+			P_PointStart.y = pDoc -> E_Ellipse.GetAt (i).bottom  ;
+			P_PointLast.x = pDoc -> E_Ellipse.GetAt (i).right ;
+			P_PointLast.y = pDoc -> E_Ellipse.GetAt (i).bottom ;
+			pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+			pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+			pDC->SelectObject(Draw_Pen3);
+
+			CPen pen4 ( PS_DOT, 1.8, RGB (100, 100, 255) );
+			CPen *Draw_Pen4 = pDC -> SelectObject(&pen);
+			P_PointStart.x = pDoc -> E_Ellipse.GetAt (i).right  ;
+			P_PointStart.y = pDoc -> E_Ellipse.GetAt (i).top  ;
+			P_PointLast.x = pDoc -> E_Ellipse.GetAt (i).right ;
+			P_PointLast.y = pDoc -> E_Ellipse.GetAt (i).bottom ;
+			pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+			pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+			pDC->SelectObject(Draw_Pen4);
 		}
 	}
 
@@ -200,12 +255,14 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 	if (!pDoc)
 		return;
 
+	// 선을 그리는 경우
 	if ( L_IsDraw == 'o' ) {
 		L_Insert.Start = L_Insert.Last = point ;
 		pDoc->L_Line.Add ( L_Insert ) ;
 		L_Current = pDoc -> L_Line.GetCount () - 1 ;
 		L_CanMove = 'o' ;
 	}
+	// 상자를 그리는 경우
 	else if ( R_IsDraw == 'o' ) {
 		R_Rect.left = point.x ;
 		R_Rect.right = point.x ;
@@ -295,7 +352,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 			}
 		}
 	}
-	
+	// PolyLine 그리기 시, 맨 처음 Skeleton을 클릭하여 만들 경우입니다.
 	else if ( P_IsDraw == 'o' && P_IsContinue == 'x' ) {
 		P_Insert.Poly_point.Add ( point ) ;
 		P_Current = pDoc -> P_Poly.GetCount () ;
@@ -304,6 +361,17 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 		P_CurrentPoint = P_Insert.Poly_point.GetCount () ;
 		P_CanMove = 'o' ;
 		P_IsContinue = 'o' ;
+	}
+	// 원을 그리는 경우
+	else if ( E_IsDraw == 'o' ) {
+		E_Insert.left = point.x ;
+		E_Insert.right = point.x ;
+		E_Insert.top = point.y ;
+		E_Insert.bottom = point.y ;
+
+		pDoc -> E_Ellipse.Add ( R_Rect ) ;
+		R_Current = pDoc -> E_Ellipse.GetCount () - 1 ;
+		E_CanMove = 'o' ;
 	}
 
 	CScrollView::OnLButtonDown(nFlags, point);
@@ -318,11 +386,13 @@ void CGraphicEditorView::OnMouseMove(UINT nFlags, CPoint point)
 	if (!pDoc)
 		return;
 
+	// 선 그리기 선택후 드래그 하는 경우
 	if ( L_CanMove == 'o' ) {
 		L_Insert.Last = point ;
 		pDoc->L_Line.SetAt ( L_Current, L_Insert ) ;
 		Invalidate () ;
 	}
+	// 상자 그리기 선택후 드래그 하는 경우
 	else if ( R_CanMove == 'o' ) {
 		R_Rect.right = point.x ;
 		R_Rect.bottom = point.y ;
@@ -341,7 +411,10 @@ void CGraphicEditorView::OnMouseMove(UINT nFlags, CPoint point)
 		pDoc->R_Rec.SetAt ( R_Current, R_Rect ) ;
 		Invalidate () ;
 	}
+	// PolyLine 그리기 선택후 드래그 하는 경우
 	else if ( P_CanMove == 'o' ) {
+
+		// 마지막 Skeleton을 클릭하여 변형 하는 경우
 		if ( P_IsStart == 'x' && P_ChangeSkeleton == 0 ) {
 			if ( P_Insert.Poly_point.GetSize () == P_CurrentPoint )
 				P_Insert.Poly_point.SetSize ( P_CurrentPoint + 1 ) ;
@@ -352,18 +425,41 @@ void CGraphicEditorView::OnMouseMove(UINT nFlags, CPoint point)
 			Invalidate () ;
 			P_IsMove = 'o' ;
 		}
+
+		// 첫 번째, 마지막 Skeleton을 제외한 부분을 변형 하는 경우
 		else if ( P_ChangeSkeleton > 0 ) {
 			P_Insert.Poly_point.SetAt ( P_ChangeSkeleton, point ) ;
 			pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.SetAt ( P_ChangeSkeleton, point ) ;
 			Invalidate () ;
 			P_IsMove = 'o' ;
 		}
+
+		// 첫 번째 Skeleton을 변형 하는 경우
 		else if ( P_IsStart == 'o' ) {
 			P_Insert.Poly_point.SetAt ( 0, point ) ;
 			pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.SetAt ( 0, point ) ;
 			Invalidate () ;
 			P_IsMove = 'o' ;
 		}
+	}
+	// 원 그리기 선택후 드래그 하는 경우
+	else if ( E_CanMove == 'o' ) {
+		E_Insert.right = point.x ;
+		E_Insert.bottom = point.y ;
+
+		if ( E_Insert.left > E_Insert.right ) {
+			int temp = E_Insert.right ;
+			E_Insert.right = E_Insert.left ;
+			E_Insert.left = temp ;
+		}
+		if ( E_Insert.top > E_Insert.bottom ) {
+			int temp = E_Insert.bottom ;
+			E_Insert.bottom = E_Insert.top ;
+			E_Insert.top = temp ;
+		}
+
+		pDoc->E_Ellipse.SetAt ( R_Current, E_Insert ) ;
+		Invalidate () ;
 	}
 	
 	CScrollView::OnMouseMove(nFlags, point);
@@ -412,7 +508,7 @@ void CGraphicEditorView::OnLButtonUp(UINT nFlags, CPoint point)
 	}
 	// PolyLine을 그리다 클릭을 땐 경우
 	else if ( P_IsDraw == 'o' ) {
-		// 만약 같은 좌표에 클릭, 땠은 경우 그리기 취소
+		// 만약 같은 좌표에 클릭, 땠을 경우 그리기 취소
 		if ( P_IsMove == 'x' ) {
 			P_CanMove = 'x' ; P_IsStart = 'x' ;
 			P_Insert.Poly_point.RemoveAll () ;
@@ -447,6 +543,28 @@ void CGraphicEditorView::OnLButtonUp(UINT nFlags, CPoint point)
 			P_IsMove = 'x' ;
 		}
 	}
+	// 원을 그리다 클릭을 땐 경우
+	else if ( E_IsDraw == 'o' ) {
+		E_Insert.right = point.x ;
+		E_Insert.bottom = point.y ;
+
+		if ( E_Insert.left > E_Insert.right ) {
+			int temp = E_Insert.right ;
+			E_Insert.right = E_Insert.left ;
+			E_Insert.left = temp ;
+		}
+		if ( E_Insert.top > E_Insert.bottom ) {
+			int temp = E_Insert.bottom ;
+			E_Insert.bottom = E_Insert.top ;
+			E_Insert.top = temp ;
+		}
+
+		pDoc->E_Ellipse.SetAt ( R_Current, E_Insert ) ;
+		Invalidate () ;
+		E_IsDraw = 'x' ;
+		E_CanMove = 'x' ;
+		IsNormal = 'o' ;
+	}
 
 	CScrollView::OnLButtonUp(nFlags, point);
 }
@@ -456,6 +574,8 @@ void CGraphicEditorView::OnDrawline()
 {
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 
+	R_IsDraw = 'x' ;
+	E_IsDraw = 'x' ;
 	P_Insert.Poly_point.RemoveAll () ;
 	P_CanMove = 'x' ;
 	P_IsContinue = 'x' ;
@@ -476,12 +596,68 @@ BOOL CGraphicEditorView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 		::GetCursorPos ( &point ) ;	// 스크린 좌표
 		ScreenToClient ( &point ) ;	// 클라이언트 좌표로 변환
 
-		
 		// 평상시엔 기본 커서로 변환 합니다.
 		if ( IsNormal == 'o' )
 			::SetCursor(AfxGetApp()->LoadStandardCursor (IDC_ARROW)) ;
+		// PolyLine을 계속해서 그리는 경우
+		else if ( P_IsContinue == 'o' && P_CanMove == 'x' ) {
+			// PolyLine의 Skeleton이 2개일 경우
+			if ( P_CurrentPoint == 1 ) {
+				// 원점과 마지막점에서 변경하려는 경우에 변형 커서로 변경 한다.
+				if ( ( (P_Insert.Poly_point.GetAt ( P_CurrentPoint ).x <= point.x + 5 &&
+						P_Insert.Poly_point.GetAt ( P_CurrentPoint ).x >= point.x - 5 &&
+						P_Insert.Poly_point.GetAt ( P_CurrentPoint ).y <= point.y + 5 &&
+						P_Insert.Poly_point.GetAt ( P_CurrentPoint ).y >= point.y - 5) ||
+						(P_Insert.Poly_point.GetAt ( 0 ).x <= point.x + 5 &&
+						P_Insert.Poly_point.GetAt ( 0 ).x >= point.x - 5 &&
+						P_Insert.Poly_point.GetAt ( 0 ).y <= point.y + 5 &&
+						P_Insert.Poly_point.GetAt ( 0 ).y >= point.y - 5) ) ) {
+					::SetCursor(AfxGetApp()->LoadStandardCursor (IDC_SIZEALL)) ;
+				}
+				// 아닌 경우엔 십자가 커서로 변경
+				else {
+					::SetCursor(AfxGetApp()->LoadStandardCursor (IDC_CROSS)) ;
+				}
+			}
+			// PolyLine의 Skeleton이 3개 이상인 경우
+			else {
+				// 원점, 마지막 Skeleton을 제외한 모든 Skeleton을 검사하여
+				// 커서의 좌표가 해당 Skeleton 중에 있는지 확인한다.
+				char P_Flag = 'x' ;
+				for ( int i = 1 ; i <= P_CurrentPoint - 1 ; i++ ) {
+					if ( P_Insert.Poly_point.GetAt (i).x <= point.x + 5 &&
+						P_Insert.Poly_point.GetAt (i).x >= point.x - 5 &&
+						P_Insert.Poly_point.GetAt (i).y <= point.y + 5 &&
+						P_Insert.Poly_point.GetAt (i).y >= point.y - 5 ) {
+							::SetCursor(AfxGetApp()->LoadStandardCursor (IDC_SIZEALL)) ;
+							P_Flag = 'o' ;
+					}
+				}
+
+				if ( P_Flag == 'x' ) {
+					// 원점 Skeleton을 찾으면 커서를 4방향 커서로 변경한다.
+					if ( (P_Insert.Poly_point.GetAt ( 0 ).x <= point.x + 5 &&
+						P_Insert.Poly_point.GetAt ( 0 ).x >= point.x - 5 &&
+						P_Insert.Poly_point.GetAt ( 0 ).y <= point.y + 5 &&
+						P_Insert.Poly_point.GetAt ( 0 ).y >= point.y - 5) ) {
+							::SetCursor(AfxGetApp()->LoadStandardCursor (IDC_SIZEALL)) ;
+					}
+					// 마지막 Skeleton을 찾으면 커서를 4방향 커서로 변경한다.
+					else if ( (P_Insert.Poly_point.GetAt ( P_CurrentPoint ).x <= point.x + 5 &&
+						P_Insert.Poly_point.GetAt ( P_CurrentPoint ).x >= point.x - 5 &&
+						P_Insert.Poly_point.GetAt ( P_CurrentPoint ).y <= point.y + 5 &&
+						P_Insert.Poly_point.GetAt ( P_CurrentPoint ).y >= point.y - 5) ) {
+							::SetCursor(AfxGetApp()->LoadStandardCursor (IDC_SIZEALL)) ;
+					}
+					// Skeleton 주변에 없다면 십자가형 커서로 변환한다.
+					else {
+						::SetCursor(AfxGetApp()->LoadStandardCursor (IDC_CROSS)) ;
+					}
+				}
+			}
+		}
 		// 그리기 모드에선 커서가 십자형으로 변합니다.
-		else {
+		else if ( IsNormal == 'x' ) {
 			::SetCursor(AfxGetApp()->LoadStandardCursor (IDC_CROSS)) ;
 		}
 		return TRUE ;
@@ -495,6 +671,8 @@ void CGraphicEditorView::OnDrawrec()
 {
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 
+	L_IsDraw = 'x' ;
+	E_IsDraw = 'x' ;
 	P_Insert.Poly_point.RemoveAll () ;
 	P_CanMove = 'x' ;
 	P_IsContinue = 'x' ;
@@ -510,6 +688,9 @@ void CGraphicEditorView::OnDrawpoly()
 {
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 
+	L_IsDraw = 'x' ;
+	R_IsDraw = 'x' ;
+	E_IsDraw = 'x' ;
 	P_Insert.Poly_point.RemoveAll () ;
 	P_CanMove = 'x' ;
 	P_IsContinue = 'x' ;
@@ -518,4 +699,34 @@ void CGraphicEditorView::OnDrawpoly()
 
 	P_IsDraw = 'o' ;
 	IsNormal = 'x' ;
+}
+
+// 원 그리기 툴바를 선택한 경우 불리어 집니다.
+void CGraphicEditorView::OnDrawellipse()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	
+	L_IsDraw = 'x' ;
+	R_IsDraw = 'x' ;
+	P_Insert.Poly_point.RemoveAll () ;
+	P_CanMove = 'x' ;
+	P_IsContinue = 'x' ;
+	P_IsDraw = 'x' ;
+	E_IsDraw = 'o' ;
+	IsNormal = 'x' ;
+
+	Invalidate (false) ;
+}
+
+void CGraphicEditorView::OnSelectobject()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	
+	P_Insert.Poly_point.RemoveAll () ;
+	P_CanMove = 'x' ;
+	P_IsContinue = 'x' ;
+	P_IsDraw = 'x' ;
+	//IsNormal = 'x' ;
+
+	Invalidate (false) ;
 }

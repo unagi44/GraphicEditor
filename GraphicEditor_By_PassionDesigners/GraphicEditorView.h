@@ -50,6 +50,12 @@ public:
 	char P_IsStart ;
 	char P_IsMove ;
 
+	// 원 그리기에 필요한 변수들
+	CRect E_Insert ;
+	int E_Current ;
+	char E_IsDraw ;
+	char E_CanMove ;
+
 // 작업입니다.
 public:
 
@@ -84,6 +90,8 @@ public:
 	afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);
 	afx_msg void OnDrawrec();
 	afx_msg void OnDrawpoly();
+	afx_msg void OnDrawellipse();
+	afx_msg void OnSelectobject();
 };
 
 #ifndef _DEBUG  // GraphicEditorView.cpp의 디버그 버전

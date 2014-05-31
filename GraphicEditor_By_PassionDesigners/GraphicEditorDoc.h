@@ -22,6 +22,8 @@ public:
 	CArray < CLine, CLine& > L_Line ;	// 선 그리기 배열
 	CArray < CRect, CRect& > R_Rec ;	// 상자 그리기 배열
 	CArray < CPolyLine, CPolyLine& > P_Poly ;	// PolyLine 그리기 배열
+	int CPolyCount ;
+	CArray < CRect, CRect& > E_Ellipse ;		// 원 그리기 배열
 // 작업입니다.
 public:
 // 재정의입니다.

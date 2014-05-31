@@ -63,10 +63,32 @@ void CGraphicEditorDoc::Serialize(CArchive& ar)
 	if (ar.IsStoring())
 	{
 		// TODO: 여기에 저장 코드를 추가합니다.
+		L_Line.Serialize (ar) ;	// 선 그리기 배열 저장
+		R_Rec.Serialize (ar) ;	// 상자 그리기 배열 저장
+		
+		// PolyLine 그리기 배열 저장
+		CPolyCount = P_Poly.GetCount () ;
+		ar << CPolyCount ;
+		for ( int i = 0 ; i < P_Poly.GetCount () ; i++ ) {
+			P_Poly.GetAt (i).Poly_point.Serialize (ar) ;
+		}
+
+		E_Ellipse.Serialize (ar) ;	// 원 그리기 배열 저장
 	}
 	else
 	{
 		// TODO: 여기에 로딩 코드를 추가합니다.
+		L_Line.Serialize (ar) ;	// 선 그리기 배열 불러오기
+		R_Rec.Serialize (ar) ;	// 상자 그리기 배열 불러오기
+
+		// PolyLine  그리기 배열 불러오기
+		ar >> CPolyCount ;
+		P_Poly.SetSize ( CPolyCount ) ;
+		for ( int i = 0 ; i < CPolyCount ; i++ ) {
+			P_Poly.GetAt (i).Poly_point.Serialize (ar) ;
+		}
+
+		E_Ellipse.Serialize (ar) ;	// 원 그리기 배열 저장
 	}
 }
 
