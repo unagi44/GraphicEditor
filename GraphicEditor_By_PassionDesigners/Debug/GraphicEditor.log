@@ -1,23 +1,10 @@
-﻿빌드 시작: 2014-06-01 오전 9:29:30
+﻿빌드 시작: 2014-06-01 오전 10:08:23
      1>2 노드의 "C:\Users\박현태\Desktop\GraphicEditor\GraphicEditor_By_PassionDesigners\GraphicEditor.vcxproj" 프로젝트(build 대상)입니다.
      1>InitializeBuildStatus:
-         "AlwaysCreate"이(가) 지정되었기 때문에 "Debug\GraphicEditor.unsuccessfulbuild"을(를) 만들고 있습니다.
+         "Debug\GraphicEditor.unsuccessfulbuild"에 연결(touching)하고 있습니다.
        ClCompile:
-         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _WINDOWS /D _DEBUG /D _UNICODE /D UNICODE /D _AFXDLL /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yc"StdAfx.h" /Fp"Debug\GraphicEditor.pch" /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt stdafx.cpp
-         stdafx.cpp
-         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _WINDOWS /D _DEBUG /D _UNICODE /D UNICODE /D _AFXDLL /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yu"StdAfx.h" /Fp"Debug\GraphicEditor.pch" /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt ChildFrm.cpp CLine.cpp CPolyLine.cpp GraphicEditor.cpp GraphicEditorDoc.cpp GraphicEditorView.cpp MainFrm.cpp
-         MainFrm.cpp
-         GraphicEditorView.cpp
-     1>c:\users\박현태\desktop\graphiceditor\graphiceditor_by_passiondesigners\graphiceditorview.cpp(261): warning C4244: '인수' : 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-     1>c:\users\박현태\desktop\graphiceditor\graphiceditor_by_passiondesigners\graphiceditorview.cpp(271): warning C4244: '인수' : 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-     1>c:\users\박현태\desktop\graphiceditor\graphiceditor_by_passiondesigners\graphiceditorview.cpp(281): warning C4244: '인수' : 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-     1>c:\users\박현태\desktop\graphiceditor\graphiceditor_by_passiondesigners\graphiceditorview.cpp(291): warning C4244: '인수' : 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-         GraphicEditorDoc.cpp
-         GraphicEditor.cpp
-         CPolyLine.cpp
-         CLine.cpp
-         ChildFrm.cpp
-         코드를 생성하고 있습니다...
+         모든 출력이 최신 상태입니다.
+         모든 출력이 최신 상태입니다.
        ResourceCompile:
          C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\rc.exe /D _DEBUG /D _UNICODE /D UNICODE /D _AFXDLL /l"0x0412" /IDebug\ /nologo /fo"Debug\GraphicEditor.res" GraphicEditor.rc 
          
@@ -27,4 +14,4 @@
 
 빌드하지 못했습니다.
 
-경과 시간: 00:00:08.92
+경과 시간: 00:00:00.48
