@@ -128,7 +128,7 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 	for ( int i = 0 ; i < pDoc -> L_Line.GetCount () ; i++ ) {
 		// 색상을 가지지 않을 경우의 출력
 		if ( pDoc -> L_Line.GetAt (i).L_Color == RGB (0,0,0) ) {
-			CPen pen ( PS_SOLID, 1, RGB (0, 0, 0) ) ;
+			CPen pen ( PS_SOLID, pDoc -> L_Line.GetAt (i).Thickness, RGB (0, 0, 0) ) ;
 			CPen *Draw_Pen = pDC -> SelectObject(&pen);
 			L_Insert.Start = pDoc -> L_Line.GetAt (i).Start ;
 			L_Insert.Last = pDoc -> L_Line.GetAt (i).Last ;
@@ -138,7 +138,7 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 		}
 		// 특정 색상을 가졌을 경우의 출력
 		else {
-			CPen pen ( PS_SOLID, 1, pDoc -> L_Line.GetAt (i).L_Color ) ;
+			CPen pen ( PS_SOLID, pDoc -> L_Line.GetAt (i).Thickness, pDoc -> L_Line.GetAt (i).L_Color ) ;
 			CPen *Draw_Pen = pDC -> SelectObject(&pen);
 			L_Insert.Start = pDoc -> L_Line.GetAt (i).Start ;
 			L_Insert.Last = pDoc -> L_Line.GetAt (i).Last ;
@@ -208,7 +208,7 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 
 			// PolyLine이 색상을 가지지 않을 경우의 출력
 			if ( pDoc -> P_Poly.GetAt (i).P_Color == RGB (0,0,0) ) {
-				CPen pen ( PS_SOLID, 1, RGB (0, 0, 0) );
+				CPen pen ( PS_SOLID, pDoc -> P_Poly.GetAt (i).thickness, RGB (0, 0, 0) );
 				CPen *Draw_Pen = pDC -> SelectObject(&pen);
 				P_PointStart = pDoc -> P_Poly.GetAt (i).Poly_point.GetAt (j) ;
 				P_PointLast = pDoc -> P_Poly.GetAt (i).Poly_point.GetAt (j+1) ;
@@ -218,7 +218,7 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 			}
 			// PolyLine이 지정된 색상을 가졌을 경우의 출력
 			else {
-				CPen pen ( PS_SOLID, 1, pDoc -> P_Poly.GetAt (i).P_Color ) ;
+				CPen pen ( PS_SOLID, pDoc -> P_Poly.GetAt (i).thickness, pDoc -> P_Poly.GetAt (i).P_Color ) ;
 				CPen *Draw_Pen = pDC -> SelectObject(&pen) ;
 				P_PointStart = pDoc -> P_Poly.GetAt (i).Poly_point.GetAt (j) ;
 				P_PointLast = pDoc -> P_Poly.GetAt (i).Poly_point.GetAt (j+1) ;
@@ -872,6 +872,11 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 		// 색상을 선택하지 않고 그렸을 경우 표준 색상 기억.
 		else if ( m_IsColor == 'x' )
 			pDoc -> P_Poly.GetAt ( P_Current ).P_Color = RGB (0,0,0) ;
+
+		if ( m_IsThickness == 'o' )
+			pDoc -> P_Poly.GetAt ( P_Current ).thickness = m_Thickness ;
+		else if ( m_IsThickness == 'x' )
+			pDoc -> P_Poly.GetAt ( P_Current ).thickness = 1 ;
 	}
 	// 원을 그리는 경우
 	else if ( E_IsDraw == 'o' ) {
@@ -1049,6 +1054,11 @@ void CGraphicEditorView::OnMouseMove(UINT nFlags, CPoint point)
 		else
 			L_Insert.L_FillColor = RGB (0,0,0) ;
 
+		if ( m_IsThickness == 'o' )
+			L_Insert.Thickness = m_Thickness ;
+		else
+			L_Insert.Thickness = 1 ;
+
 		pDoc->L_Line.SetAt ( L_Current, L_Insert ) ;
 		Invalidate () ;
 	}
@@ -1152,6 +1162,11 @@ void CGraphicEditorView::OnLButtonUp(UINT nFlags, CPoint point)
 			L_Insert.L_Color = m_Color ;
 		else
 			L_Insert.L_Color = RGB (0,0,0) ;
+
+		if ( m_IsThickness == 'o' )
+			L_Insert.Thickness = m_Thickness ;
+		else
+			L_Insert.Thickness = 1 ;
 
 		pDoc->L_Line.SetAt ( L_Current, L_Insert ) ;
 		Invalidate () ;
