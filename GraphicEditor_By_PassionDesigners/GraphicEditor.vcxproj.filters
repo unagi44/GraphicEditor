@@ -69,6 +69,9 @@
     <ClInclude Include="CPolyLine.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="Thickness.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GraphicEditor.cpp">
@@ -93,6 +96,9 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="CPolyLine.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Thickness.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

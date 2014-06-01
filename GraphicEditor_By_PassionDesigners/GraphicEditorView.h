@@ -27,6 +27,8 @@ public:
 	COLORREF m_FillColor ;
 	char m_IsColor ;
 	char m_IsFillColor ;
+	char m_IsThickness ;
+	char m_Thickness ;
 
 	// 선 그리기에 필요한 변수들
 	CLine L_Insert ;
@@ -59,6 +61,30 @@ public:
 	int E_Current ;
 	char E_IsDraw ;
 	char E_CanMove ;
+
+	// 세모 그리기에 필요한 변수들
+	CRect T_Insert ;
+	int T_Current ;
+	char T_IsDraw ;
+	char T_CanMove ;
+
+	// 역 삼각형 그리기에 필요한 변수들
+	CRect RT_Insert ;
+	int RT_Current ;
+	char RT_IsDraw ;
+	char RT_CanMove ;
+
+	// 직각 삼각형 그리기에 필요한 변수들
+	CRect RightT_Insert ;
+	int RightT_Current ;
+	char RightT_IsDraw ;
+	char RightT_CanMove ;
+
+	// 역 직각 삼각형 그리기에 필요한 변수들
+	CRect RRightT_Insert ;
+	int RRightT_Current ;
+	char RRightT_IsDraw ;
+	char RRightT_CanMove ;
 
 // 작업입니다.
 public:
@@ -99,6 +125,13 @@ public:
 	afx_msg void OnChangecolor();
 	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
 	afx_msg void OnChangefillcolor();
+	afx_msg void OnNofillcolor();
+	afx_msg void OnDrawtriangle();
+	afx_msg void OnDrawreversetri();
+	afx_msg void OnThickness();
+	afx_msg void OnRightangledtri();
+//	afx_msg void OnRrightangledtri();
+	afx_msg void OnRRrightangledtri();
 };
 
 #ifndef _DEBUG  // GraphicEditorView.cpp의 디버그 버전

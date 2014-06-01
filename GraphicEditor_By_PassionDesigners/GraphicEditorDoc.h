@@ -24,12 +24,30 @@ public:
 	CArray < CPolyLine, CPolyLine& > P_Poly ;	// PolyLine 그리기 배열
 	int CPolyCount ;
 	CArray < CRect, CRect& > E_Ellipse ;		// 원 그리기 배열
+	CArray < CRect, CRect& > T_Triangle ;		// 세모 그리기 배열
+	CArray < CRect, CRect& > RT_Triangle ;		// 역 삼각형 그리기 배열
+	CArray < CRect, CRect& > RightT_Triangle ;	// 직각 삼각형 그리기 배열
+	CArray < CRect, CRect& > RRightT_Triangle ;	// 역 직각 삼각형 그리기 배열
 // 작업입니다.
 public:
-	CArray < int, int > R_Color ;
-	CArray < int, int > R_FillColor ;
-	CArray < int, int > E_Color ;
-	CArray < int, int > E_FillColor ;
+	CArray < int, int > R_Color ;		// 상자 선 색
+	CArray < int, int > R_FillColor ;	// 상자 채우기 색
+	CArray < int, int > E_Color ;		// 원 선 색
+	CArray < int, int > E_FillColor ;	// 원 채우기 색
+	CArray < int, int > T_Color ;		// 세모 선 색
+	CArray < int, int > T_FillColor ;	// 세모 채우기 색
+	CArray < int, int > RT_Color ;		// 역 삼각형 선 색
+	CArray < int, int > RT_FillColor ;	// 역 삼각형 채우기 색
+	CArray < int, int > RightT_Color ;	// 직각 삼각형 선 색
+	CArray < int, int > RightT_FillColor ;	// 직각 삼각형 채우기 색
+	CArray < int, int > RRightT_Color ;		// 역 직각 삼각형 선 색
+	CArray < int, int > RRightT_FillColor ;	// 역 직각 삼각형 채우기 색
+	CArray < int, int > R_Thickness ;			// 상자의 선 두께
+	CArray < int, int > E_Thickness ;			// 원의 선 두께
+	CArray < int, int > T_Thickness ;			// 세모의 선 두께
+	CArray < int, int > RT_Thickness ;			// 역 삼각형의 선 두께
+	CArray < int, int > RightT_Thickness ;		// 직각 삼각형의 선 두께
+	CArray < int, int > RRightT_Thickness ;		// 역 직각 삼각형의 선 두께
 // 재정의입니다.
 public:
 	virtual BOOL OnNewDocument();

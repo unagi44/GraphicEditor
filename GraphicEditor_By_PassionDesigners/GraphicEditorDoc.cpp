@@ -75,10 +75,29 @@ void CGraphicEditorDoc::Serialize(CArchive& ar)
 		}
 
 		E_Ellipse.Serialize (ar) ;	// 원 그리기 배열 저장
+		T_Triangle.Serialize (ar) ;	// 세모 그리기 배열 저장
+		RT_Triangle.Serialize (ar) ;// 역 삼각형 그리기 배열 저장
 		R_Color.Serialize (ar) ;	// 사각형의 각 선 색상 정보 저장
 		E_Color.Serialize (ar) ;	// 원의 각 선 색상 정보 저장
 		R_FillColor.Serialize (ar) ;	// 사각형의 각 채우기 색상 정보 저장
 		E_FillColor.Serialize (ar) ;	// 원의 각 채우기 색상 정보 저장
+		T_Color.Serialize (ar) ;		// 세모 선 색상 정보 저장
+		T_FillColor.Serialize (ar) ;	// 세모 채우기 색상 정보 저장
+		RT_Color.Serialize (ar) ;		// 역 삼각형 선 색상 정보 저장
+		RT_FillColor.Serialize (ar) ;	// 역 삼각형 채우기 색상 정보 저장
+		RightT_Triangle.Serialize (ar) ;	// 직각 삼각형 그리기 배열 저장
+		RRightT_Triangle.Serialize (ar) ;	// 역 직각 삼각형 그리기 배열 저장
+		RightT_Color.Serialize (ar) ;		// 직각 삼각형 선 색상 정보 저장
+		RightT_FillColor.Serialize (ar) ;	// 직각 삼각형 채우기 색상 정보 저장
+		RRightT_Color.Serialize (ar) ;		// 역 직각 삼각형 선 색상 정보 저장
+		RRightT_FillColor.Serialize (ar) ;	// 역 직각 삼각형 채우기 색상 정보 저장
+
+		R_Thickness.Serialize (ar) ;		// 상자의 선 두께를 저장
+		E_Thickness.Serialize (ar) ;		// 원의 선 두께를 저장
+		T_Thickness.Serialize (ar) ;		// 세모의 선 두께를 저장
+		RT_Thickness.Serialize (ar) ;		// 역 삼각형의 선 두께를 저장
+		RightT_Thickness.Serialize (ar) ;	// 직각 삼각형의 선 두께를 저장
+		RRightT_Thickness.Serialize (ar) ;	// 역 직각 삼각형의 선 두께를 저장
 	}
 	else
 	{
@@ -95,10 +114,29 @@ void CGraphicEditorDoc::Serialize(CArchive& ar)
 		}
 
 		E_Ellipse.Serialize (ar) ;	// 원 그리기 배열 불러오기
+		T_Triangle.Serialize (ar) ;	// 세모 그리기 배열 불러오기
+		RT_Triangle.Serialize (ar) ;// 역 삼각형 그리기 배열 불러오기
 		R_Color.Serialize (ar) ;	// 사각형의 각 선 색상 정보 불러오기
 		E_Color.Serialize (ar) ;	// 사각형의 각 선 색상 정보 불러오기
 		R_FillColor.Serialize (ar) ;	// 사각형의 각 채우기 색상 정보 불러오기
 		E_FillColor.Serialize (ar) ;	// 원의 각 채우기 색상 정보 불러오기
+		T_Color.Serialize (ar) ;		// 세모 각 선 색상 정보 불러오기
+		T_FillColor.Serialize (ar) ;	// 세모 각 채우기 색상 정보 불러오기
+		RT_Color.Serialize (ar) ;		// 역 삼각형 선 색상 정보 불러오기
+		RT_FillColor.Serialize (ar) ;	// 역 삼각형 채우기 색상 정보 불러오기
+		RightT_Triangle.Serialize (ar) ;	// 직각 삼각형 그리기 배열 불러오기
+		RRightT_Triangle.Serialize (ar) ;	// 역 직각 삼각형 그리기 배열 불러오기
+		RightT_Color.Serialize (ar) ;		// 직각 삼각형 선 색상 정보 불러오기
+		RightT_FillColor.Serialize (ar) ;	// 직각 삼각형 채우기 색상 정보 불러오기
+		RRightT_Color.Serialize (ar) ;		// 역 직각 삼각형 선 색상 정보 불러오기
+		RRightT_FillColor.Serialize (ar) ;	// 역 직각 삼각형 채우기 색상 정보 불러오기
+
+		R_Thickness.Serialize (ar) ;		// 상자의 선 두께 불러오기
+		E_Thickness.Serialize (ar) ;		// 원의 선 두께 불러오기
+		T_Thickness.Serialize (ar) ;		// 세모의 선 두께 불러오기
+		RT_Thickness.Serialize (ar) ;		// 역 삼각형의 선 두께 불러오기
+		RightT_Thickness.Serialize (ar) ;	// 직각 삼각형의 선 두께 불러오기
+		RRightT_Thickness.Serialize (ar) ;	// 역 직각 삼각형의 선 두께 불러오기
 	}
 }
 
