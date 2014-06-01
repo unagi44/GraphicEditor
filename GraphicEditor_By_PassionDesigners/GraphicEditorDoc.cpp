@@ -71,9 +71,14 @@ void CGraphicEditorDoc::Serialize(CArchive& ar)
 		ar << CPolyCount ;
 		for ( int i = 0 ; i < P_Poly.GetCount () ; i++ ) {
 			P_Poly.GetAt (i).Poly_point.Serialize (ar) ;
+			ar << P_Poly.GetAt (i).P_Color ;
 		}
 
 		E_Ellipse.Serialize (ar) ;	// 원 그리기 배열 저장
+		R_Color.Serialize (ar) ;	// 사각형의 각 선 색상 정보 저장
+		E_Color.Serialize (ar) ;	// 원의 각 선 색상 정보 저장
+		R_FillColor.Serialize (ar) ;	// 사각형의 각 채우기 색상 정보 저장
+		E_FillColor.Serialize (ar) ;	// 원의 각 채우기 색상 정보 저장
 	}
 	else
 	{
@@ -86,9 +91,14 @@ void CGraphicEditorDoc::Serialize(CArchive& ar)
 		P_Poly.SetSize ( CPolyCount ) ;
 		for ( int i = 0 ; i < CPolyCount ; i++ ) {
 			P_Poly.GetAt (i).Poly_point.Serialize (ar) ;
+			ar >> P_Poly.GetAt (i).P_Color ;
 		}
 
-		E_Ellipse.Serialize (ar) ;	// 원 그리기 배열 저장
+		E_Ellipse.Serialize (ar) ;	// 원 그리기 배열 불러오기
+		R_Color.Serialize (ar) ;	// 사각형의 각 선 색상 정보 불러오기
+		E_Color.Serialize (ar) ;	// 사각형의 각 선 색상 정보 불러오기
+		R_FillColor.Serialize (ar) ;	// 사각형의 각 채우기 색상 정보 불러오기
+		E_FillColor.Serialize (ar) ;	// 원의 각 채우기 색상 정보 불러오기
 	}
 }
 

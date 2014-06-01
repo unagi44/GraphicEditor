@@ -95,6 +95,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
+    <None Include="res\bmp00001.bmp" />
     <None Include="res\GraphicEditor.ico" />
     <None Include="res\GraphicEditor.rc2" />
     <None Include="res\GraphicEditorDoc.ico" />
