@@ -72,6 +72,7 @@ void CGraphicEditorDoc::Serialize(CArchive& ar)
 		for ( int i = 0 ; i < P_Poly.GetCount () ; i++ ) {
 			P_Poly.GetAt (i).Poly_point.Serialize (ar) ;
 			ar << P_Poly.GetAt (i).P_Color ;
+			ar << P_Poly.GetAt (i).thickness ;
 		}
 
 		E_Ellipse.Serialize (ar) ;	// 원 그리기 배열 저장
@@ -98,6 +99,14 @@ void CGraphicEditorDoc::Serialize(CArchive& ar)
 		RT_Thickness.Serialize (ar) ;		// 역 삼각형의 선 두께를 저장
 		RightT_Thickness.Serialize (ar) ;	// 직각 삼각형의 선 두께를 저장
 		RRightT_Thickness.Serialize (ar) ;	// 역 직각 삼각형의 선 두께를 저장
+		RTLT_Triangle.Serialize (ar) ;		// 오른쪽 -> 왼쪽 삼각형 그리기 배열 저장
+		LTRT_Triangle.Serialize (ar) ;		// 왼쪽 -> 오른쪽 삼각형 그리기 배열 저장
+		RTLT_Color.Serialize (ar) ;			// 오른쪽 -> 왼쪽 삼각형 선 색 저장
+		RTLT_FillColor.Serialize (ar) ;		// 오른쪽 -> 왼쪽 삼각형 채우기 색 저장
+		RTLT_Thickness.Serialize (ar) ;		// 오른쪽 -> 왼쪽 삼각형 두께 저장
+		LTRT_Color.Serialize (ar) ;			// 왼쪽 -> 오른쪽 삼각형 선 색 저장
+		LTRT_FillColor.Serialize (ar) ;		// 왼쪽 -> 오른쪽 삼각형 채우기 색 저장
+		LTRT_Thickness.Serialize (ar) ;		// 왼쪽 -> 오른쪽 삼각형 두께 저장
 	}
 	else
 	{
@@ -111,6 +120,7 @@ void CGraphicEditorDoc::Serialize(CArchive& ar)
 		for ( int i = 0 ; i < CPolyCount ; i++ ) {
 			P_Poly.GetAt (i).Poly_point.Serialize (ar) ;
 			ar >> P_Poly.GetAt (i).P_Color ;
+			ar >> P_Poly.GetAt (i).thickness ;
 		}
 
 		E_Ellipse.Serialize (ar) ;	// 원 그리기 배열 불러오기
@@ -137,6 +147,14 @@ void CGraphicEditorDoc::Serialize(CArchive& ar)
 		RT_Thickness.Serialize (ar) ;		// 역 삼각형의 선 두께 불러오기
 		RightT_Thickness.Serialize (ar) ;	// 직각 삼각형의 선 두께 불러오기
 		RRightT_Thickness.Serialize (ar) ;	// 역 직각 삼각형의 선 두께 불러오기
+		RTLT_Triangle.Serialize (ar) ;		// 오른쪽 -> 왼쪽 삼각형 그리기 배열 불러오기
+		LTRT_Triangle.Serialize (ar) ;		// 왼쪽 -> 오른쪽 삼각형 그리기 배열 불러오기
+		RTLT_Color.Serialize (ar) ;			// 오른쪽 -> 왼쪽 삼각형 선 색 불러오기
+		RTLT_FillColor.Serialize (ar) ;		// 오른쪽 -> 왼쪽 삼각형 채우기 색 불러오기
+		RTLT_Thickness.Serialize (ar) ;		// 오른쪽 -> 왼쪽 삼각형 두께 불러오기
+		LTRT_Color.Serialize (ar) ;			// 왼쪽 -> 오른쪽 삼각형 선 색 불러오기
+		LTRT_FillColor.Serialize (ar) ;		// 왼쪽 -> 오른쪽 삼각형 채우기 색 불러오기
+		LTRT_Thickness.Serialize (ar) ;		// 왼쪽 -> 오른쪽 삼각형 두께 불러오기
 	}
 }
 

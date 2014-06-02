@@ -51,6 +51,8 @@ BEGIN_MESSAGE_MAP(CGraphicEditorView, CScrollView)
 	ON_COMMAND(ID_RightAngledTri, &CGraphicEditorView::OnRightangledtri)
 //	ON_COMMAND(ID_RRightAngledTri, &CGraphicEditorView::OnRrightangledtri)
 ON_COMMAND(ID_RRightAngledTri, &CGraphicEditorView::OnRRrightangledtri)
+ON_COMMAND(ID_RightToLeftTri, &CGraphicEditorView::OnRighttolefttri)
+ON_COMMAND(ID_LeftToRightTri, &CGraphicEditorView::OnLefttorighttri)
 END_MESSAGE_MAP()
 
 // CGraphicEditorView 생성/소멸
@@ -81,6 +83,7 @@ CGraphicEditorView::CGraphicEditorView()
 	P_IsStart = 'x' ;
 	P_IsMove = 'x' ;
 	P_ChangeSkeleton = 0 ;
+	P_IsSkeletonStart = 'x' ;
 
 	// 원 그리기에 필요한 변수들 초기화
 	E_IsDraw = 'x' ;
@@ -101,6 +104,14 @@ CGraphicEditorView::CGraphicEditorView()
 	// 역 직각 삼각형 그리기에 필요한 변수들 초기화
 	RRightT_IsDraw = 'x' ;
 	RRightT_CanMove = 'x' ;
+
+	// 왼쪽 -> 오른쪽 삼각형 그리기에 필요한 변수들 초기화
+	LTRT_IsDraw = 'x' ;
+	LTRT_CanMove = 'x' ;
+
+	// 오른쪽 -> 왼쪽 삼각형 그리기에 필요한 변수들 초기화
+	RTLT_IsDraw = 'x' ;
+	RTLT_CanMove = 'x' ;
 }
 
 CGraphicEditorView::~CGraphicEditorView()
@@ -347,6 +358,13 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 							  pDoc -> T_Triangle.GetAt (i).top}, {pDoc -> T_Triangle.GetAt (i).left, pDoc -> T_Triangle.GetAt (i).bottom},
 							 {pDoc -> T_Triangle.GetAt (i).right, pDoc -> T_Triangle.GetAt (i).bottom} } ;
 
+		// 상단 꼭지점이 bottom에 생기는 경우
+		if ( pDoc -> T_Triangle.GetAt (i).top > pDoc -> T_Triangle.GetAt (i).bottom ) {
+			T_Point[0].y = pDoc -> T_Triangle.GetAt (i).bottom ;
+			T_Point[1].y = pDoc -> T_Triangle.GetAt (i).top ;
+			T_Point[2].y = pDoc -> T_Triangle.GetAt (i).top ;
+		}
+
 		// 선 색을 가지지 않았을 경우의 출력
 		if ( pDoc -> T_Color.GetAt (i) == RGB (0,0,0) ) {
 
@@ -405,31 +423,61 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 		if ( pDoc -> T_Triangle.GetCount () - 1 == i && T_CanMove == 'o' ) {
 			CPen pen ( PS_DOT, 1.8, RGB (100, 100, 255) );
 			CPen *Draw_Pen = pDC -> SelectObject(&pen);
-			P_PointStart.x = pDoc -> T_Triangle.GetAt (i).left - pDoc -> T_Thickness.GetAt (i) / 2 ;
-			P_PointStart.y = pDoc -> T_Triangle.GetAt (i).top - pDoc -> T_Thickness.GetAt (i) / 2 ;
-			P_PointLast.x = pDoc -> T_Triangle.GetAt (i).right + pDoc -> T_Thickness.GetAt (i) / 2 ;
-			P_PointLast.y = pDoc -> T_Triangle.GetAt (i).top - pDoc -> T_Thickness.GetAt (i) / 2 ;
-			pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
-			pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
-			pDC->SelectObject(Draw_Pen);
-;
-			CPen *Draw_Pen2 = pDC -> SelectObject(&pen);
-			P_PointStart.x = pDoc -> T_Triangle.GetAt (i).left - pDoc -> T_Thickness.GetAt (i) / 2 ;
-			P_PointStart.y = pDoc -> T_Triangle.GetAt (i).top - pDoc -> T_Thickness.GetAt (i) / 2 ;
-			P_PointLast.x = pDoc -> T_Triangle.GetAt (i).left - pDoc -> T_Thickness.GetAt (i) / 2 ;
-			P_PointLast.y = pDoc -> T_Triangle.GetAt (i).bottom + pDoc -> T_Thickness.GetAt (i) / 2 ;
-			pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
-			pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
-			pDC->SelectObject(Draw_Pen2);
+			if ( pDoc -> T_Triangle.GetAt (i).top > pDoc -> T_Triangle.GetAt (i).bottom ) {
 
-			CPen *Draw_Pen4 = pDC -> SelectObject(&pen);
-			P_PointStart.x = pDoc -> T_Triangle.GetAt (i).right + pDoc -> T_Thickness.GetAt (i) / 2 ;
-			P_PointStart.y = pDoc -> T_Triangle.GetAt (i).top - pDoc -> T_Thickness.GetAt (i) / 2 ;
-			P_PointLast.x = pDoc -> T_Triangle.GetAt (i).right + pDoc -> T_Thickness.GetAt (i) / 2 ;
-			P_PointLast.y = pDoc -> T_Triangle.GetAt (i).bottom + pDoc -> T_Thickness.GetAt (i) / 2 ;
-			pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
-			pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
-			pDC->SelectObject(Draw_Pen4);
+				P_PointStart.x = pDoc -> T_Triangle.GetAt (i).left + pDoc -> T_Thickness.GetAt (i) / 2 ;
+				P_PointStart.y = pDoc -> T_Triangle.GetAt (i).bottom + pDoc -> T_Thickness.GetAt (i) / 2 ;
+				P_PointLast.x = pDoc -> T_Triangle.GetAt (i).right - pDoc -> T_Thickness.GetAt (i) / 2 ;
+				P_PointLast.y = pDoc -> T_Triangle.GetAt (i).bottom + pDoc -> T_Thickness.GetAt (i) / 2 ;
+				pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+				pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+				pDC->SelectObject(Draw_Pen);
+				;
+				CPen *Draw_Pen2 = pDC -> SelectObject(&pen);
+				P_PointStart.x = pDoc -> T_Triangle.GetAt (i).left + pDoc -> T_Thickness.GetAt (i) / 2 ;
+				P_PointStart.y = pDoc -> T_Triangle.GetAt (i).top + pDoc -> T_Thickness.GetAt (i) / 2 ;
+				P_PointLast.x = pDoc -> T_Triangle.GetAt (i).left + pDoc -> T_Thickness.GetAt (i) / 2 ;
+				P_PointLast.y = pDoc -> T_Triangle.GetAt (i).bottom - pDoc -> T_Thickness.GetAt (i) / 2 ;
+				pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+				pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+				pDC->SelectObject(Draw_Pen2);
+
+				CPen *Draw_Pen4 = pDC -> SelectObject(&pen);
+				P_PointStart.x = pDoc -> T_Triangle.GetAt (i).right - pDoc -> T_Thickness.GetAt (i) / 2 ;
+				P_PointStart.y = pDoc -> T_Triangle.GetAt (i).top + pDoc -> T_Thickness.GetAt (i) / 2 ;
+				P_PointLast.x = pDoc -> T_Triangle.GetAt (i).right - pDoc -> T_Thickness.GetAt (i) / 2 ;
+				P_PointLast.y = pDoc -> T_Triangle.GetAt (i).bottom - pDoc -> T_Thickness.GetAt (i) / 2 ;
+				pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+				pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+				pDC->SelectObject(Draw_Pen4);
+			}
+			else {
+				P_PointStart.x = pDoc -> T_Triangle.GetAt (i).left - pDoc -> T_Thickness.GetAt (i) / 2 ;
+				P_PointStart.y = pDoc -> T_Triangle.GetAt (i).top - pDoc -> T_Thickness.GetAt (i) / 2 ;
+				P_PointLast.x = pDoc -> T_Triangle.GetAt (i).right + pDoc -> T_Thickness.GetAt (i) / 2 ;
+				P_PointLast.y = pDoc -> T_Triangle.GetAt (i).top - pDoc -> T_Thickness.GetAt (i) / 2 ;
+				pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+				pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+				pDC->SelectObject(Draw_Pen);
+				;
+				CPen *Draw_Pen2 = pDC -> SelectObject(&pen);
+				P_PointStart.x = pDoc -> T_Triangle.GetAt (i).left - pDoc -> T_Thickness.GetAt (i) / 2 ;
+				P_PointStart.y = pDoc -> T_Triangle.GetAt (i).top - pDoc -> T_Thickness.GetAt (i) / 2 ;
+				P_PointLast.x = pDoc -> T_Triangle.GetAt (i).left - pDoc -> T_Thickness.GetAt (i) / 2 ;
+				P_PointLast.y = pDoc -> T_Triangle.GetAt (i).bottom + pDoc -> T_Thickness.GetAt (i) / 2 ;
+				pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+				pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+				pDC->SelectObject(Draw_Pen2);
+
+				CPen *Draw_Pen4 = pDC -> SelectObject(&pen);
+				P_PointStart.x = pDoc -> T_Triangle.GetAt (i).right + pDoc -> T_Thickness.GetAt (i) / 2 ;
+				P_PointStart.y = pDoc -> T_Triangle.GetAt (i).top - pDoc -> T_Thickness.GetAt (i) / 2 ;
+				P_PointLast.x = pDoc -> T_Triangle.GetAt (i).right + pDoc -> T_Thickness.GetAt (i) / 2 ;
+				P_PointLast.y = pDoc -> T_Triangle.GetAt (i).bottom + pDoc -> T_Thickness.GetAt (i) / 2 ;
+				pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+				pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+				pDC->SelectObject(Draw_Pen4);
+			}
 		}
 	}
 
@@ -440,6 +488,13 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 		POINT RT_Point[3] = { {pDoc -> RT_Triangle.GetAt (i).left + (pDoc -> RT_Triangle.GetAt (i).right - pDoc -> RT_Triangle.GetAt (i).left) / 2,
 							   pDoc -> RT_Triangle.GetAt (i).bottom}, {pDoc -> RT_Triangle.GetAt (i).left, pDoc -> RT_Triangle.GetAt (i).top},
 							  {pDoc -> RT_Triangle.GetAt (i).right, pDoc -> RT_Triangle.GetAt (i).top} } ;
+
+		// 상단 꼭지점이 top에 생기는 경우
+		if ( pDoc -> RT_Triangle.GetAt (i).top > pDoc -> RT_Triangle.GetAt (i).bottom ) {
+			RT_Point[0].y = pDoc -> RT_Triangle.GetAt (i).top ;
+			RT_Point[1].y = pDoc -> RT_Triangle.GetAt (i).bottom ;
+			RT_Point[2].y = pDoc -> RT_Triangle.GetAt (i).bottom ;
+		}
 
 		// 선 색을 가지지 않았을 경우의 출력
 		if ( pDoc -> RT_Color.GetAt (i) == RGB (0,0,0) ) {
@@ -499,31 +554,62 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 		if ( pDoc -> RT_Triangle.GetCount () - 1 == i && RT_CanMove == 'o' ) {
 			CPen pen ( PS_DOT, 1.8, RGB (100, 100, 255) );
 			CPen *Draw_Pen = pDC -> SelectObject(&pen);
-			P_PointStart.x = pDoc -> RT_Triangle.GetAt (i).left - pDoc -> RT_Thickness.GetAt (i) / 2 ;
-			P_PointStart.y = pDoc -> RT_Triangle.GetAt (i).bottom + pDoc -> RT_Thickness.GetAt (i) / 2 ;
-			P_PointLast.x = pDoc -> RT_Triangle.GetAt (i).right + pDoc -> RT_Thickness.GetAt (i) / 2 ;
-			P_PointLast.y = pDoc -> RT_Triangle.GetAt (i).bottom + pDoc -> RT_Thickness.GetAt (i) / 2 ;
-			pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
-			pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
-			pDC->SelectObject(Draw_Pen);
-;
-			CPen *Draw_Pen2 = pDC -> SelectObject(&pen);
-			P_PointStart.x = pDoc -> RT_Triangle.GetAt (i).left - pDoc -> RT_Thickness.GetAt (i) / 2 ;
-			P_PointStart.y = pDoc -> RT_Triangle.GetAt (i).top - pDoc -> RT_Thickness.GetAt (i) / 2 ;
-			P_PointLast.x = pDoc -> RT_Triangle.GetAt (i).left - pDoc -> RT_Thickness.GetAt (i) / 2 ;
-			P_PointLast.y = pDoc -> RT_Triangle.GetAt (i).bottom + pDoc -> RT_Thickness.GetAt (i) / 2 ;
-			pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
-			pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
-			pDC->SelectObject(Draw_Pen2);
+			// 상단 꼭지점이 top에 생기는 경우
+			if ( pDoc -> RT_Triangle.GetAt (i).top > pDoc -> RT_Triangle.GetAt (i).bottom ) {
+				P_PointStart.x = pDoc -> RT_Triangle.GetAt (i).left + pDoc -> RT_Thickness.GetAt (i) / 2 ;
+				P_PointStart.y = pDoc -> RT_Triangle.GetAt (i).top - pDoc -> RT_Thickness.GetAt (i) / 2 ;
+				P_PointLast.x = pDoc -> RT_Triangle.GetAt (i).right - pDoc -> RT_Thickness.GetAt (i) / 2 ;
+				P_PointLast.y = pDoc -> RT_Triangle.GetAt (i).top - pDoc -> RT_Thickness.GetAt (i) / 2 ;
+				pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+				pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+				pDC->SelectObject(Draw_Pen);
+				;
+				CPen *Draw_Pen2 = pDC -> SelectObject(&pen);
+				P_PointStart.x = pDoc -> RT_Triangle.GetAt (i).left + pDoc -> RT_Thickness.GetAt (i) / 2 ;
+				P_PointStart.y = pDoc -> RT_Triangle.GetAt (i).top + pDoc -> RT_Thickness.GetAt (i) / 2 ;
+				P_PointLast.x = pDoc -> RT_Triangle.GetAt (i).left + pDoc -> RT_Thickness.GetAt (i) / 2 ;
+				P_PointLast.y = pDoc -> RT_Triangle.GetAt (i).bottom - pDoc -> RT_Thickness.GetAt (i) / 2 ;
+				pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+				pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+				pDC->SelectObject(Draw_Pen2);
 
-			CPen *Draw_Pen4 = pDC -> SelectObject(&pen);
-			P_PointStart.x = pDoc -> RT_Triangle.GetAt (i).right + pDoc -> RT_Thickness.GetAt (i) / 2 ;
-			P_PointStart.y = pDoc -> RT_Triangle.GetAt (i).top - pDoc -> RT_Thickness.GetAt (i) / 2 ;
-			P_PointLast.x = pDoc -> RT_Triangle.GetAt (i).right + pDoc -> RT_Thickness.GetAt (i) / 2 ;
-			P_PointLast.y = pDoc -> RT_Triangle.GetAt (i).bottom + pDoc -> RT_Thickness.GetAt (i) / 2 ;
-			pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
-			pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
-			pDC->SelectObject(Draw_Pen4);
+				CPen *Draw_Pen4 = pDC -> SelectObject(&pen);
+				P_PointStart.x = pDoc -> RT_Triangle.GetAt (i).right - pDoc -> RT_Thickness.GetAt (i) / 2 ;
+				P_PointStart.y = pDoc -> RT_Triangle.GetAt (i).top + pDoc -> RT_Thickness.GetAt (i) / 2 ;
+				P_PointLast.x = pDoc -> RT_Triangle.GetAt (i).right - pDoc -> RT_Thickness.GetAt (i) / 2 ;
+				P_PointLast.y = pDoc -> RT_Triangle.GetAt (i).bottom - pDoc -> RT_Thickness.GetAt (i) / 2 ;
+				pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+				pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+				pDC->SelectObject(Draw_Pen4);
+			}
+			// 정상인 경우
+			else {
+				P_PointStart.x = pDoc -> RT_Triangle.GetAt (i).left - pDoc -> RT_Thickness.GetAt (i) / 2 ;
+				P_PointStart.y = pDoc -> RT_Triangle.GetAt (i).bottom + pDoc -> RT_Thickness.GetAt (i) / 2 ;
+				P_PointLast.x = pDoc -> RT_Triangle.GetAt (i).right + pDoc -> RT_Thickness.GetAt (i) / 2 ;
+				P_PointLast.y = pDoc -> RT_Triangle.GetAt (i).bottom + pDoc -> RT_Thickness.GetAt (i) / 2 ;
+				pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+				pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+				pDC->SelectObject(Draw_Pen);
+				;
+				CPen *Draw_Pen2 = pDC -> SelectObject(&pen);
+				P_PointStart.x = pDoc -> RT_Triangle.GetAt (i).left - pDoc -> RT_Thickness.GetAt (i) / 2 ;
+				P_PointStart.y = pDoc -> RT_Triangle.GetAt (i).top - pDoc -> RT_Thickness.GetAt (i) / 2 ;
+				P_PointLast.x = pDoc -> RT_Triangle.GetAt (i).left - pDoc -> RT_Thickness.GetAt (i) / 2 ;
+				P_PointLast.y = pDoc -> RT_Triangle.GetAt (i).bottom + pDoc -> RT_Thickness.GetAt (i) / 2 ;
+				pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+				pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+				pDC->SelectObject(Draw_Pen2);
+
+				CPen *Draw_Pen4 = pDC -> SelectObject(&pen);
+				P_PointStart.x = pDoc -> RT_Triangle.GetAt (i).right + pDoc -> RT_Thickness.GetAt (i) / 2 ;
+				P_PointStart.y = pDoc -> RT_Triangle.GetAt (i).top - pDoc -> RT_Thickness.GetAt (i) / 2 ;
+				P_PointLast.x = pDoc -> RT_Triangle.GetAt (i).right + pDoc -> RT_Thickness.GetAt (i) / 2 ;
+				P_PointLast.y = pDoc -> RT_Triangle.GetAt (i).bottom + pDoc -> RT_Thickness.GetAt (i) / 2 ;
+				pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+				pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+				pDC->SelectObject(Draw_Pen4);
+			}
 		}
 	}
 
@@ -534,6 +620,18 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 		POINT RightT_Point[3] = { {pDoc -> RightT_Triangle.GetAt (i).right, pDoc -> RightT_Triangle.GetAt (i).top},
 								  {pDoc -> RightT_Triangle.GetAt (i).left, pDoc -> RightT_Triangle.GetAt (i).bottom},
 								  {pDoc -> RightT_Triangle.GetAt (i).right, pDoc -> RightT_Triangle.GetAt (i).bottom} } ;
+
+		if ( pDoc -> RightT_Triangle.GetAt (i).left > pDoc -> RightT_Triangle.GetAt (i).right ) {
+			RightT_Point[0].x = pDoc -> RightT_Triangle.GetAt (i).left ;
+			RightT_Point[1].x = pDoc -> RightT_Triangle.GetAt (i).right ;
+			RightT_Point[2].x = pDoc -> RightT_Triangle.GetAt (i).left ;
+		}
+
+		if ( pDoc -> RightT_Triangle.GetAt (i).top > pDoc -> RightT_Triangle.GetAt (i).bottom ) {
+			RightT_Point[0].y = pDoc -> RightT_Triangle.GetAt (i).bottom ;
+			RightT_Point[1].y = pDoc -> RightT_Triangle.GetAt (i).top ;
+			RightT_Point[2].y = pDoc -> RightT_Triangle.GetAt (i).top ;
+		}
 
 		// 선 색을 가지지 않았을 경우의 출력
 		if ( pDoc -> RightT_Color.GetAt (i) == RGB (0,0,0) ) {
@@ -591,24 +689,87 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 
 		// 만약 직각 삼각형을 그리고 있는 상태라면 테두리 직사각형을 그려줍니다.
 		if ( pDoc -> RightT_Triangle.GetCount () - 1 == i && RightT_CanMove == 'o' ) {
-			CPen pen ( PS_DOT, 1.8, RGB (100, 100, 255) );
-			CPen *Draw_Pen = pDC -> SelectObject(&pen);
-			P_PointStart.x = pDoc -> RightT_Triangle.GetAt (i).left - pDoc -> RightT_Thickness.GetAt (i) / 2 ;
-			P_PointStart.y = pDoc -> RightT_Triangle.GetAt (i).top - pDoc -> RightT_Thickness.GetAt (i) / 2 ;
-			P_PointLast.x = pDoc -> RightT_Triangle.GetAt (i).right + pDoc -> RightT_Thickness.GetAt (i) / 2 ;
-			P_PointLast.y = pDoc -> RightT_Triangle.GetAt (i).top - pDoc -> RightT_Thickness.GetAt (i) / 2 ;
-			pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
-			pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
-			pDC->SelectObject(Draw_Pen);
-;
-			CPen *Draw_Pen2 = pDC -> SelectObject(&pen);
-			P_PointStart.x = pDoc -> RightT_Triangle.GetAt (i).left - pDoc -> RightT_Thickness.GetAt (i) / 2 ;
-			P_PointStart.y = pDoc -> RightT_Triangle.GetAt (i).top - pDoc -> RightT_Thickness.GetAt (i) / 2 ;
-			P_PointLast.x = pDoc -> RightT_Triangle.GetAt (i).left - pDoc -> RightT_Thickness.GetAt (i) / 2 ;
-			P_PointLast.y = pDoc -> RightT_Triangle.GetAt (i).bottom + pDoc -> RightT_Thickness.GetAt (i) / 2 ;
-			pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
-			pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
-			pDC->SelectObject(Draw_Pen2);
+			CPen pen ( PS_DOT, 1.8, RGB (100, 100, 255) ) ;
+			if ( pDoc -> RightT_Triangle.GetAt (i).top > pDoc -> RightT_Triangle.GetAt (i).bottom ) {
+				if ( pDoc -> RightT_Triangle.GetAt (i).left > pDoc -> RightT_Triangle.GetAt (i).right ) {
+					CPen *Draw_Pen = pDC -> SelectObject(&pen);
+					P_PointStart.x = pDoc -> RightT_Triangle.GetAt (i).right + pDoc -> RightT_Thickness.GetAt (i) / 2 ;
+					P_PointStart.y = pDoc -> RightT_Triangle.GetAt (i).bottom + pDoc -> RightT_Thickness.GetAt (i) / 2 ;
+					P_PointLast.x = pDoc -> RightT_Triangle.GetAt (i).left - pDoc -> RightT_Thickness.GetAt (i) / 2 ;
+					P_PointLast.y = pDoc -> RightT_Triangle.GetAt (i).bottom + pDoc -> RightT_Thickness.GetAt (i) / 2 ;
+					pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+					pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+					pDC->SelectObject(Draw_Pen);
+					;
+					CPen *Draw_Pen2 = pDC -> SelectObject(&pen);
+					P_PointStart.x = pDoc -> RightT_Triangle.GetAt (i).right + pDoc -> RightT_Thickness.GetAt (i) / 2 ;
+					P_PointStart.y = pDoc -> RightT_Triangle.GetAt (i).top + pDoc -> RightT_Thickness.GetAt (i) / 2 ;
+					P_PointLast.x = pDoc -> RightT_Triangle.GetAt (i).right + pDoc -> RightT_Thickness.GetAt (i) / 2 ;
+					P_PointLast.y = pDoc -> RightT_Triangle.GetAt (i).bottom - pDoc -> RightT_Thickness.GetAt (i) / 2 ;
+					pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+					pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+					pDC->SelectObject(Draw_Pen2);
+				}
+				else {
+					CPen *Draw_Pen = pDC -> SelectObject(&pen);
+					P_PointStart.x = pDoc -> RightT_Triangle.GetAt (i).left + pDoc -> RightT_Thickness.GetAt (i) / 2 ;
+					P_PointStart.y = pDoc -> RightT_Triangle.GetAt (i).bottom + pDoc -> RightT_Thickness.GetAt (i) / 2 ;
+					P_PointLast.x = pDoc -> RightT_Triangle.GetAt (i).right - pDoc -> RightT_Thickness.GetAt (i) / 2 ;
+					P_PointLast.y = pDoc -> RightT_Triangle.GetAt (i).bottom + pDoc -> RightT_Thickness.GetAt (i) / 2 ;
+					pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+					pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+					pDC->SelectObject(Draw_Pen);
+					;
+					CPen *Draw_Pen2 = pDC -> SelectObject(&pen);
+					P_PointStart.x = pDoc -> RightT_Triangle.GetAt (i).left + pDoc -> RightT_Thickness.GetAt (i) / 2 ;
+					P_PointStart.y = pDoc -> RightT_Triangle.GetAt (i).top + pDoc -> RightT_Thickness.GetAt (i) / 2 ;
+					P_PointLast.x = pDoc -> RightT_Triangle.GetAt (i).left + pDoc -> RightT_Thickness.GetAt (i) / 2 ;
+					P_PointLast.y = pDoc -> RightT_Triangle.GetAt (i).bottom - pDoc -> RightT_Thickness.GetAt (i) / 2 ;
+					pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+					pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+					pDC->SelectObject(Draw_Pen2);
+				}
+			}
+			else {
+				if ( pDoc -> RightT_Triangle.GetAt (i).left > pDoc -> RightT_Triangle.GetAt (i).right ) {
+					CPen *Draw_Pen = pDC -> SelectObject(&pen);
+					P_PointStart.x = pDoc -> RightT_Triangle.GetAt (i).right - pDoc -> RightT_Thickness.GetAt (i) / 2 ;
+					P_PointStart.y = pDoc -> RightT_Triangle.GetAt (i).top - pDoc -> RightT_Thickness.GetAt (i) / 2 ;
+					P_PointLast.x = pDoc -> RightT_Triangle.GetAt (i).left + pDoc -> RightT_Thickness.GetAt (i) / 2 ;
+					P_PointLast.y = pDoc -> RightT_Triangle.GetAt (i).top - pDoc -> RightT_Thickness.GetAt (i) / 2 ;
+					pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+					pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+					pDC->SelectObject(Draw_Pen);
+					;
+					CPen *Draw_Pen2 = pDC -> SelectObject(&pen);
+					P_PointStart.x = pDoc -> RightT_Triangle.GetAt (i).right - pDoc -> RightT_Thickness.GetAt (i) / 2 ;
+					P_PointStart.y = pDoc -> RightT_Triangle.GetAt (i).top - pDoc -> RightT_Thickness.GetAt (i) / 2 ;
+					P_PointLast.x = pDoc -> RightT_Triangle.GetAt (i).right - pDoc -> RightT_Thickness.GetAt (i) / 2 ;
+					P_PointLast.y = pDoc -> RightT_Triangle.GetAt (i).bottom + pDoc -> RightT_Thickness.GetAt (i) / 2 ;
+					pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+					pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+					pDC->SelectObject(Draw_Pen2);
+				}
+				else {
+					CPen *Draw_Pen = pDC -> SelectObject(&pen);
+					P_PointStart.x = pDoc -> RightT_Triangle.GetAt (i).left - pDoc -> RightT_Thickness.GetAt (i) / 2 ;
+					P_PointStart.y = pDoc -> RightT_Triangle.GetAt (i).top - pDoc -> RightT_Thickness.GetAt (i) / 2 ;
+					P_PointLast.x = pDoc -> RightT_Triangle.GetAt (i).right + pDoc -> RightT_Thickness.GetAt (i) / 2 ;
+					P_PointLast.y = pDoc -> RightT_Triangle.GetAt (i).top - pDoc -> RightT_Thickness.GetAt (i) / 2 ;
+					pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+					pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+					pDC->SelectObject(Draw_Pen);
+					;
+					CPen *Draw_Pen2 = pDC -> SelectObject(&pen);
+					P_PointStart.x = pDoc -> RightT_Triangle.GetAt (i).left - pDoc -> RightT_Thickness.GetAt (i) / 2 ;
+					P_PointStart.y = pDoc -> RightT_Triangle.GetAt (i).top - pDoc -> RightT_Thickness.GetAt (i) / 2 ;
+					P_PointLast.x = pDoc -> RightT_Triangle.GetAt (i).left - pDoc -> RightT_Thickness.GetAt (i) / 2 ;
+					P_PointLast.y = pDoc -> RightT_Triangle.GetAt (i).bottom + pDoc -> RightT_Thickness.GetAt (i) / 2 ;
+					pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+					pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+					pDC->SelectObject(Draw_Pen2);
+				}
+			}
 		}
 	}
 
@@ -619,6 +780,18 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 		POINT RRightT_Point[3] = { {pDoc -> RRightT_Triangle.GetAt (i).left, pDoc -> RRightT_Triangle.GetAt (i).top},
 								   {pDoc -> RRightT_Triangle.GetAt (i).left, pDoc -> RRightT_Triangle.GetAt (i).bottom},
 								   {pDoc -> RRightT_Triangle.GetAt (i).right, pDoc -> RRightT_Triangle.GetAt (i).top} } ;
+
+		if ( pDoc -> RRightT_Triangle.GetAt (i).left > pDoc -> RRightT_Triangle.GetAt (i).right ) {
+			RRightT_Point[0].x = pDoc -> RRightT_Triangle.GetAt (i).right ;
+			RRightT_Point[1].x = pDoc -> RRightT_Triangle.GetAt (i).right ;
+			RRightT_Point[2].x = pDoc -> RRightT_Triangle.GetAt (i).left ;
+		}
+
+		if ( pDoc -> RRightT_Triangle.GetAt (i).top > pDoc -> RRightT_Triangle.GetAt (i).bottom ) {
+			RRightT_Point[0].y = pDoc -> RRightT_Triangle.GetAt (i).bottom ;
+			RRightT_Point[1].y = pDoc -> RRightT_Triangle.GetAt (i).top ;
+			RRightT_Point[2].y = pDoc -> RRightT_Triangle.GetAt (i).bottom ;
+		}
 
 		// 선 색을 가지지 않았을 경우의 출력
 		if ( pDoc -> RRightT_Color.GetAt (i) == RGB (0,0,0) ) {
@@ -677,23 +850,351 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 		// 만약 역 직각 삼각형을 그리고 있는 상태라면 테두리 직사각형을 그려줍니다.
 		if ( pDoc -> RRightT_Triangle.GetCount () - 1 == i && RRightT_CanMove == 'o' ) {
 			CPen pen ( PS_DOT, 1.8, RGB (100, 100, 255) );
-			CPen *Draw_Pen = pDC -> SelectObject(&pen);
-			P_PointStart.x = pDoc -> RRightT_Triangle.GetAt (i).right + pDoc -> RRightT_Thickness.GetAt (i) / 2 ;
-			P_PointStart.y = pDoc -> RRightT_Triangle.GetAt (i).top - pDoc -> RRightT_Thickness.GetAt (i) / 2 ;
-			P_PointLast.x = pDoc -> RRightT_Triangle.GetAt (i).right + pDoc -> RRightT_Thickness.GetAt (i) / 2 ;
-			P_PointLast.y = pDoc -> RRightT_Triangle.GetAt (i).bottom + pDoc -> RRightT_Thickness.GetAt (i) / 2 ;
-			pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
-			pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
-			pDC->SelectObject(Draw_Pen);
-;
-			CPen *Draw_Pen2 = pDC -> SelectObject(&pen);
-			P_PointStart.x = pDoc -> RRightT_Triangle.GetAt (i).left - pDoc -> RRightT_Thickness.GetAt (i) / 2 ;
-			P_PointStart.y = pDoc -> RRightT_Triangle.GetAt (i).bottom + pDoc -> RRightT_Thickness.GetAt (i) / 2 ;
-			P_PointLast.x = pDoc -> RRightT_Triangle.GetAt (i).right + pDoc -> RRightT_Thickness.GetAt (i) / 2 ;
-			P_PointLast.y = pDoc -> RRightT_Triangle.GetAt (i).bottom + pDoc -> RRightT_Thickness.GetAt (i) / 2 ;
-			pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
-			pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
-			pDC->SelectObject(Draw_Pen2);
+			
+			if ( pDoc -> RRightT_Triangle.GetAt (i).top > pDoc -> RRightT_Triangle.GetAt (i).bottom ) {
+				if ( pDoc -> RRightT_Triangle.GetAt (i).left > pDoc -> RRightT_Triangle.GetAt (i).right ) {
+					CPen *Draw_Pen = pDC -> SelectObject(&pen);
+					P_PointStart.x = pDoc -> RRightT_Triangle.GetAt (i).left - pDoc -> RRightT_Thickness.GetAt (i) / 2 ;
+					P_PointStart.y = pDoc -> RRightT_Triangle.GetAt (i).top + pDoc -> RRightT_Thickness.GetAt (i) / 2 ;
+					P_PointLast.x = pDoc -> RRightT_Triangle.GetAt (i).left - pDoc -> RRightT_Thickness.GetAt (i) / 2 ;
+					P_PointLast.y = pDoc -> RRightT_Triangle.GetAt (i).bottom - pDoc -> RRightT_Thickness.GetAt (i) / 2 ;
+					pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+					pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+					pDC->SelectObject(Draw_Pen);
+					;
+					CPen *Draw_Pen2 = pDC -> SelectObject(&pen);
+					P_PointStart.x = pDoc -> RRightT_Triangle.GetAt (i).right + pDoc -> RRightT_Thickness.GetAt (i) / 2 ;
+					P_PointStart.y = pDoc -> RRightT_Triangle.GetAt (i).top - pDoc -> RRightT_Thickness.GetAt (i) / 2 ;
+					P_PointLast.x = pDoc -> RRightT_Triangle.GetAt (i).left - pDoc -> RRightT_Thickness.GetAt (i) / 2 ;
+					P_PointLast.y = pDoc -> RRightT_Triangle.GetAt (i).top - pDoc -> RRightT_Thickness.GetAt (i) / 2 ;
+					pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+					pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+					pDC->SelectObject(Draw_Pen2);
+				}
+				else {
+					CPen *Draw_Pen = pDC -> SelectObject(&pen);
+					P_PointStart.x = pDoc -> RRightT_Triangle.GetAt (i).right - pDoc -> RRightT_Thickness.GetAt (i) / 2 ;
+					P_PointStart.y = pDoc -> RRightT_Triangle.GetAt (i).top + pDoc -> RRightT_Thickness.GetAt (i) / 2 ;
+					P_PointLast.x = pDoc -> RRightT_Triangle.GetAt (i).right - pDoc -> RRightT_Thickness.GetAt (i) / 2 ;
+					P_PointLast.y = pDoc -> RRightT_Triangle.GetAt (i).bottom - pDoc -> RRightT_Thickness.GetAt (i) / 2 ;
+					pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+					pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+					pDC->SelectObject(Draw_Pen);
+					;
+					CPen *Draw_Pen2 = pDC -> SelectObject(&pen);
+					P_PointStart.x = pDoc -> RRightT_Triangle.GetAt (i).left + pDoc -> RRightT_Thickness.GetAt (i) / 2 ;
+					P_PointStart.y = pDoc -> RRightT_Triangle.GetAt (i).top - pDoc -> RRightT_Thickness.GetAt (i) / 2 ;
+					P_PointLast.x = pDoc -> RRightT_Triangle.GetAt (i).right - pDoc -> RRightT_Thickness.GetAt (i) / 2 ;
+					P_PointLast.y = pDoc -> RRightT_Triangle.GetAt (i).top - pDoc -> RRightT_Thickness.GetAt (i) / 2 ;
+					pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+					pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+					pDC->SelectObject(Draw_Pen2);
+				}
+			}
+			else {
+				if ( pDoc -> RRightT_Triangle.GetAt (i).left > pDoc -> RRightT_Triangle.GetAt (i).right ) {
+					CPen *Draw_Pen = pDC -> SelectObject(&pen);
+					P_PointStart.x = pDoc -> RRightT_Triangle.GetAt (i).left + pDoc -> RRightT_Thickness.GetAt (i) / 2 ;
+					P_PointStart.y = pDoc -> RRightT_Triangle.GetAt (i).top - pDoc -> RRightT_Thickness.GetAt (i) / 2 ;
+					P_PointLast.x = pDoc -> RRightT_Triangle.GetAt (i).left + pDoc -> RRightT_Thickness.GetAt (i) / 2 ;
+					P_PointLast.y = pDoc -> RRightT_Triangle.GetAt (i).bottom + pDoc -> RRightT_Thickness.GetAt (i) / 2 ;
+					pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+					pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+					pDC->SelectObject(Draw_Pen);
+					;
+					CPen *Draw_Pen2 = pDC -> SelectObject(&pen);
+					P_PointStart.x = pDoc -> RRightT_Triangle.GetAt (i).right - pDoc -> RRightT_Thickness.GetAt (i) / 2 ;
+					P_PointStart.y = pDoc -> RRightT_Triangle.GetAt (i).bottom + pDoc -> RRightT_Thickness.GetAt (i) / 2 ;
+					P_PointLast.x = pDoc -> RRightT_Triangle.GetAt (i).left + pDoc -> RRightT_Thickness.GetAt (i) / 2 ;
+					P_PointLast.y = pDoc -> RRightT_Triangle.GetAt (i).bottom + pDoc -> RRightT_Thickness.GetAt (i) / 2 ;
+					pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+					pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+					pDC->SelectObject(Draw_Pen2);
+				}
+				else {
+					CPen *Draw_Pen = pDC -> SelectObject(&pen);
+					P_PointStart.x = pDoc -> RRightT_Triangle.GetAt (i).right + pDoc -> RRightT_Thickness.GetAt (i) / 2 ;
+					P_PointStart.y = pDoc -> RRightT_Triangle.GetAt (i).top - pDoc -> RRightT_Thickness.GetAt (i) / 2 ;
+					P_PointLast.x = pDoc -> RRightT_Triangle.GetAt (i).right + pDoc -> RRightT_Thickness.GetAt (i) / 2 ;
+					P_PointLast.y = pDoc -> RRightT_Triangle.GetAt (i).bottom + pDoc -> RRightT_Thickness.GetAt (i) / 2 ;
+					pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+					pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+					pDC->SelectObject(Draw_Pen);
+					;
+					CPen *Draw_Pen2 = pDC -> SelectObject(&pen);
+					P_PointStart.x = pDoc -> RRightT_Triangle.GetAt (i).left - pDoc -> RRightT_Thickness.GetAt (i) / 2 ;
+					P_PointStart.y = pDoc -> RRightT_Triangle.GetAt (i).bottom + pDoc -> RRightT_Thickness.GetAt (i) / 2 ;
+					P_PointLast.x = pDoc -> RRightT_Triangle.GetAt (i).right + pDoc -> RRightT_Thickness.GetAt (i) / 2 ;
+					P_PointLast.y = pDoc -> RRightT_Triangle.GetAt (i).bottom + pDoc -> RRightT_Thickness.GetAt (i) / 2 ;
+					pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+					pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+					pDC->SelectObject(Draw_Pen2);
+				}
+			}
+		}
+	}
+
+	// 그린 왼쪽 -> 오른쪽 삼각형을 모두 화면에 띄웁니다.
+	for ( int i = 0 ; i < pDoc -> LTRT_Triangle.GetCount () ; i++ ) {
+
+		// 그릴 왼쪽 -> 오른쪽 삼각형의 각 Point 좌표
+		POINT LTRT_Point[3] = { {pDoc -> LTRT_Triangle.GetAt (i).right,
+								 pDoc -> LTRT_Triangle.GetAt (i).top + (pDoc -> LTRT_Triangle.GetAt (i).bottom - pDoc -> LTRT_Triangle.GetAt (i).top) / 2 },
+								{pDoc -> LTRT_Triangle.GetAt (i).left, pDoc -> LTRT_Triangle.GetAt (i).top},
+								{pDoc -> LTRT_Triangle.GetAt (i).left, pDoc -> LTRT_Triangle.GetAt (i).bottom} } ;
+		
+		if ( pDoc -> LTRT_Triangle.GetAt (i).left > pDoc -> LTRT_Triangle.GetAt (i).right ) {
+			LTRT_Point[0].x = pDoc -> LTRT_Triangle.GetAt (i).left ;
+			LTRT_Point[1].x = pDoc -> LTRT_Triangle.GetAt (i).right ;
+			LTRT_Point[2].x = pDoc -> LTRT_Triangle.GetAt (i).right ;
+		}
+
+		// 선 색을 가지지 않았을 경우의 출력
+		if ( pDoc -> LTRT_Color.GetAt (i) == RGB (0,0,0) ) {
+
+			// 채우기 색상을 가지지 않았을 경우의 출력
+			if ( pDoc -> LTRT_FillColor.GetAt (i) == RGB (0,0,0) ) {
+				CPen pen;
+				pen.CreatePen( PS_SOLID, pDoc -> LTRT_Thickness.GetAt (i), RGB (0,0,0) ) ;
+				CPen* oldPen = pDC->SelectObject( &pen ) ;
+				pDC -> SelectStockObject ( NULL_BRUSH ) ;
+				pDC -> Polygon ( LTRT_Point, 3 ) ;
+				pDC -> SelectObject ( oldPen ) ;
+			}
+			// 채우기 색상을 가졌을 경우의 출력
+			else {
+				CBrush brush;
+				brush.CreateSolidBrush( pDoc -> LTRT_FillColor.GetAt (i) ) ;
+				CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+				CPen pen ( PS_SOLID, pDoc -> LTRT_Thickness.GetAt (i), RGB (0, 0, 0) );
+				CPen *Draw_Pen = pDC -> SelectObject(&pen);
+
+				pDC -> Polygon ( LTRT_Point, 3 ) ;
+
+				pDC->SelectObject ( Draw_Pen ) ;
+				pDC -> SelectObject ( oldBrush ) ;
+			}
+		}
+		// 특정 선 색상을 가졌을 경우의 출력
+		else {
+			
+			// 채우기 색상을 가지지 않았을 경우의 출력
+			if ( pDoc -> LTRT_FillColor.GetAt (i) == RGB (0,0,0) ) {
+				CPen pen ( PS_SOLID, pDoc -> LTRT_Thickness.GetAt (i), pDoc -> LTRT_Color.GetAt (i) );
+				CPen *Draw_Pen = pDC -> SelectObject(&pen);
+				pDC -> SelectStockObject ( NULL_BRUSH ) ;
+				pDC -> Polygon ( LTRT_Point, 3 ) ;
+
+				pDC->SelectObject(Draw_Pen);
+			}
+			// 채우기 색상을 가졌을 경우의 출력
+			else {
+
+				CPen pen ( PS_SOLID, pDoc -> LTRT_Thickness.GetAt (i), pDoc -> LTRT_Color.GetAt (i) );
+				CPen *Draw_Pen = pDC -> SelectObject(&pen);
+				CBrush brush;
+				brush.CreateSolidBrush( pDoc -> LTRT_FillColor.GetAt (i) ) ;
+				CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+
+				pDC -> Polygon ( LTRT_Point, 3 ) ;
+
+				pDC->SelectObject(Draw_Pen);
+				pDC -> SelectObject ( oldBrush ) ;		
+			}
+		}
+		
+		// 만약 왼쪽 -> 오른쪽 삼각형을 그리고 있는 상태라면 테두리 직사각형을 그려줍니다.
+		if ( pDoc -> LTRT_Triangle.GetCount () - 1 == i && LTRT_CanMove == 'o' ) {
+			CPen pen ( PS_DOT, 1.8, RGB (100, 100, 255) );
+			
+			if ( pDoc -> LTRT_Triangle.GetAt (i).left > pDoc -> LTRT_Triangle.GetAt (i).right ) {
+				CPen *Draw_Pen = pDC -> SelectObject(&pen);
+				P_PointStart.x = pDoc -> LTRT_Triangle.GetAt (i).left + pDoc -> LTRT_Thickness.GetAt (i) / 2 ;
+				P_PointStart.y = pDoc -> LTRT_Triangle.GetAt (i).top - pDoc -> LTRT_Thickness.GetAt (i) / 2 ;
+				P_PointLast.x = pDoc -> LTRT_Triangle.GetAt (i).left + pDoc -> LTRT_Thickness.GetAt (i) / 2 ;
+				P_PointLast.y = pDoc -> LTRT_Triangle.GetAt (i).bottom + pDoc -> LTRT_Thickness.GetAt (i) / 2 ;
+				pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+				pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+				pDC->SelectObject(Draw_Pen);
+				
+				CPen *Draw_Pen2 = pDC -> SelectObject(&pen);
+				P_PointStart.x = pDoc -> LTRT_Triangle.GetAt (i).right - pDoc -> LTRT_Thickness.GetAt (i) / 2 ;
+				P_PointStart.y = pDoc -> LTRT_Triangle.GetAt (i).top + pDoc -> LTRT_Thickness.GetAt (i) / 2 ;
+				P_PointLast.x = pDoc -> LTRT_Triangle.GetAt (i).left + pDoc -> LTRT_Thickness.GetAt (i) / 2 ;
+				P_PointLast.y = pDoc -> LTRT_Triangle.GetAt (i).top + pDoc -> LTRT_Thickness.GetAt (i) / 2 ;
+				pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+				pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+				pDC->SelectObject(Draw_Pen2);
+
+				CPen *Draw_Pen3 = pDC -> SelectObject(&pen);
+				P_PointStart.x = pDoc -> LTRT_Triangle.GetAt (i).right - pDoc -> LTRT_Thickness.GetAt (i) / 2 ;
+				P_PointStart.y = pDoc -> LTRT_Triangle.GetAt (i).bottom + pDoc -> LTRT_Thickness.GetAt (i) / 2 ;
+				P_PointLast.x = pDoc -> LTRT_Triangle.GetAt (i).left + pDoc -> LTRT_Thickness.GetAt (i) / 2 ;
+				P_PointLast.y = pDoc -> LTRT_Triangle.GetAt (i).bottom + pDoc -> LTRT_Thickness.GetAt (i) / 2 ;
+				pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+				pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+				pDC->SelectObject(Draw_Pen3);
+			}
+			else {
+				CPen *Draw_Pen = pDC -> SelectObject(&pen);
+				P_PointStart.x = pDoc -> LTRT_Triangle.GetAt (i).right + pDoc -> LTRT_Thickness.GetAt (i) / 2 ;
+				P_PointStart.y = pDoc -> LTRT_Triangle.GetAt (i).top - pDoc -> LTRT_Thickness.GetAt (i) / 2 ;
+				P_PointLast.x = pDoc -> LTRT_Triangle.GetAt (i).right + pDoc -> LTRT_Thickness.GetAt (i) / 2 ;
+				P_PointLast.y = pDoc -> LTRT_Triangle.GetAt (i).bottom + pDoc -> LTRT_Thickness.GetAt (i) / 2 ;
+				pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+				pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+				pDC->SelectObject(Draw_Pen);
+				
+				CPen *Draw_Pen2 = pDC -> SelectObject(&pen);
+				P_PointStart.x = pDoc -> LTRT_Triangle.GetAt (i).left - pDoc -> LTRT_Thickness.GetAt (i) / 2 ;
+				P_PointStart.y = pDoc -> LTRT_Triangle.GetAt (i).top + pDoc -> LTRT_Thickness.GetAt (i) / 2 ;
+				P_PointLast.x = pDoc -> LTRT_Triangle.GetAt (i).right + pDoc -> LTRT_Thickness.GetAt (i) / 2 ;
+				P_PointLast.y = pDoc -> LTRT_Triangle.GetAt (i).top + pDoc -> LTRT_Thickness.GetAt (i) / 2 ;
+				pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+				pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+				pDC->SelectObject(Draw_Pen2);
+
+				CPen *Draw_Pen3 = pDC -> SelectObject(&pen);
+				P_PointStart.x = pDoc -> LTRT_Triangle.GetAt (i).left - pDoc -> LTRT_Thickness.GetAt (i) / 2 ;
+				P_PointStart.y = pDoc -> LTRT_Triangle.GetAt (i).bottom + pDoc -> LTRT_Thickness.GetAt (i) / 2 ;
+				P_PointLast.x = pDoc -> LTRT_Triangle.GetAt (i).right + pDoc -> LTRT_Thickness.GetAt (i) / 2 ;
+				P_PointLast.y = pDoc -> LTRT_Triangle.GetAt (i).bottom + pDoc -> LTRT_Thickness.GetAt (i) / 2 ;
+				pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+				pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+				pDC->SelectObject(Draw_Pen3);
+			}
+		}
+	}
+
+	// 그린 오른쪽 -> 왼쪽 삼각형을 모두 화면에 띄웁니다.
+	for ( int i = 0 ; i < pDoc -> RTLT_Triangle.GetCount () ; i++ ) {
+
+		// 그릴 오른쪽 -> 왼쪽 삼각형의 각 Point 좌표
+		POINT RTLT_Point[3] = { {pDoc -> RTLT_Triangle.GetAt (i).left,
+								 pDoc -> RTLT_Triangle.GetAt (i).top + (pDoc -> RTLT_Triangle.GetAt (i).bottom - pDoc -> RTLT_Triangle.GetAt (i).top) / 2 },
+								{pDoc -> RTLT_Triangle.GetAt (i).right, pDoc -> RTLT_Triangle.GetAt (i).top},
+								{pDoc -> RTLT_Triangle.GetAt (i).right, pDoc -> RTLT_Triangle.GetAt (i).bottom} } ;
+		
+		if ( pDoc -> RTLT_Triangle.GetAt (i).left > pDoc -> RTLT_Triangle.GetAt (i).right ) {
+			RTLT_Point[0].x = pDoc -> RTLT_Triangle.GetAt (i).right ;
+			RTLT_Point[1].x = pDoc -> RTLT_Triangle.GetAt (i).left ;
+			RTLT_Point[2].x = pDoc -> RTLT_Triangle.GetAt (i).left ;
+		}
+
+		// 선 색을 가지지 않았을 경우의 출력
+		if ( pDoc -> RTLT_Color.GetAt (i) == RGB (0,0,0) ) {
+
+			// 채우기 색상을 가지지 않았을 경우의 출력
+			if ( pDoc -> RTLT_FillColor.GetAt (i) == RGB (0,0,0) ) {
+				CPen pen;
+				pen.CreatePen( PS_SOLID, pDoc -> RTLT_Thickness.GetAt (i), RGB (0,0,0) ) ;
+				CPen* oldPen = pDC->SelectObject( &pen ) ;
+				pDC -> SelectStockObject ( NULL_BRUSH ) ;
+				pDC -> Polygon ( RTLT_Point, 3 ) ;
+				pDC -> SelectObject ( oldPen ) ;
+			}
+			// 채우기 색상을 가졌을 경우의 출력
+			else {
+				CBrush brush;
+				brush.CreateSolidBrush( pDoc -> RTLT_FillColor.GetAt (i) ) ;
+				CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+				CPen pen ( PS_SOLID, pDoc -> RTLT_Thickness.GetAt (i), RGB (0, 0, 0) );
+				CPen *Draw_Pen = pDC -> SelectObject(&pen);
+
+				pDC -> Polygon ( RTLT_Point, 3 ) ;
+
+				pDC->SelectObject ( Draw_Pen ) ;
+				pDC -> SelectObject ( oldBrush ) ;
+			}
+		}
+		// 특정 선 색상을 가졌을 경우의 출력
+		else {
+			
+			// 채우기 색상을 가지지 않았을 경우의 출력
+			if ( pDoc -> RTLT_FillColor.GetAt (i) == RGB (0,0,0) ) {
+				CPen pen ( PS_SOLID, pDoc -> RTLT_Thickness.GetAt (i), pDoc -> RTLT_Color.GetAt (i) );
+				CPen *Draw_Pen = pDC -> SelectObject(&pen);
+				pDC -> SelectStockObject ( NULL_BRUSH ) ;
+				pDC -> Polygon ( RTLT_Point, 3 ) ;
+
+				pDC->SelectObject(Draw_Pen);
+			}
+			// 채우기 색상을 가졌을 경우의 출력
+			else {
+
+				CPen pen ( PS_SOLID, pDoc -> RTLT_Thickness.GetAt (i), pDoc -> RTLT_Color.GetAt (i) );
+				CPen *Draw_Pen = pDC -> SelectObject(&pen);
+				CBrush brush;
+				brush.CreateSolidBrush( pDoc -> RTLT_FillColor.GetAt (i) ) ;
+				CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+
+				pDC -> Polygon ( RTLT_Point, 3 ) ;
+
+				pDC->SelectObject(Draw_Pen);
+				pDC -> SelectObject ( oldBrush ) ;		
+			}
+		}
+		
+		// 만약 왼쪽 -> 오른쪽 삼각형을 그리고 있는 상태라면 테두리 직사각형을 그려줍니다.
+		if ( pDoc -> RTLT_Triangle.GetCount () - 1 == i && RTLT_CanMove == 'o' ) {
+			CPen pen ( PS_DOT, 1.8, RGB (100, 100, 255) );
+			
+			if ( pDoc -> RTLT_Triangle.GetAt (i).left > pDoc -> RTLT_Triangle.GetAt (i).right ) {
+				CPen *Draw_Pen = pDC -> SelectObject(&pen);
+				P_PointStart.x = pDoc -> RTLT_Triangle.GetAt (i).right + pDoc -> RTLT_Thickness.GetAt (i) / 2 ;
+				P_PointStart.y = pDoc -> RTLT_Triangle.GetAt (i).top - pDoc -> RTLT_Thickness.GetAt (i) / 2 ;
+				P_PointLast.x = pDoc -> RTLT_Triangle.GetAt (i).right + pDoc -> RTLT_Thickness.GetAt (i) / 2 ;
+				P_PointLast.y = pDoc -> RTLT_Triangle.GetAt (i).bottom + pDoc -> RTLT_Thickness.GetAt (i) / 2 ;
+				pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+				pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+				pDC->SelectObject(Draw_Pen);
+				
+				CPen *Draw_Pen2 = pDC -> SelectObject(&pen);
+				P_PointStart.x = pDoc -> RTLT_Triangle.GetAt (i).left - pDoc -> RTLT_Thickness.GetAt (i) / 2 ;
+				P_PointStart.y = pDoc -> RTLT_Triangle.GetAt (i).top + pDoc -> RTLT_Thickness.GetAt (i) / 2 ;
+				P_PointLast.x = pDoc -> RTLT_Triangle.GetAt (i).right + pDoc -> RTLT_Thickness.GetAt (i) / 2 ;
+				P_PointLast.y = pDoc -> RTLT_Triangle.GetAt (i).top + pDoc -> RTLT_Thickness.GetAt (i) / 2 ;
+				pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+				pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+				pDC->SelectObject(Draw_Pen2);
+
+				CPen *Draw_Pen3 = pDC -> SelectObject(&pen);
+				P_PointStart.x = pDoc -> RTLT_Triangle.GetAt (i).left - pDoc -> RTLT_Thickness.GetAt (i) / 2 ;
+				P_PointStart.y = pDoc -> RTLT_Triangle.GetAt (i).bottom + pDoc -> RTLT_Thickness.GetAt (i) / 2 ;
+				P_PointLast.x = pDoc -> RTLT_Triangle.GetAt (i).right + pDoc -> RTLT_Thickness.GetAt (i) / 2 ;
+				P_PointLast.y = pDoc -> RTLT_Triangle.GetAt (i).bottom + pDoc -> RTLT_Thickness.GetAt (i) / 2 ;
+				pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+				pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+				pDC->SelectObject(Draw_Pen3);
+			}
+			else {
+				CPen *Draw_Pen = pDC -> SelectObject(&pen);
+				P_PointStart.x = pDoc -> RTLT_Triangle.GetAt (i).left + pDoc -> RTLT_Thickness.GetAt (i) / 2 ;
+				P_PointStart.y = pDoc -> RTLT_Triangle.GetAt (i).top - pDoc -> RTLT_Thickness.GetAt (i) / 2 ;
+				P_PointLast.x = pDoc -> RTLT_Triangle.GetAt (i).left + pDoc -> RTLT_Thickness.GetAt (i) / 2 ;
+				P_PointLast.y = pDoc -> RTLT_Triangle.GetAt (i).bottom + pDoc -> RTLT_Thickness.GetAt (i) / 2 ;
+				pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+				pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+				pDC->SelectObject(Draw_Pen);
+				
+				CPen *Draw_Pen2 = pDC -> SelectObject(&pen);
+				P_PointStart.x = pDoc -> RTLT_Triangle.GetAt (i).right - pDoc -> RTLT_Thickness.GetAt (i) / 2 ;
+				P_PointStart.y = pDoc -> RTLT_Triangle.GetAt (i).top + pDoc -> RTLT_Thickness.GetAt (i) / 2 ;
+				P_PointLast.x = pDoc -> RTLT_Triangle.GetAt (i).left + pDoc -> RTLT_Thickness.GetAt (i) / 2 ;
+				P_PointLast.y = pDoc -> RTLT_Triangle.GetAt (i).top + pDoc -> RTLT_Thickness.GetAt (i) / 2 ;
+				pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+				pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+				pDC->SelectObject(Draw_Pen2);
+
+				CPen *Draw_Pen3 = pDC -> SelectObject(&pen);
+				P_PointStart.x = pDoc -> RTLT_Triangle.GetAt (i).right - pDoc -> RTLT_Thickness.GetAt (i) / 2 ;
+				P_PointStart.y = pDoc -> RTLT_Triangle.GetAt (i).bottom + pDoc -> RTLT_Thickness.GetAt (i) / 2 ;
+				P_PointLast.x = pDoc -> RTLT_Triangle.GetAt (i).left + pDoc -> RTLT_Thickness.GetAt (i) / 2 ;
+				P_PointLast.y = pDoc -> RTLT_Triangle.GetAt (i).bottom + pDoc -> RTLT_Thickness.GetAt (i) / 2 ;
+				pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+				pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+				pDC->SelectObject(Draw_Pen3);
+			}
 		}
 	}
 }
@@ -1028,6 +1529,67 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 		else if ( m_IsThickness == 'x' )
 			pDoc -> RRightT_Thickness.Add (1) ;
 	}
+	// 왼쪽 -> 오른쪽 삼각형을 그리는 경우
+	else if ( LTRT_IsDraw == 'o' ) {
+		LTRT_Insert.left = point.x ;
+		LTRT_Insert.right = point.x ;
+		LTRT_Insert.top = point.y ;
+		LTRT_Insert.bottom = point.y ;
+
+		pDoc -> LTRT_Triangle.Add ( LTRT_Insert ) ;
+		LTRT_Current = pDoc -> LTRT_Triangle.GetCount () - 1 ;
+		LTRT_CanMove = 'o' ;
+
+		// 만약 색상을 선택하고 그렸을 경우 선택 색상을 기억.
+		if ( m_IsColor == 'o' )
+			pDoc -> LTRT_Color.Add ( m_Color ) ;
+		// 색상을 선택하지 않고 그렸을 경우 표준 색상 기억.
+		else if ( m_IsColor == 'x' )
+			pDoc -> LTRT_Color.Add (RGB(0,0,0)) ;
+
+		if ( m_IsFillColor == 'o' )
+			pDoc -> LTRT_FillColor.Add ( m_FillColor ) ;
+		else if ( m_IsFillColor == 'x' )
+			pDoc -> LTRT_FillColor.Add ( RGB(0,0,0) ) ;
+
+		// 두께 설정을 한 경우
+		if ( m_IsThickness == 'o' )
+			pDoc -> LTRT_Thickness.Add ( m_Thickness ) ;
+		// 두께 설정을 하지 않은 경우
+		else if ( m_IsThickness == 'x' )
+			pDoc -> LTRT_Thickness.Add (1) ;
+	}
+	// 오른쪽 -> 왼쪽 삼각형을 그리는 경우
+	else if ( RTLT_IsDraw == 'o' ) {
+		RTLT_Insert.left = point.x ;
+		RTLT_Insert.right = point.x ;
+		RTLT_Insert.top = point.y ;
+		RTLT_Insert.bottom = point.y ;
+
+		pDoc -> RTLT_Triangle.Add ( RTLT_Insert ) ;
+		RTLT_Current = pDoc -> RTLT_Triangle.GetCount () - 1 ;
+		RTLT_CanMove = 'o' ;
+
+		// 만약 색상을 선택하고 그렸을 경우 선택 색상을 기억.
+		if ( m_IsColor == 'o' )
+			pDoc -> RTLT_Color.Add ( m_Color ) ;
+		// 색상을 선택하지 않고 그렸을 경우 표준 색상 기억.
+		else if ( m_IsColor == 'x' )
+			pDoc -> RTLT_Color.Add (RGB(0,0,0)) ;
+
+		if ( m_IsFillColor == 'o' )
+			pDoc -> RTLT_FillColor.Add ( m_FillColor ) ;
+		else if ( m_IsFillColor == 'x' )
+			pDoc -> RTLT_FillColor.Add ( RGB(0,0,0) ) ;
+
+		// 두께 설정을 한 경우
+		if ( m_IsThickness == 'o' )
+			pDoc -> RTLT_Thickness.Add ( m_Thickness ) ;
+		// 두께 설정을 하지 않은 경우
+		else if ( m_IsThickness == 'x' )
+			pDoc -> RTLT_Thickness.Add (1) ;
+	}
+
 
 	CScrollView::OnLButtonDown(nFlags, point);
 }
@@ -1095,10 +1657,25 @@ void CGraphicEditorView::OnMouseMove(UINT nFlags, CPoint point)
 
 		// 첫 번째 Skeleton을 변형 하는 경우
 		else if ( P_IsStart == 'o' ) {
-			P_Insert.Poly_point.SetAt ( 0, point ) ;
-			pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.SetAt ( 0, point ) ;
+			if ( P_IsSkeletonStart != 'o' )
+				P_CurrentPoint++ ;
+
+			pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.SetSize ( P_CurrentPoint+1 ) ;
+			pDoc -> P_Poly.GetAt ( P_Current).Poly_point.SetAt ( 0, point ) ;
+			P_Insert.Poly_point.SetSize ( P_CurrentPoint+1 ) ;
+
+			if ( P_IsSkeletonStart != 'o' ) {
+				for ( int i = 1 ; i < P_CurrentPoint + 1 ; i++ ) {
+					pDoc -> P_Poly.GetAt ( P_Current).Poly_point.SetAt ( i, P_Insert.Poly_point.GetAt (i-1) ) ;
+					P_Insert.Poly_point.SetAt ( i-1, pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt (i-1) ) ;
+				}
+
+				P_Insert.Poly_point.SetAt ( P_CurrentPoint, pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt (P_CurrentPoint) ) ;
+			}
+
 			Invalidate () ;
 			P_IsMove = 'o' ;
+			P_IsSkeletonStart = 'o' ;
 		}
 	}
 	// 원 그리기 선택후 드래그 하는 경우
@@ -1139,6 +1716,22 @@ void CGraphicEditorView::OnMouseMove(UINT nFlags, CPoint point)
 		RRightT_Insert.bottom = point.y ;
 
 		pDoc->RRightT_Triangle.SetAt ( RRightT_Current, RRightT_Insert ) ;
+		Invalidate () ;
+	}
+	// 왼쪽 -> 오른쪽 삼각형 그리기 선택후 드래그 하는 경우
+	else if ( LTRT_CanMove == 'o' ) {
+		LTRT_Insert.right = point.x ;
+		LTRT_Insert.bottom = point.y ;
+
+		pDoc->LTRT_Triangle.SetAt ( LTRT_Current, LTRT_Insert ) ;
+		Invalidate () ;
+	}
+	// 오른쪽 -> 왼쪽 삼각형 그리기 선택후 드래그 하는 경우
+	else if ( RTLT_CanMove == 'o' ) {
+		RTLT_Insert.right = point.x ;
+		RTLT_Insert.bottom = point.y ;
+
+		pDoc->RTLT_Triangle.SetAt ( RTLT_Current, RTLT_Insert ) ;
 		Invalidate () ;
 	}
 	
@@ -1222,6 +1815,7 @@ void CGraphicEditorView::OnLButtonUp(UINT nFlags, CPoint point)
 				pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.SetAt ( 0, point ) ;
 				Invalidate () ;
 				P_IsStart = 'x' ;
+				P_IsSkeletonStart = 'x' ;
 			}
 			// 만약 첫번째, 마지막 Skeleton외 다른 Skeleton을 변경한 경우
 			else if ( P_ChangeSkeleton > 0 ) {
@@ -1344,6 +1938,50 @@ void CGraphicEditorView::OnLButtonUp(UINT nFlags, CPoint point)
 		RRightT_CanMove = 'x' ;
 		IsNormal = 'o' ;
 	}
+	// 왼쪽 -> 오른쪽 직각 삼각형을 그리다 클릭을 땐 경우
+	else if ( LTRT_IsDraw == 'o' ) {
+		LTRT_Insert.right = point.x ;
+		LTRT_Insert.bottom = point.y ;
+
+		if ( LTRT_Insert.left > LTRT_Insert.right ) {
+			int temp = LTRT_Insert.right ;
+			LTRT_Insert.right = LTRT_Insert.left ;
+			LTRT_Insert.left = temp ;
+		}
+		if ( LTRT_Insert.top > LTRT_Insert.bottom ) {
+			int temp = LTRT_Insert.bottom ;
+			LTRT_Insert.bottom = LTRT_Insert.top ;
+			LTRT_Insert.top = temp ;
+		}
+
+		pDoc -> LTRT_Triangle.SetAt ( LTRT_Current, LTRT_Insert ) ;
+		Invalidate () ;
+		LTRT_IsDraw = 'x' ;
+		LTRT_CanMove = 'x' ;
+		IsNormal = 'o' ;
+	}
+	// 오른쪽 -> 왼쪽 직각 삼각형을 그리다 클릭을 땐 경우
+	else if ( RTLT_IsDraw == 'o' ) {
+		RTLT_Insert.right = point.x ;
+		RTLT_Insert.bottom = point.y ;
+
+		if ( RTLT_Insert.left > RTLT_Insert.right ) {
+			int temp = RTLT_Insert.right ;
+			RTLT_Insert.right = RTLT_Insert.left ;
+			RTLT_Insert.left = temp ;
+		}
+		if ( RTLT_Insert.top > RTLT_Insert.bottom ) {
+			int temp = RTLT_Insert.bottom ;
+			RTLT_Insert.bottom = RTLT_Insert.top ;
+			RTLT_Insert.top = temp ;
+		}
+
+		pDoc -> RTLT_Triangle.SetAt ( RTLT_Current, RTLT_Insert ) ;
+		Invalidate () ;
+		RTLT_IsDraw = 'x' ;
+		RTLT_CanMove = 'x' ;
+		IsNormal = 'o' ;
+	}
 
 	CScrollView::OnLButtonUp(nFlags, point);
 }
@@ -1353,6 +1991,8 @@ void CGraphicEditorView::OnDrawline()
 {
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 	
+	LTRT_IsDraw = 'x' ;
+	RTLT_IsDraw = 'x' ;
 	RRightT_IsDraw = 'x' ;
 	RightT_IsDraw = 'x' ;
 	RT_IsDraw = 'x' ;
@@ -1453,6 +2093,8 @@ void CGraphicEditorView::OnDrawrec()
 {
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 
+	LTRT_IsDraw = 'x' ;
+	RTLT_IsDraw = 'x' ;
 	RRightT_IsDraw = 'x' ;
 	RightT_IsDraw = 'x' ;
 	RT_IsDraw = 'x' ;
@@ -1474,6 +2116,8 @@ void CGraphicEditorView::OnDrawpoly()
 {
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 
+	LTRT_IsDraw = 'x' ;
+	RTLT_IsDraw = 'x' ;
 	RRightT_IsDraw = 'x' ;
 	RightT_IsDraw = 'x' ;
 	RT_IsDraw = 'x' ;
@@ -1496,6 +2140,8 @@ void CGraphicEditorView::OnDrawellipse()
 {
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 	
+	LTRT_IsDraw = 'x' ;
+	RTLT_IsDraw = 'x' ;
 	RRightT_IsDraw = 'x' ;
 	RightT_IsDraw = 'x' ;
 	RT_IsDraw = 'x' ;
@@ -1516,6 +2162,8 @@ void CGraphicEditorView::OnSelectobject()
 {
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 
+	LTRT_IsDraw = 'x' ;
+	RTLT_IsDraw = 'x' ;
 	RRightT_IsDraw = 'x' ;
 	RightT_IsDraw = 'x' ;
 	RT_IsDraw = 'x' ;
@@ -1584,11 +2232,13 @@ void CGraphicEditorView::OnNofillcolor()
 	m_IsFillColor = 'x' ;
 }
 
-
+// 세모 그리기 모드
 void CGraphicEditorView::OnDrawtriangle()
 {
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 	
+	LTRT_IsDraw = 'x' ;
+	RTLT_IsDraw = 'x' ;
 	RRightT_IsDraw = 'x' ;
 	RightT_IsDraw = 'x' ;
 	RT_IsDraw = 'x' ;
@@ -1605,11 +2255,13 @@ void CGraphicEditorView::OnDrawtriangle()
 	Invalidate () ;
 }
 
-
+// 역 삼각형 그리기 모드
 void CGraphicEditorView::OnDrawreversetri()
 {
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 
+	LTRT_IsDraw = 'x' ;
+	RTLT_IsDraw = 'x' ;
 	RRightT_IsDraw = 'x' ;
 	RightT_IsDraw = 'x' ;
 	RT_IsDraw = 'o' ;
@@ -1626,6 +2278,7 @@ void CGraphicEditorView::OnDrawreversetri()
 	Invalidate () ;
 }
 
+// 두께 지정 버튼 처리기
 void CGraphicEditorView::OnThickness()
 {
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
@@ -1638,11 +2291,13 @@ void CGraphicEditorView::OnThickness()
 	}
 }
 
-
+// 직각 삼각형 그리기 모드
 void CGraphicEditorView::OnRightangledtri()
 {
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 
+	LTRT_IsDraw = 'x' ;
+	RTLT_IsDraw = 'x' ;
 	RRightT_IsDraw = 'x' ;
 	RightT_IsDraw = 'o' ;
 	RT_IsDraw = 'x' ;
@@ -1659,11 +2314,60 @@ void CGraphicEditorView::OnRightangledtri()
 	Invalidate () ;
 }
 
+// 역 직각 삼각형 그리기 모드
 void CGraphicEditorView::OnRRrightangledtri()
 {
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 
+	LTRT_IsDraw = 'x' ;
+	RTLT_IsDraw = 'x' ;
 	RRightT_IsDraw = 'o' ;
+	RightT_IsDraw = 'x' ;
+	RT_IsDraw = 'x' ;
+	T_IsDraw = 'x' ;
+	L_IsDraw = 'x' ;
+	R_IsDraw = 'x' ;
+	P_Insert.Poly_point.RemoveAll () ;
+	P_CanMove = 'x' ;
+	P_IsContinue = 'x' ;
+	P_IsDraw = 'x' ;
+	E_IsDraw = 'x' ;
+	IsNormal = 'x' ;
+
+	Invalidate () ;
+}
+
+// 오른쪽 -> 왼쪽 삼각형 그리기 모드
+void CGraphicEditorView::OnRighttolefttri()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+
+	LTRT_IsDraw = 'x' ;
+	RTLT_IsDraw = 'o' ;
+	RRightT_IsDraw = 'x' ;
+	RightT_IsDraw = 'x' ;
+	RT_IsDraw = 'x' ;
+	T_IsDraw = 'x' ;
+	L_IsDraw = 'x' ;
+	R_IsDraw = 'x' ;
+	P_Insert.Poly_point.RemoveAll () ;
+	P_CanMove = 'x' ;
+	P_IsContinue = 'x' ;
+	P_IsDraw = 'x' ;
+	E_IsDraw = 'x' ;
+	IsNormal = 'x' ;
+
+	Invalidate () ;
+}
+
+// 왼쪽 -> 오른쪽 삼각형 그리기 모드
+void CGraphicEditorView::OnLefttorighttri()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+
+	LTRT_IsDraw = 'o' ;
+	RTLT_IsDraw = 'x' ;
+	RRightT_IsDraw = 'x' ;
 	RightT_IsDraw = 'x' ;
 	RT_IsDraw = 'x' ;
 	T_IsDraw = 'x' ;

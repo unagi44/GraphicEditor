@@ -55,6 +55,7 @@ public:
 	char P_IsContinue ;
 	char P_IsStart ;
 	char P_IsMove ;
+	char P_IsSkeletonStart ;
 
 	// 원 그리기에 필요한 변수들
 	CRect E_Insert ;
@@ -85,6 +86,18 @@ public:
 	int RRightT_Current ;
 	char RRightT_IsDraw ;
 	char RRightT_CanMove ;
+
+	// 오른쪽 -> 왼쪽 삼각형 그리기에 필요한 변수들
+	CRect RTLT_Insert ;
+	int RTLT_Current ;
+	char RTLT_IsDraw ;
+	char RTLT_CanMove ;
+
+	// 왼쪽 -> 오른쪽 삼각형 그리기에 필요한 변수들
+	CRect LTRT_Insert ;
+	int LTRT_Current ;
+	char LTRT_IsDraw ;
+	char LTRT_CanMove ;
 
 // 작업입니다.
 public:
@@ -132,6 +145,8 @@ public:
 	afx_msg void OnRightangledtri();
 //	afx_msg void OnRrightangledtri();
 	afx_msg void OnRRrightangledtri();
+	afx_msg void OnRighttolefttri();
+	afx_msg void OnLefttorighttri();
 };
 
 #ifndef _DEBUG  // GraphicEditorView.cpp의 디버그 버전

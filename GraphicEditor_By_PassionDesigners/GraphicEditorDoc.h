@@ -28,6 +28,8 @@ public:
 	CArray < CRect, CRect& > RT_Triangle ;		// 역 삼각형 그리기 배열
 	CArray < CRect, CRect& > RightT_Triangle ;	// 직각 삼각형 그리기 배열
 	CArray < CRect, CRect& > RRightT_Triangle ;	// 역 직각 삼각형 그리기 배열
+	CArray < CRect, CRect& > RTLT_Triangle ;	// 오른쪽 -> 왼쪽 삼각형 그리기 배열
+	CArray < CRect, CRect& > LTRT_Triangle ;	// 왼쪽 -> 오른쪽 삼각형 그리기 배열
 // 작업입니다.
 public:
 	CArray < int, int > R_Color ;		// 상자 선 색
@@ -48,6 +50,24 @@ public:
 	CArray < int, int > RT_Thickness ;			// 역 삼각형의 선 두께
 	CArray < int, int > RightT_Thickness ;		// 직각 삼각형의 선 두께
 	CArray < int, int > RRightT_Thickness ;		// 역 직각 삼각형의 선 두께
+	CArray < int, int > RTLT_Color ;			// 오른쪽 -> 왼쪽 삼각형 선 색
+	CArray < int, int > RTLT_FillColor ;		// 오른쪽 -> 왼쪽 삼각형 채우기 색
+	CArray < int, int > RTLT_Thickness ;		// 오른쪽 -> 왼쪽 삼각형 두께
+	CArray < int, int > LTRT_Color ;			// 왼쪽 -> 오른쪽 삼각형 선 색
+	CArray < int, int > LTRT_FillColor ;		// 왼쪽 -> 오른쪽 삼각형 채우기 색
+	CArray < int, int > LTRT_Thickness ;		// 왼쪽 -> 오른쪽 삼각형 두께
+public:
+	int L_Count ;			// 선 객체의 개수
+	int P_Count ;			// PolyLine 객체의 개수
+	int R_Count ;			// 상자 객체의 개수
+	int E_Count ;			// 원 객체의 개수
+	int T_Count ;			// 세모 객체의 개수
+	int RT_Count ;			// 역 삼각형 객체의 개수
+	int RightT_Count ;		// 직각 삼각형 객체의 개수
+	int RRightT_Count ;		// 직각 역 삼각형 객체의 개수
+	int LTRT_Count ;		// 왼쪽 -> 오른쪽 삼각형 객체의 개수
+	int RTLT_Count ;		// 오른쪽 -> 왼쪽 객체의 개수
+
 // 재정의입니다.
 public:
 	virtual BOOL OnNewDocument();
