@@ -35,6 +35,16 @@ END_MESSAGE_MAP()
 CGraphicEditorDoc::CGraphicEditorDoc()
 {
 	// TODO: 여기에 일회성 생성 코드를 추가합니다.
+	L_Count = 0 ;
+	R_Count = 0 ;
+	P_Count = 0 ;
+	E_Count = 0 ;
+	T_Count = 0 ;
+	RT_Count = 0 ;
+	RightT_Count = 0 ;
+	RRightT_Count = 0 ;
+	LTRT_Count = 0 ;
+	RTLT_Count = 0 ;
 }
 
 CGraphicEditorDoc::~CGraphicEditorDoc()
@@ -107,6 +117,18 @@ void CGraphicEditorDoc::Serialize(CArchive& ar)
 		LTRT_Color.Serialize (ar) ;			// 왼쪽 -> 오른쪽 삼각형 선 색 저장
 		LTRT_FillColor.Serialize (ar) ;		// 왼쪽 -> 오른쪽 삼각형 채우기 색 저장
 		LTRT_Thickness.Serialize (ar) ;		// 왼쪽 -> 오른쪽 삼각형 두께 저장
+		What.Serialize (ar) ;
+
+		ar << L_Count ;
+		ar << R_Count ;
+		ar << P_Count ;
+		ar << E_Count ;
+		ar << T_Count ;
+		ar << RT_Count ;
+		ar << RightT_Count ;
+		ar << RRightT_Count ;
+		ar << LTRT_Count ;
+		ar << RTLT_Count ;
 	}
 	else
 	{
@@ -155,6 +177,18 @@ void CGraphicEditorDoc::Serialize(CArchive& ar)
 		LTRT_Color.Serialize (ar) ;			// 왼쪽 -> 오른쪽 삼각형 선 색 불러오기
 		LTRT_FillColor.Serialize (ar) ;		// 왼쪽 -> 오른쪽 삼각형 채우기 색 불러오기
 		LTRT_Thickness.Serialize (ar) ;		// 왼쪽 -> 오른쪽 삼각형 두께 불러오기
+		What.Serialize (ar) ;
+
+		ar >> L_Count ;
+		ar >> R_Count ;
+		ar >> P_Count ;
+		ar >> E_Count ;
+		ar >> T_Count ;
+		ar >> RT_Count ;
+		ar >> RightT_Count ;
+		ar >> RRightT_Count ;
+		ar >> LTRT_Count ;
+		ar >> RTLT_Count ;
 	}
 }
 

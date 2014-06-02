@@ -57,6 +57,7 @@ public:
 	CArray < int, int > LTRT_FillColor ;		// 왼쪽 -> 오른쪽 삼각형 채우기 색
 	CArray < int, int > LTRT_Thickness ;		// 왼쪽 -> 오른쪽 삼각형 두께
 public:
+	CArray < CString, CString > What ;
 	int L_Count ;			// 선 객체의 개수
 	int P_Count ;			// PolyLine 객체의 개수
 	int R_Count ;			// 상자 객체의 개수
