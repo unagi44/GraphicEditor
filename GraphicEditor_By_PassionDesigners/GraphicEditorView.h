@@ -41,6 +41,7 @@ public:
 	char M_IsMove ;
 	char M_IsSelect ;
 	char M_IsDraw ;
+	char M_IsLineSelect ;
 	char M_ChangeLineOnePoint ;
 	char M_IsChangeLineStart ;
 

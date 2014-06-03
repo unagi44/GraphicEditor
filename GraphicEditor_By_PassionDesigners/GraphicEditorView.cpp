@@ -74,6 +74,7 @@ CGraphicEditorView::CGraphicEditorView()
 	M_IsMove = 'x' ;
 	M_IsSelect = 'x' ;
 	M_ChangeLineOnePoint = 'x' ;
+	M_IsLineSelect = 'x' ;
 
 	// 텍스트 삽입에 필요한 변수 초기화
 	Text_IsText = 'x' ;
@@ -1789,7 +1790,8 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 			Text_IsContinue = 'o' ;
 	}
 	// 선 객체를 변경시키는 경우
-	else if ( M_IsDraw == 'o' && ((pDoc -> L_Line.GetAt ( M_Number ).Start.x - 15 <= point.x && pDoc -> L_Line.GetAt ( M_Number ).Start.x + 15 >= point.x
+	else if ( M_IsDraw == 'o' && M_IsLineSelect == 'o' &&
+			  ((pDoc -> L_Line.GetAt ( M_Number ).Start.x - 15 <= point.x && pDoc -> L_Line.GetAt ( M_Number ).Start.x + 15 >= point.x
 			  && pDoc -> L_Line.GetAt ( M_Number ).Start.y - 15 <= point.y && pDoc -> L_Line.GetAt ( M_Number ).Start.y + 15 >= point.y) ||
 			  (pDoc -> L_Line.GetAt ( M_Number ).Last.x - 15 <= point.x && pDoc -> L_Line.GetAt ( M_Number ).Last.x + 15 >= point.x
 			  && pDoc -> L_Line.GetAt ( M_Number ).Last.y - 15 <= point.y && pDoc -> L_Line.GetAt ( M_Number ).Last.y + 15 >= point.y)) ) {
@@ -2005,6 +2007,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 					}
 				}
 				L_Number-- ;
+				M_IsLineSelect = 'o' ;
 			}
 
 			// 상자 객체인 경우
@@ -2208,11 +2211,6 @@ void CGraphicEditorView::OnMouseMove(UINT nFlags, CPoint point)
 			L_Insert.L_Color = m_Color ;
 		else
 			L_Insert.L_Color = RGB (0,0,0) ;
-
-		if ( m_IsFillColor == 'o' )
-			L_Insert.L_FillColor = m_Color ;
-		else
-			L_Insert.L_FillColor = RGB (0,0,0) ;
 
 		if ( m_IsThickness == 'o' )
 			L_Insert.Thickness = m_Thickness ;
@@ -2518,6 +2516,7 @@ void CGraphicEditorView::OnLButtonUp(UINT nFlags, CPoint point)
 		Invalidate () ;
 		M_IsChangeLineStart = 'x' ;
 		M_ChangeLineOnePoint = 'x' ;
+		M_IsLineSelect = 'x' ;
 	}
 	// 객체를 이동시키다 클릭을 땐 경우
 	else if ( M_IsMove == 'o' ) {
@@ -3359,6 +3358,9 @@ void CGraphicEditorView::OnLButtonDblClk(UINT nFlags, CPoint point)
 		P_IsMove = 'x' ;
 	}
 
+	M_IsChangeLineStart = 'x' ;
+	M_ChangeLineOnePoint = 'x' ;
+	M_IsLineSelect = 'x' ;
 	M_IsSelect = 'x' ;
 	M_IsDraw = 'x' ;
 	M_IsMove = 'x' ;
@@ -3383,11 +3385,46 @@ void CGraphicEditorView::OnLButtonDblClk(UINT nFlags, CPoint point)
 void CGraphicEditorView::OnChangefillcolor()
 {
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
-	CColorDialog dlgColor(0, CC_FULLOPEN, NULL);
-	if( dlgColor.DoModal() == IDOK )
-	{
-		m_FillColor = dlgColor.GetColor();
+
+	CGraphicEditorDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	if (!pDoc)
+		return;
+
+	CColorDialog dlgColor(0, CC_FULLOPEN, NULL) ;
+	
+	if ( M_IsDraw != 'o' ) {
+		if( dlgColor.DoModal() == IDOK )
+		{
+			m_FillColor = dlgColor.GetColor();
+			m_IsFillColor = 'o' ;
+		}
+	}
+	else {
 		m_IsFillColor = 'o' ;
+
+		if ( dlgColor.DoModal () == IDOK ) {
+			m_FillColor = dlgColor.GetColor () ;
+
+			if ( M_What == _T ("R") )
+				pDoc -> R_FillColor.GetAt ( M_Number ) = m_FillColor ;
+			else if ( M_What == _T("E") )
+				pDoc -> E_FillColor.GetAt ( M_Number ) = m_FillColor ;
+			else if ( M_What == _T("T") )
+				pDoc -> T_FillColor.GetAt ( M_Number ) = m_FillColor ;
+			else if ( M_What == _T("RT") )
+				pDoc -> RT_FillColor.GetAt ( M_Number ) = m_FillColor ;
+			else if ( M_What == _T("RightT") )
+				pDoc -> RightT_FillColor.GetAt ( M_Number ) = m_FillColor ;
+			else if ( M_What == _T("RRightT") )
+				pDoc -> RRightT_FillColor.GetAt ( M_Number ) = m_FillColor ;
+			else if ( M_What == _T("LTRT") )
+				pDoc -> LTRT_FillColor.GetAt ( M_Number ) = m_FillColor ;
+			else if ( M_What == _T("RTLT") )
+				pDoc -> RTLT_FillColor.GetAt ( M_Number ) = m_FillColor ;
+		}
+
+		Invalidate () ;
 	}
 }
 
