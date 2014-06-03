@@ -59,6 +59,16 @@ public:
 	CArray < int, int > LTRT_Color ;			// 왼쪽 -> 오른쪽 삼각형 선 색
 	CArray < int, int > LTRT_FillColor ;		// 왼쪽 -> 오른쪽 삼각형 채우기 색
 	CArray < int, int > LTRT_Thickness ;		// 왼쪽 -> 오른쪽 삼각형 두께
+	CArray < int, int > L_Location ;			// 그린 모든 객체 중 선 객체의 각 Index
+	CArray < int, int > R_Location ;			// 그린 모든 객체 중 상자 객체의 각 Index
+	CArray < int, int > P_Location ;			// 그린 모든 객체 중 PolyLine 객체의 각 Index
+	CArray < int, int > E_Location ;			// 그린 모든 객체 중 원 객체의 각 Index
+	CArray < int, int > T_Location ;			// 그린 모든 객체 중 세모 객체의 각 Index
+	CArray < int, int > RT_Location ;			// 그린 모든 객체 중 역 삼각형 객체의 각 Index
+	CArray < int, int > RightT_Location ;		// 그린 모든 객체 중 직각 삼각형 객체의 각 Index
+	CArray < int, int > RRightT_Location ;		// 그린 모든 객체 중 역 직각 삼각형 객체의 각 Index
+	CArray < int, int > LTRT_Location ;			// 그린 모든 객체 중 왼쪽 -> 오른쪽 삼각형 객체의 각 Index
+	CArray < int, int > RTLT_Location ;			// 그린 모든 객체 중 오른쪽 -> 왼쪽 삼각형 객체의 각 Index
 public:
 	CArray < CString, CString > What ;
 	int L_Count ;			// 선 객체의 개수

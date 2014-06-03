@@ -1418,6 +1418,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 		L_Insert.Start = L_Insert.Last = point ;
 		pDoc->L_Line.Add ( L_Insert ) ;
 		pDoc->What.Add ( _T("L") ) ;
+		pDoc->L_Location.Add ( pDoc->What.GetSize () - 1 ) ;
 		pDoc->L_Count++ ;
 		L_Current = pDoc -> L_Line.GetCount () - 1 ;
 		L_CanMove = 'o' ;
@@ -1431,6 +1432,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 
 		pDoc -> R_Rec.Add ( R_Rect ) ;
 		pDoc->What.Add ( _T("R") ) ;
+		pDoc->R_Location.Add ( pDoc->What.GetSize () - 1 ) ;
 		pDoc->R_Count++ ;
 		R_Current = pDoc -> R_Rec.GetCount () - 1 ;
 		R_CanMove = 'o' ;
@@ -1517,6 +1519,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 	else if ( P_IsDraw == 'o' && P_IsContinue == 'x' ) {
 		P_Insert.Poly_point.Add ( point ) ;
 		pDoc->What.Add ( _T("P") ) ;
+		pDoc->P_Location.Add ( pDoc->What.GetSize () - 1 ) ;
 		pDoc -> P_Count = P_Current = pDoc -> P_Poly.GetCount () ;
 		pDoc -> P_Count++ ;
 		pDoc -> P_Poly.SetSize (P_Current + 1) ;
@@ -1546,6 +1549,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 
 		pDoc -> E_Ellipse.Add ( E_Insert ) ;
 		pDoc->What.Add ( _T("E") ) ;
+		pDoc->E_Location.Add ( pDoc->What.GetSize () - 1 ) ;
 		pDoc->E_Count++ ;
 		R_Current = pDoc -> E_Ellipse.GetCount () - 1 ;
 		E_CanMove = 'o' ;
@@ -1578,6 +1582,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 
 		pDoc -> T_Triangle.Add ( T_Insert ) ;
 		pDoc->What.Add ( _T("T") ) ;
+		pDoc->T_Location.Add ( pDoc->What.GetSize () - 1 ) ;
 		pDoc->T_Count++ ;
 		T_Current = pDoc -> T_Triangle.GetCount () - 1 ;
 		T_CanMove = 'o' ;
@@ -1610,6 +1615,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 
 		pDoc -> RT_Triangle.Add ( RT_Insert ) ;
 		pDoc->What.Add ( _T("RT") ) ;
+		pDoc->RT_Location.Add ( pDoc->What.GetSize () - 1 ) ;
 		pDoc->RT_Count++ ;
 		RT_Current = pDoc -> RT_Triangle.GetCount () - 1 ;
 		RT_CanMove = 'o' ;
@@ -1642,6 +1648,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 
 		pDoc -> RightT_Triangle.Add ( RightT_Insert ) ;
 		pDoc->What.Add ( _T("RightT") ) ;
+		pDoc->RightT_Location.Add ( pDoc->What.GetSize () - 1 ) ;
 		pDoc->RightT_Count++ ;
 		RightT_Current = pDoc -> RightT_Triangle.GetCount () - 1 ;
 		RightT_CanMove = 'o' ;
@@ -1674,6 +1681,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 
 		pDoc -> RRightT_Triangle.Add ( RRightT_Insert ) ;
 		pDoc->What.Add ( _T("RRightT") ) ;
+		pDoc->RRightT_Location.Add ( pDoc->What.GetSize () - 1 ) ;
 		pDoc->RRightT_Count++ ;
 		RRightT_Current = pDoc -> RRightT_Triangle.GetCount () - 1 ;
 		RRightT_CanMove = 'o' ;
@@ -1706,6 +1714,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 
 		pDoc -> LTRT_Triangle.Add ( LTRT_Insert ) ;
 		pDoc->What.Add ( _T("LTRT") ) ;
+		pDoc->LTRT_Location.Add ( pDoc->What.GetSize () - 1 ) ;
 		pDoc->LTRT_Count++ ;
 		LTRT_Current = pDoc -> LTRT_Triangle.GetCount () - 1 ;
 		LTRT_CanMove = 'o' ;
@@ -1738,6 +1747,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 
 		pDoc -> RTLT_Triangle.Add ( RTLT_Insert ) ;
 		pDoc->What.Add ( _T("RTLT") ) ;
+		pDoc->RTLT_Location.Add ( pDoc->What.GetSize () - 1 ) ;
 		pDoc->RTLT_Count++ ;
 		RTLT_Current = pDoc -> RTLT_Triangle.GetCount () - 1 ;
 		RTLT_CanMove = 'o' ;
@@ -1789,405 +1799,418 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 		if ( Text_IsContinue != 'o' )
 			Text_IsContinue = 'o' ;
 	}
-	// 선 객체를 변경시키는 경우
-	else if ( M_IsDraw == 'o' && M_IsLineSelect == 'o' &&
-			  ((pDoc -> L_Line.GetAt ( M_Number ).Start.x - 15 <= point.x && pDoc -> L_Line.GetAt ( M_Number ).Start.x + 15 >= point.x
-			  && pDoc -> L_Line.GetAt ( M_Number ).Start.y - 15 <= point.y && pDoc -> L_Line.GetAt ( M_Number ).Start.y + 15 >= point.y) ||
-			  (pDoc -> L_Line.GetAt ( M_Number ).Last.x - 15 <= point.x && pDoc -> L_Line.GetAt ( M_Number ).Last.x + 15 >= point.x
-			  && pDoc -> L_Line.GetAt ( M_Number ).Last.y - 15 <= point.y && pDoc -> L_Line.GetAt ( M_Number ).Last.y + 15 >= point.y)) ) {
-	
-		M_ChangeLineOnePoint = 'o' ;
-		if ( pDoc -> L_Line.GetAt ( M_Number ).Start.x - 15 <= point.x && pDoc -> L_Line.GetAt ( M_Number ).Start.x + 15 >= point.x
-			 && pDoc -> L_Line.GetAt ( M_Number ).Start.y - 15 <= point.y && pDoc -> L_Line.GetAt ( M_Number ).Start.y + 15 >= point.y ) {
-
-			M_IsChangeLineStart = 'o' ;
-		}
-		else {
-			M_IsChangeLineStart = 'x' ;
-		}
-	}
 	// 객체를 이동, 선택하는 경우
 	else if ( M_IsMove == 'o' ) {
 
-		int L_Number = pDoc -> L_Count - 1;
-		int R_Number = pDoc -> R_Count - 1;
-		int P_Number = pDoc -> P_Count - 1;
-		int E_Number = pDoc -> E_Count - 1;
-		int T_Number = pDoc -> T_Count - 1;
-		int RT_Number = pDoc -> RT_Count - 1;
-		int RightT_Number = pDoc -> RightT_Count - 1;
-		int RRightT_Number = pDoc -> RRightT_Count - 1;
-		int LTRT_Number = pDoc -> LTRT_Count - 1;
-		int RTLT_Number = pDoc -> RTLT_Count - 1;
+		// 선 객체를 변경시키는 경우
+		if ( M_IsLineSelect == 'o' &&
+			((pDoc -> L_Line.GetAt ( M_Number ).Start.x - 15 <= point.x && pDoc -> L_Line.GetAt ( M_Number ).Start.x + 15 >= point.x
+			&& pDoc -> L_Line.GetAt ( M_Number ).Start.y - 15 <= point.y && pDoc -> L_Line.GetAt ( M_Number ).Start.y + 15 >= point.y) ||
+			(pDoc -> L_Line.GetAt ( M_Number ).Last.x - 15 <= point.x && pDoc -> L_Line.GetAt ( M_Number ).Last.x + 15 >= point.x
+			&& pDoc -> L_Line.GetAt ( M_Number ).Last.y - 15 <= point.y && pDoc -> L_Line.GetAt ( M_Number ).Last.y + 15 >= point.y)) ) {
 
-		// 선택한 좌표에 객체가 있는지 전부 확인합니다.
-		// 늦게 그린 객체부터 확인합니다.
-		for ( int i = pDoc->What.GetCount () ; i > 0  ; i-- ) {
+				M_ChangeLineOnePoint = 'o' ;
+				if ( pDoc -> L_Line.GetAt ( M_Number ).Start.x - 15 <= point.x && pDoc -> L_Line.GetAt ( M_Number ).Start.x + 15 >= point.x
+					&& pDoc -> L_Line.GetAt ( M_Number ).Start.y - 15 <= point.y && pDoc -> L_Line.GetAt ( M_Number ).Start.y + 15 >= point.y ) {
 
-			// 선 객체인 경우
-			if ( pDoc -> What.GetAt (i-1) == _T ("L") ) {
-				if ( pDoc -> L_Line.GetAt ( L_Number ).Start.x >= pDoc -> L_Line.GetAt ( L_Number ).Last.x ) {
-					if ( pDoc -> L_Line.GetAt ( L_Number ).Start.y >= pDoc -> L_Line.GetAt ( L_Number ).Last.y ) {
-						if ( point.x >= pDoc -> L_Line.GetAt ( L_Number ).Last.x - pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 && point.x <= pDoc -> L_Line.GetAt ( L_Number ).Start.x + pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 &&
-							 point.y >= pDoc -> L_Line.GetAt ( L_Number ).Last.y - pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 && point.y <= pDoc -> L_Line.GetAt ( L_Number ).Start.y + pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ) {
+						M_IsChangeLineStart = 'o' ;
+				}
+				else {
+					M_IsChangeLineStart = 'x' ;
+				}
+		}
+		else {
+			M_IsLineSelect = 'x' ;
+			M_ChangeLineOnePoint = 'x' ;
+			M_IsChangeLineStart = 'x' ;
+			int L_Number = pDoc -> L_Count - 1;
+			int R_Number = pDoc -> R_Count - 1;
+			int P_Number = pDoc -> P_Count - 1;
+			int E_Number = pDoc -> E_Count - 1;
+			int T_Number = pDoc -> T_Count - 1;
+			int RT_Number = pDoc -> RT_Count - 1;
+			int RightT_Number = pDoc -> RightT_Count - 1;
+			int RRightT_Number = pDoc -> RRightT_Count - 1;
+			int LTRT_Number = pDoc -> LTRT_Count - 1;
+			int RTLT_Number = pDoc -> RTLT_Count - 1;
 
-							M_Rect.top = pDoc -> L_Line.GetAt ( L_Number ).Last.y ;
-							M_Rect.bottom = pDoc -> L_Line.GetAt ( L_Number ).Start.y ;
-							M_Rect.left = pDoc -> L_Line.GetAt ( L_Number ).Last.x ;
-							M_Rect.right = pDoc -> L_Line.GetAt ( L_Number ).Start.x ;
-							M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
-							M_What.Format ( _T ("L") ) ; M_Number = L_Number ;
-							M_IsDraw = 'o' ;
-							if ( M_Rect.left <= M_Rect.right ) {
-								M_Rect.right += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-								M_Rect.left -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-								if ( M_Rect.top <= M_Rect.bottom ) {
-									M_Rect.top -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-									M_Rect.bottom += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-								}
-								else if ( M_Rect.top > M_Rect.bottom ) {
-									M_Rect.top += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-									M_Rect.bottom -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-									int temp = M_Rect.top ;
-									M_Rect.top = M_Rect.bottom ;
-									M_Rect.bottom = temp ;
-								}
+			// 선택한 좌표에 객체가 있는지 전부 확인합니다.
+			// 늦게 그린 객체부터 확인합니다.
+			for ( int i = pDoc->What.GetCount () ; i > 0  ; i-- ) {
+
+				// 선 객체인 경우
+				if ( pDoc -> What.GetAt (i-1) == _T ("L") ) {
+					if ( pDoc -> L_Line.GetAt ( L_Number ).Start.x >= pDoc -> L_Line.GetAt ( L_Number ).Last.x ) {
+						if ( pDoc -> L_Line.GetAt ( L_Number ).Start.y >= pDoc -> L_Line.GetAt ( L_Number ).Last.y ) {
+							if ( point.x >= pDoc -> L_Line.GetAt ( L_Number ).Last.x - pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 && point.x <= pDoc -> L_Line.GetAt ( L_Number ).Start.x + pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 &&
+								point.y >= pDoc -> L_Line.GetAt ( L_Number ).Last.y - pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 && point.y <= pDoc -> L_Line.GetAt ( L_Number ).Start.y + pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ) {
+
+									M_Rect.top = pDoc -> L_Line.GetAt ( L_Number ).Last.y ;
+									M_Rect.bottom = pDoc -> L_Line.GetAt ( L_Number ).Start.y ;
+									M_Rect.left = pDoc -> L_Line.GetAt ( L_Number ).Last.x ;
+									M_Rect.right = pDoc -> L_Line.GetAt ( L_Number ).Start.x ;
+									M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
+									M_What.Format ( _T ("L") ) ; M_Number = L_Number ;
+									M_IsDraw = 'o' ;
+									if ( M_Rect.left <= M_Rect.right ) {
+										M_Rect.right += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+										M_Rect.left -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+										if ( M_Rect.top <= M_Rect.bottom ) {
+											M_Rect.top -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+											M_Rect.bottom += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+										}
+										else if ( M_Rect.top > M_Rect.bottom ) {
+											M_Rect.top += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+											M_Rect.bottom -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+											int temp = M_Rect.top ;
+											M_Rect.top = M_Rect.bottom ;
+											M_Rect.bottom = temp ;
+										}
+									}
+									else if ( M_Rect.left > M_Rect.right ) {
+										M_Rect.right -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+										M_Rect.left += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+										if ( M_Rect.top <= M_Rect.bottom ) {
+											M_Rect.top -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+											M_Rect.bottom += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+											int temp = M_Rect.left ;
+											M_Rect.left = M_Rect.right ;
+											M_Rect.right = temp ;
+										}
+										else if ( M_Rect.top > M_Rect.bottom ) {
+											M_Rect.top += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+											M_Rect.bottom -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+											int temp = M_Rect.top ;
+											M_Rect.top = M_Rect.bottom ;
+											M_Rect.bottom = temp ;
+											temp = M_Rect.left ;
+											M_Rect.left = M_Rect.right ;
+											M_Rect.right = temp ;
+										}
+									}
+									Invalidate () ; M_IsLineSelect = 'o' ; break ;
 							}
-							else if ( M_Rect.left > M_Rect.right ) {
-								M_Rect.right -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-								M_Rect.left += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-								if ( M_Rect.top <= M_Rect.bottom ) {
-									M_Rect.top -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-									M_Rect.bottom += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-									int temp = M_Rect.left ;
-									M_Rect.left = M_Rect.right ;
-									M_Rect.right = temp ;
-								}
-								else if ( M_Rect.top > M_Rect.bottom ) {
-									M_Rect.top += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-									M_Rect.bottom -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-									int temp = M_Rect.top ;
-									M_Rect.top = M_Rect.bottom ;
-									M_Rect.bottom = temp ;
-									temp = M_Rect.left ;
-									M_Rect.left = M_Rect.right ;
-									M_Rect.right = temp ;
-								}
+						}
+						else if ( pDoc -> L_Line.GetAt ( L_Number ).Start.y < pDoc -> L_Line.GetAt ( L_Number ).Last.y ) {
+							if ( point.x >= pDoc -> L_Line.GetAt ( L_Number ).Last.x - pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 && point.x <= pDoc -> L_Line.GetAt ( L_Number ).Start.x + pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 &&
+								point.y >= pDoc -> L_Line.GetAt ( L_Number ).Start.y - pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 && point.y <= pDoc -> L_Line.GetAt ( L_Number ).Last.y + pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ) {
+
+									M_Rect.top = pDoc -> L_Line.GetAt ( L_Number ).Start.y ;
+									M_Rect.bottom = pDoc -> L_Line.GetAt ( L_Number ).Last.y ;
+									M_Rect.left = pDoc -> L_Line.GetAt ( L_Number ).Last.x ;
+									M_Rect.right = pDoc -> L_Line.GetAt ( L_Number ).Start.x ;
+									M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
+									M_What.Format ( _T ("L") ) ; M_Number = L_Number ;
+									M_IsDraw = 'o' ;
+									if ( M_Rect.left <= M_Rect.right ) {
+										M_Rect.right += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+										M_Rect.left -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+										if ( M_Rect.top <= M_Rect.bottom ) {
+											M_Rect.top -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+											M_Rect.bottom += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+										}
+										else if ( M_Rect.top > M_Rect.bottom ) {
+											M_Rect.top += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+											M_Rect.bottom -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+											int temp = M_Rect.top ;
+											M_Rect.top = M_Rect.bottom ;
+											M_Rect.bottom = temp ;
+										}
+									}
+									else if ( M_Rect.left > M_Rect.right ) {
+										M_Rect.right -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+										M_Rect.left += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+										if ( M_Rect.top <= M_Rect.bottom ) {
+											M_Rect.top -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+											M_Rect.bottom += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+											int temp = M_Rect.left ;
+											M_Rect.left = M_Rect.right ;
+											M_Rect.right = temp ;
+										}
+										else if ( M_Rect.top > M_Rect.bottom ) {
+											M_Rect.top += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+											M_Rect.bottom -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+											int temp = M_Rect.top ;
+											M_Rect.top = M_Rect.bottom ;
+											M_Rect.bottom = temp ;
+											temp = M_Rect.left ;
+											M_Rect.left = M_Rect.right ;
+											M_Rect.right = temp ;
+										}
+									}
+									Invalidate () ; M_IsLineSelect = 'o' ; break ;
 							}
-							Invalidate () ; break ;
 						}
 					}
-					else if ( pDoc -> L_Line.GetAt ( L_Number ).Start.y < pDoc -> L_Line.GetAt ( L_Number ).Last.y ) {
-						if ( point.x >= pDoc -> L_Line.GetAt ( L_Number ).Last.x - pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 && point.x <= pDoc -> L_Line.GetAt ( L_Number ).Start.x + pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 &&
-							 point.y >= pDoc -> L_Line.GetAt ( L_Number ).Start.y - pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 && point.y <= pDoc -> L_Line.GetAt ( L_Number ).Last.y + pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ) {
+					else if ( pDoc -> L_Line.GetAt ( L_Number ).Start.x < pDoc -> L_Line.GetAt ( L_Number ).Last.x ) {
+						if ( pDoc -> L_Line.GetAt ( L_Number ).Start.y >= pDoc -> L_Line.GetAt ( L_Number ).Last.y ) {
+							if ( point.x >= pDoc -> L_Line.GetAt ( L_Number ).Start.x - pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 && point.x <= pDoc -> L_Line.GetAt ( L_Number ).Last.x + pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 &&
+								point.y >= pDoc -> L_Line.GetAt ( L_Number ).Last.y - pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 && point.y <= pDoc -> L_Line.GetAt ( L_Number ).Start.y + pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ) {
 
-							M_Rect.top = pDoc -> L_Line.GetAt ( L_Number ).Start.y ;
-							M_Rect.bottom = pDoc -> L_Line.GetAt ( L_Number ).Last.y ;
-							M_Rect.left = pDoc -> L_Line.GetAt ( L_Number ).Last.x ;
-							M_Rect.right = pDoc -> L_Line.GetAt ( L_Number ).Start.x ;
-							M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
-							M_What.Format ( _T ("L") ) ; M_Number = L_Number ;
-							M_IsDraw = 'o' ;
-							if ( M_Rect.left <= M_Rect.right ) {
-								M_Rect.right += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-								M_Rect.left -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-								if ( M_Rect.top <= M_Rect.bottom ) {
-									M_Rect.top -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-									M_Rect.bottom += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-								}
-								else if ( M_Rect.top > M_Rect.bottom ) {
-									M_Rect.top += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-									M_Rect.bottom -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-									int temp = M_Rect.top ;
-									M_Rect.top = M_Rect.bottom ;
-									M_Rect.bottom = temp ;
-								}
+									M_Rect.top = pDoc -> L_Line.GetAt ( L_Number ).Last.y ;
+									M_Rect.bottom = pDoc -> L_Line.GetAt ( L_Number ).Start.y ;
+									M_Rect.left = pDoc -> L_Line.GetAt ( L_Number ).Start.x ;
+									M_Rect.right = pDoc -> L_Line.GetAt ( L_Number ).Last.x ;
+									M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
+									M_What.Format ( _T ("L") ) ; M_Number = L_Number ;
+									M_IsDraw = 'o' ;
+									if ( M_Rect.left <= M_Rect.right ) {
+										M_Rect.right += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+										M_Rect.left -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+										if ( M_Rect.top <= M_Rect.bottom ) {
+											M_Rect.top -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+											M_Rect.bottom += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+										}
+										else if ( M_Rect.top > M_Rect.bottom ) {
+											M_Rect.top += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+											M_Rect.bottom -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+										}
+									}
+									else if ( M_Rect.left > M_Rect.right ) {
+										M_Rect.right -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+										M_Rect.left += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+										if ( M_Rect.top <= M_Rect.bottom ) {
+											M_Rect.top -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+											M_Rect.bottom += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+										}
+										else if ( M_Rect.top > M_Rect.bottom ) {
+											M_Rect.top += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+											M_Rect.bottom -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+										}
+									}
+									Invalidate () ; M_IsLineSelect = 'o' ; break ;
 							}
-							else if ( M_Rect.left > M_Rect.right ) {
-								M_Rect.right -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-								M_Rect.left += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-								if ( M_Rect.top <= M_Rect.bottom ) {
-									M_Rect.top -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-									M_Rect.bottom += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-									int temp = M_Rect.left ;
-									M_Rect.left = M_Rect.right ;
-									M_Rect.right = temp ;
-								}
-								else if ( M_Rect.top > M_Rect.bottom ) {
-									M_Rect.top += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-									M_Rect.bottom -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-									int temp = M_Rect.top ;
-									M_Rect.top = M_Rect.bottom ;
-									M_Rect.bottom = temp ;
-									temp = M_Rect.left ;
-									M_Rect.left = M_Rect.right ;
-									M_Rect.right = temp ;
-								}
+						}
+						else if ( pDoc -> L_Line.GetAt ( L_Number ).Start.y < pDoc -> L_Line.GetAt ( L_Number ).Last.y ) {
+							if ( point.x >= pDoc -> L_Line.GetAt ( L_Number ).Start.x - pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 && point.x <= pDoc -> L_Line.GetAt ( L_Number ).Last.x + pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 &&
+								point.y >= pDoc -> L_Line.GetAt ( L_Number ).Start.y - pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 && point.y <= pDoc -> L_Line.GetAt ( L_Number ).Last.y + pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ) {
+
+									M_Rect.top = pDoc -> L_Line.GetAt ( L_Number ).Start.y ;
+									M_Rect.bottom = pDoc -> L_Line.GetAt ( L_Number ).Last.y ;
+									M_Rect.left = pDoc -> L_Line.GetAt ( L_Number ).Start.x ;
+									M_Rect.right = pDoc -> L_Line.GetAt ( L_Number ).Last.x ;
+									M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
+									M_What.Format ( _T ("L") ) ; M_Number = L_Number ;
+									M_IsDraw = 'o' ;
+									if ( M_Rect.left <= M_Rect.right ) {
+										M_Rect.right += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+										M_Rect.left -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+										if ( M_Rect.top <= M_Rect.bottom ) {
+											M_Rect.top -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+											M_Rect.bottom += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+										}
+										else if ( M_Rect.top > M_Rect.bottom ) {
+											M_Rect.top += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+											M_Rect.bottom -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+										}
+									}
+									else if ( M_Rect.left > M_Rect.right ) {
+										M_Rect.right -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+										M_Rect.left += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+										if ( M_Rect.top <= M_Rect.bottom ) {
+											M_Rect.top -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+											M_Rect.bottom += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+										}
+										else if ( M_Rect.top > M_Rect.bottom ) {
+											M_Rect.top += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+											M_Rect.bottom -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+										}
+									}
+									Invalidate () ; M_IsLineSelect = 'o' ; break ;
 							}
-							Invalidate () ; break ;
 						}
 					}
+					L_Number-- ;
 				}
-				else if ( pDoc -> L_Line.GetAt ( L_Number ).Start.x < pDoc -> L_Line.GetAt ( L_Number ).Last.x ) {
-					if ( pDoc -> L_Line.GetAt ( L_Number ).Start.y >= pDoc -> L_Line.GetAt ( L_Number ).Last.y ) {
-						if ( point.x >= pDoc -> L_Line.GetAt ( L_Number ).Start.x - pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 && point.x <= pDoc -> L_Line.GetAt ( L_Number ).Last.x + pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 &&
-							 point.y >= pDoc -> L_Line.GetAt ( L_Number ).Last.y - pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 && point.y <= pDoc -> L_Line.GetAt ( L_Number ).Start.y + pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ) {
 
-							M_Rect.top = pDoc -> L_Line.GetAt ( L_Number ).Last.y ;
-							M_Rect.bottom = pDoc -> L_Line.GetAt ( L_Number ).Start.y ;
-							M_Rect.left = pDoc -> L_Line.GetAt ( L_Number ).Start.x ;
-							M_Rect.right = pDoc -> L_Line.GetAt ( L_Number ).Last.x ;
+				// 상자 객체인 경우
+				else if ( pDoc -> What.GetAt (i-1) == _T ("R") ) {
+					M_IsLineSelect == 'x' ;
+					if ( pDoc -> R_Rec.GetAt ( R_Number ).left - 2 <= point.x && pDoc -> R_Rec.GetAt ( R_Number ).right + 2 >= point.x &&
+						pDoc -> R_Rec.GetAt ( R_Number ).top - 2 <= point.y && pDoc -> R_Rec.GetAt ( R_Number ).bottom + 2 >= point.y ) {
+
+							M_Rect.top = pDoc -> R_Rec.GetAt ( R_Number ).top - pDoc -> R_Thickness.GetAt ( R_Number ) / 2 - 2 ;
+							M_Rect.bottom = pDoc -> R_Rec.GetAt ( R_Number ).bottom + pDoc -> R_Thickness.GetAt ( R_Number ) / 2 + 2 ;
+							M_Rect.left = pDoc -> R_Rec.GetAt ( R_Number ).left - pDoc -> R_Thickness.GetAt ( R_Number ) / 2 - 2 ;
+							M_Rect.right = pDoc -> R_Rec.GetAt ( R_Number ).right + pDoc -> R_Thickness.GetAt ( R_Number ) / 2 + 2 ;
+
 							M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
-							M_What.Format ( _T ("L") ) ; M_Number = L_Number ;
+							M_What.Format ( _T ("R") ) ; M_Number = R_Number ;
 							M_IsDraw = 'o' ;
-							if ( M_Rect.left <= M_Rect.right ) {
-								M_Rect.right += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-								M_Rect.left -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-								if ( M_Rect.top <= M_Rect.bottom ) {
-									M_Rect.top -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-									M_Rect.bottom += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-								}
-								else if ( M_Rect.top > M_Rect.bottom ) {
-									M_Rect.top += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-									M_Rect.bottom -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-								}
-							}
-							else if ( M_Rect.left > M_Rect.right ) {
-								M_Rect.right -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-								M_Rect.left += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-								if ( M_Rect.top <= M_Rect.bottom ) {
-									M_Rect.top -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-									M_Rect.bottom += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-								}
-								else if ( M_Rect.top > M_Rect.bottom ) {
-									M_Rect.top += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-									M_Rect.bottom -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-								}
-							}
 							Invalidate () ; break ;
-						}
 					}
-					else if ( pDoc -> L_Line.GetAt ( L_Number ).Start.y < pDoc -> L_Line.GetAt ( L_Number ).Last.y ) {
-						if ( point.x >= pDoc -> L_Line.GetAt ( L_Number ).Start.x - pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 && point.x <= pDoc -> L_Line.GetAt ( L_Number ).Last.x + pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 &&
-							 point.y >= pDoc -> L_Line.GetAt ( L_Number ).Start.y - pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 && point.y <= pDoc -> L_Line.GetAt ( L_Number ).Last.y + pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ) {
+					R_Number-- ;
+				}
 
-							M_Rect.top = pDoc -> L_Line.GetAt ( L_Number ).Start.y ;
-							M_Rect.bottom = pDoc -> L_Line.GetAt ( L_Number ).Last.y ;
-							M_Rect.left = pDoc -> L_Line.GetAt ( L_Number ).Start.x ;
-							M_Rect.right = pDoc -> L_Line.GetAt ( L_Number ).Last.x ;
+				// PolyLine 객체인 경우
+				else if ( pDoc -> What.GetAt (i-1) == _T ("P") ) {
+					M_IsLineSelect == 'x' ;
+					int MAX_x = pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (0).x ;
+					int MAX_y = pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (0).y ;
+					int MIN_x = MAX_x ;
+					int MIN_y = MAX_y ;
+
+					for ( int i = 1 ; i < pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetCount () ; i++ ) {
+						if ( MAX_x < pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (i).x )
+							MAX_x = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (i).x ;
+						else if ( MIN_x > pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (i).x )
+							MIN_x = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (i).x ;
+
+						if ( MAX_y < pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (i).y )
+							MAX_y = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (i).y ;
+						else if ( MIN_y > pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (i).y )
+							MIN_y = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (i).y ;
+					}
+
+					if ( MAX_x >= point.x && MIN_x <= point.x && MAX_y >= point.y && MIN_y <= point.y ) {
+						M_Rect.top = MIN_y ;
+						M_Rect.bottom = MAX_y ;
+						M_Rect.left = MIN_x ;
+						M_Rect.right = MAX_x ;
+
+						M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
+						M_What.Format ( _T ("P") ) ; M_Number = P_Number ;
+						M_IsDraw = 'o' ;
+						Invalidate () ; break ;
+					}
+					P_Number-- ;
+				}
+
+				// 원 객체인 경우
+				else if ( pDoc -> What.GetAt (i-1) == _T ("E") ) {
+					M_IsLineSelect == 'x' ;
+					if ( pDoc -> E_Ellipse.GetAt ( E_Number ).left - 2 <= point.x && pDoc -> E_Ellipse.GetAt ( E_Number ).right + 2 >= point.x &&
+						pDoc -> E_Ellipse.GetAt ( E_Number ).top - 2 <= point.y && pDoc -> E_Ellipse.GetAt ( E_Number ).bottom + 2 >= point.y ) {
+
+							M_Rect.top = pDoc -> E_Ellipse.GetAt ( E_Number ).top - pDoc -> E_Thickness.GetAt ( E_Number ) / 2 - 2 ;
+							M_Rect.bottom = pDoc -> E_Ellipse.GetAt ( E_Number ).bottom + pDoc -> E_Thickness.GetAt ( E_Number ) / 2 + 2 ;
+							M_Rect.left = pDoc -> E_Ellipse.GetAt ( E_Number ).left - pDoc -> E_Thickness.GetAt ( E_Number ) / 2 - 2 ;
+							M_Rect.right = pDoc -> E_Ellipse.GetAt ( E_Number ).right + pDoc -> E_Thickness.GetAt ( E_Number ) / 2 + 2 ;
+
 							M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
-							M_What.Format ( _T ("L") ) ; M_Number = L_Number ;
+							M_What.Format ( _T ("E") ) ; M_Number = E_Number ;
 							M_IsDraw = 'o' ;
-							if ( M_Rect.left <= M_Rect.right ) {
-								M_Rect.right += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-								M_Rect.left -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-								if ( M_Rect.top <= M_Rect.bottom ) {
-									M_Rect.top -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-									M_Rect.bottom += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-								}
-								else if ( M_Rect.top > M_Rect.bottom ) {
-									M_Rect.top += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-									M_Rect.bottom -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-								}
-							}
-							else if ( M_Rect.left > M_Rect.right ) {
-								M_Rect.right -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-								M_Rect.left += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-								if ( M_Rect.top <= M_Rect.bottom ) {
-									M_Rect.top -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-									M_Rect.bottom += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-								}
-								else if ( M_Rect.top > M_Rect.bottom ) {
-									M_Rect.top += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-									M_Rect.bottom -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
-								}
-							}
 							Invalidate () ; break ;
-						}
 					}
+					E_Number-- ;
+
 				}
-				L_Number-- ;
-				M_IsLineSelect = 'o' ;
+
+				// 세모 객체인 경우
+				else if ( pDoc -> What.GetAt (i-1) == _T ("T") ) {
+					M_IsLineSelect == 'x' ;
+					if ( pDoc -> T_Triangle.GetAt ( T_Number ).left - 2 <= point.x && pDoc -> T_Triangle.GetAt ( T_Number ).right + 2 >= point.x &&
+						pDoc -> T_Triangle.GetAt ( T_Number ).top - 2 <= point.y && pDoc -> T_Triangle.GetAt ( T_Number ).bottom + 2 >= point.y ) {
+
+							M_Rect.top = pDoc -> T_Triangle.GetAt ( T_Number ).top - pDoc -> T_Thickness.GetAt ( T_Number ) / 2 - 2 ;
+							M_Rect.bottom = pDoc -> T_Triangle.GetAt ( T_Number ).bottom + pDoc -> T_Thickness.GetAt ( T_Number ) / 2 + 2 ;
+							M_Rect.left = pDoc -> T_Triangle.GetAt ( T_Number ).left - pDoc -> T_Thickness.GetAt ( T_Number ) / 2 - 2 ;
+							M_Rect.right = pDoc -> T_Triangle.GetAt ( T_Number ).right + pDoc -> T_Thickness.GetAt ( T_Number ) / 2 + 2 ;
+
+							M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
+							M_What.Format ( _T ("T") ) ; M_Number = T_Number ;
+							M_IsDraw = 'o' ;
+							Invalidate () ; break ;
+					}
+					T_Number-- ;
+				}
+
+				// 역 삼각형 객체인 경우
+				else if ( pDoc -> What.GetAt (i-1) == _T ("RT") ) {
+					M_IsLineSelect == 'x' ;
+					if ( pDoc -> RT_Triangle.GetAt ( RT_Number ).left - 2 <= point.x && pDoc -> RT_Triangle.GetAt ( RT_Number ).right + 2 >= point.x &&
+						pDoc -> RT_Triangle.GetAt ( RT_Number ).top - 2 <= point.y && pDoc -> RT_Triangle.GetAt ( RT_Number ).bottom + 2 >= point.y ) {
+
+							M_Rect.top = pDoc -> RT_Triangle.GetAt ( RT_Number ).top - pDoc -> RT_Thickness.GetAt ( RT_Number ) / 2 - 2 ;
+							M_Rect.bottom = pDoc -> RT_Triangle.GetAt ( RT_Number ).bottom + pDoc -> RT_Thickness.GetAt ( RT_Number ) / 2 + 2 ;
+							M_Rect.left = pDoc -> RT_Triangle.GetAt ( RT_Number ).left - pDoc -> RT_Thickness.GetAt ( RT_Number ) / 2 - 2 ;
+							M_Rect.right = pDoc -> RT_Triangle.GetAt ( RT_Number ).right + pDoc -> RT_Thickness.GetAt ( RT_Number ) / 2 + 2 ;
+
+							M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
+							M_What.Format ( _T ("RT") ) ; M_Number = RT_Number ;
+							M_IsDraw = 'o' ;
+							Invalidate () ; break ;
+					}
+					RT_Number-- ;
+				}
+
+				// 직각 삼각형 객체인 경우
+				else if ( pDoc -> What.GetAt (i-1) == _T ("RightT") ) {
+					M_IsLineSelect == 'x' ;
+					if ( pDoc -> RightT_Triangle.GetAt ( RightT_Number ).left - 2 <= point.x && pDoc -> RightT_Triangle.GetAt ( RightT_Number ).right + 2 >= point.x &&
+						pDoc -> RightT_Triangle.GetAt ( RightT_Number ).top - 2 <= point.y && pDoc -> RightT_Triangle.GetAt ( RightT_Number ).bottom + 2 >= point.y ) {
+
+							M_Rect.top = pDoc -> RightT_Triangle.GetAt ( RightT_Number ).top - pDoc -> RightT_Thickness.GetAt ( RightT_Number ) / 2 - 2 ;
+							M_Rect.bottom = pDoc -> RightT_Triangle.GetAt ( RightT_Number ).bottom + pDoc -> RightT_Thickness.GetAt ( RightT_Number ) / 2 + 2 ;
+							M_Rect.left = pDoc -> RightT_Triangle.GetAt ( RightT_Number ).left - pDoc -> RightT_Thickness.GetAt ( RightT_Number ) / 2 - 2 ;
+							M_Rect.right = pDoc -> RightT_Triangle.GetAt ( RightT_Number ).right + pDoc -> RightT_Thickness.GetAt ( RightT_Number ) / 2 + 2 ;
+
+							M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
+							M_What.Format ( _T ("RightT") ) ; M_Number = RightT_Number ;
+							M_IsDraw = 'o' ;
+							Invalidate () ; break ;
+					}
+					RightT_Number-- ;
+				}
+
+				// 역 직각 삼각형 객체인 경우
+				else if ( pDoc -> What.GetAt (i-1) == _T ("RRightT") ) {
+					M_IsLineSelect == 'x' ;
+					if ( pDoc -> RRightT_Triangle.GetAt ( RRightT_Number ).left - 2 <= point.x && pDoc -> RRightT_Triangle.GetAt ( RRightT_Number ).right + 2 >= point.x &&
+						pDoc -> RRightT_Triangle.GetAt ( RRightT_Number ).top - 2 <= point.y && pDoc -> RRightT_Triangle.GetAt ( RRightT_Number ).bottom + 2 >= point.y ) {
+
+							M_Rect.top = pDoc -> RRightT_Triangle.GetAt ( RRightT_Number ).top - pDoc -> RRightT_Thickness.GetAt ( RRightT_Number ) / 2 - 2 ;
+							M_Rect.bottom = pDoc -> RRightT_Triangle.GetAt ( RRightT_Number ).bottom + pDoc -> RRightT_Thickness.GetAt ( RRightT_Number ) / 2 + 2 ;
+							M_Rect.left = pDoc -> RRightT_Triangle.GetAt ( RRightT_Number ).left - pDoc -> RRightT_Thickness.GetAt ( RRightT_Number ) / 2 - 2 ;
+							M_Rect.right = pDoc -> RRightT_Triangle.GetAt ( RRightT_Number ).right + pDoc -> RRightT_Thickness.GetAt ( RRightT_Number ) / 2 + 2 ;
+
+							M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
+							M_What.Format ( _T ("RRightT") ) ; M_Number = RRightT_Number ;
+							M_IsDraw = 'o' ;
+							Invalidate () ; break ;
+					}
+					RRightT_Number-- ;
+				}
+
+				// 왼쪽 -> 오른쪽 삼각형 객체인 경우
+				else if ( pDoc -> What.GetAt (i-1) == _T ("LTRT") ) {
+					M_IsLineSelect == 'x' ;
+					if ( pDoc -> LTRT_Triangle.GetAt ( LTRT_Number ).left - 2 <= point.x && pDoc -> LTRT_Triangle.GetAt ( LTRT_Number ).right + 2 >= point.x &&
+						pDoc -> LTRT_Triangle.GetAt ( LTRT_Number ).top - 2 <= point.y && pDoc -> LTRT_Triangle.GetAt ( LTRT_Number ).bottom + 2 >= point.y ) {
+
+							M_Rect.top = pDoc -> LTRT_Triangle.GetAt ( LTRT_Number ).top - pDoc -> LTRT_Thickness.GetAt ( LTRT_Number ) / 2 - 2 ;
+							M_Rect.bottom = pDoc -> LTRT_Triangle.GetAt ( LTRT_Number ).bottom + pDoc -> LTRT_Thickness.GetAt ( LTRT_Number ) / 2 + 2 ;
+							M_Rect.left = pDoc -> LTRT_Triangle.GetAt ( LTRT_Number ).left - pDoc -> LTRT_Thickness.GetAt ( LTRT_Number ) / 2 - 2 ;
+							M_Rect.right = pDoc -> LTRT_Triangle.GetAt ( LTRT_Number ).right + pDoc -> LTRT_Thickness.GetAt ( LTRT_Number ) / 2 + 2 ;
+
+							M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
+							M_What.Format ( _T ("LTRT") ) ; M_Number = LTRT_Number ;
+							M_IsDraw = 'o' ;
+							Invalidate () ; break ;
+					}
+					LTRT_Number-- ;
+				}
+
+				// 오른쪽 -> 왼쪽 삼각형 객체인 경우
+				else if ( pDoc -> What.GetAt (i-1) == _T ("RTLT") ) {
+					M_IsLineSelect == 'x' ;
+					if ( pDoc -> RTLT_Triangle.GetAt ( RTLT_Number ).left - 2 <= point.x && pDoc -> RTLT_Triangle.GetAt ( RTLT_Number ).right + 2 >= point.x &&
+						pDoc -> RTLT_Triangle.GetAt ( RTLT_Number ).top - 2 <= point.y && pDoc -> RTLT_Triangle.GetAt ( RTLT_Number ).bottom + 2 >= point.y ) {
+
+							M_Rect.top = pDoc -> RTLT_Triangle.GetAt ( RTLT_Number ).top - pDoc -> RTLT_Thickness.GetAt ( RTLT_Number ) / 2 - 2 ;
+							M_Rect.bottom = pDoc -> RTLT_Triangle.GetAt ( RTLT_Number ).bottom + pDoc -> RTLT_Thickness.GetAt ( RTLT_Number ) / 2 + 2 ;
+							M_Rect.left = pDoc -> RTLT_Triangle.GetAt ( RTLT_Number ).left - pDoc -> RTLT_Thickness.GetAt ( RTLT_Number ) / 2 - 2 ;
+							M_Rect.right = pDoc -> RTLT_Triangle.GetAt ( RTLT_Number ).right + pDoc -> RTLT_Thickness.GetAt ( RTLT_Number ) / 2 + 2 ;
+
+							M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
+							M_What.Format ( _T ("RTLT") ) ; M_Number = RTLT_Number ;
+							M_IsDraw = 'o' ;
+							Invalidate () ; break ;
+					}
+					RTLT_Number-- ;
+				}
+
 			}
-
-			// 상자 객체인 경우
-			else if ( pDoc -> What.GetAt (i-1) == _T ("R") ) {
-				if ( pDoc -> R_Rec.GetAt ( R_Number ).left - 2 <= point.x && pDoc -> R_Rec.GetAt ( R_Number ).right + 2 >= point.x &&
-					 pDoc -> R_Rec.GetAt ( R_Number ).top - 2 <= point.y && pDoc -> R_Rec.GetAt ( R_Number ).bottom + 2 >= point.y ) {
-				
-					M_Rect.top = pDoc -> R_Rec.GetAt ( R_Number ).top - pDoc -> R_Thickness.GetAt ( R_Number ) / 2 - 2 ;
-					M_Rect.bottom = pDoc -> R_Rec.GetAt ( R_Number ).bottom + pDoc -> R_Thickness.GetAt ( R_Number ) / 2 + 2 ;
-					M_Rect.left = pDoc -> R_Rec.GetAt ( R_Number ).left - pDoc -> R_Thickness.GetAt ( R_Number ) / 2 - 2 ;
-					M_Rect.right = pDoc -> R_Rec.GetAt ( R_Number ).right + pDoc -> R_Thickness.GetAt ( R_Number ) / 2 + 2 ;
-
-					M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
-					M_What.Format ( _T ("R") ) ; M_Number = R_Number ;
-					M_IsDraw = 'o' ;
-					Invalidate () ; break ;
-				}
-				R_Number-- ;
-			}
-
-			// PolyLine 객체인 경우
-			else if ( pDoc -> What.GetAt (i-1) == _T ("P") ) {
-				int MAX_x = pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (0).x ;
-				int MAX_y = pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (0).y ;
-				int MIN_x = MAX_x ;
-				int MIN_y = MAX_y ;
-
-				for ( int i = 1 ; i < pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetCount () ; i++ ) {
-					if ( MAX_x < pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (i).x )
-						MAX_x = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (i).x ;
-					else if ( MIN_x > pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (i).x )
-						MIN_x = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (i).x ;
-
-					if ( MAX_y < pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (i).y )
-						MAX_y = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (i).y ;
-					else if ( MIN_y > pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (i).y )
-						MIN_y = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (i).y ;
-				}
-
-				if ( MAX_x >= point.x && MIN_x <= point.x && MAX_y >= point.y && MIN_y <= point.y ) {
-					M_Rect.top = MIN_y ;
-					M_Rect.bottom = MAX_y ;
-					M_Rect.left = MIN_x ;
-					M_Rect.right = MAX_x ;
-
-					M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
-					M_What.Format ( _T ("P") ) ; M_Number = P_Number ;
-					M_IsDraw = 'o' ;
-					Invalidate () ; break ;
-				}
-				P_Number-- ;
-			}
-
-			// 원 객체인 경우
-			else if ( pDoc -> What.GetAt (i-1) == _T ("E") ) {
-				if ( pDoc -> E_Ellipse.GetAt ( E_Number ).left - 2 <= point.x && pDoc -> E_Ellipse.GetAt ( E_Number ).right + 2 >= point.x &&
-					 pDoc -> E_Ellipse.GetAt ( E_Number ).top - 2 <= point.y && pDoc -> E_Ellipse.GetAt ( E_Number ).bottom + 2 >= point.y ) {
-				
-					M_Rect.top = pDoc -> E_Ellipse.GetAt ( E_Number ).top - pDoc -> E_Thickness.GetAt ( E_Number ) / 2 - 2 ;
-					M_Rect.bottom = pDoc -> E_Ellipse.GetAt ( E_Number ).bottom + pDoc -> E_Thickness.GetAt ( E_Number ) / 2 + 2 ;
-					M_Rect.left = pDoc -> E_Ellipse.GetAt ( E_Number ).left - pDoc -> E_Thickness.GetAt ( E_Number ) / 2 - 2 ;
-					M_Rect.right = pDoc -> E_Ellipse.GetAt ( E_Number ).right + pDoc -> E_Thickness.GetAt ( E_Number ) / 2 + 2 ;
-
-					M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
-					M_What.Format ( _T ("E") ) ; M_Number = E_Number ;
-					M_IsDraw = 'o' ;
-					Invalidate () ; break ;
-				}
-				E_Number-- ;
-				
-			}
-
-			// 세모 객체인 경우
-			else if ( pDoc -> What.GetAt (i-1) == _T ("T") ) {
-				if ( pDoc -> T_Triangle.GetAt ( T_Number ).left - 2 <= point.x && pDoc -> T_Triangle.GetAt ( T_Number ).right + 2 >= point.x &&
-					 pDoc -> T_Triangle.GetAt ( T_Number ).top - 2 <= point.y && pDoc -> T_Triangle.GetAt ( T_Number ).bottom + 2 >= point.y ) {
-				
-					M_Rect.top = pDoc -> T_Triangle.GetAt ( T_Number ).top - pDoc -> T_Thickness.GetAt ( T_Number ) / 2 - 2 ;
-					M_Rect.bottom = pDoc -> T_Triangle.GetAt ( T_Number ).bottom + pDoc -> T_Thickness.GetAt ( T_Number ) / 2 + 2 ;
-					M_Rect.left = pDoc -> T_Triangle.GetAt ( T_Number ).left - pDoc -> T_Thickness.GetAt ( T_Number ) / 2 - 2 ;
-					M_Rect.right = pDoc -> T_Triangle.GetAt ( T_Number ).right + pDoc -> T_Thickness.GetAt ( T_Number ) / 2 + 2 ;
-
-					M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
-					M_What.Format ( _T ("T") ) ; M_Number = T_Number ;
-					M_IsDraw = 'o' ;
-					Invalidate () ; break ;
-				}
-				T_Number-- ;
-			}
-
-			// 역 삼각형 객체인 경우
-			else if ( pDoc -> What.GetAt (i-1) == _T ("RT") ) {
-				if ( pDoc -> RT_Triangle.GetAt ( RT_Number ).left - 2 <= point.x && pDoc -> RT_Triangle.GetAt ( RT_Number ).right + 2 >= point.x &&
-					 pDoc -> RT_Triangle.GetAt ( RT_Number ).top - 2 <= point.y && pDoc -> RT_Triangle.GetAt ( RT_Number ).bottom + 2 >= point.y ) {
-				
-					M_Rect.top = pDoc -> RT_Triangle.GetAt ( RT_Number ).top - pDoc -> RT_Thickness.GetAt ( RT_Number ) / 2 - 2 ;
-					M_Rect.bottom = pDoc -> RT_Triangle.GetAt ( RT_Number ).bottom + pDoc -> RT_Thickness.GetAt ( RT_Number ) / 2 + 2 ;
-					M_Rect.left = pDoc -> RT_Triangle.GetAt ( RT_Number ).left - pDoc -> RT_Thickness.GetAt ( RT_Number ) / 2 - 2 ;
-					M_Rect.right = pDoc -> RT_Triangle.GetAt ( RT_Number ).right + pDoc -> RT_Thickness.GetAt ( RT_Number ) / 2 + 2 ;
-
-					M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
-					M_What.Format ( _T ("RT") ) ; M_Number = RT_Number ;
-					M_IsDraw = 'o' ;
-					Invalidate () ; break ;
-				}
-				RT_Number-- ;
-			}
-
-			// 직각 삼각형 객체인 경우
-			else if ( pDoc -> What.GetAt (i-1) == _T ("RightT") ) {
-				if ( pDoc -> RightT_Triangle.GetAt ( RightT_Number ).left - 2 <= point.x && pDoc -> RightT_Triangle.GetAt ( RightT_Number ).right + 2 >= point.x &&
-					 pDoc -> RightT_Triangle.GetAt ( RightT_Number ).top - 2 <= point.y && pDoc -> RightT_Triangle.GetAt ( RightT_Number ).bottom + 2 >= point.y ) {
-				
-					M_Rect.top = pDoc -> RightT_Triangle.GetAt ( RightT_Number ).top - pDoc -> RightT_Thickness.GetAt ( RightT_Number ) / 2 - 2 ;
-					M_Rect.bottom = pDoc -> RightT_Triangle.GetAt ( RightT_Number ).bottom + pDoc -> RightT_Thickness.GetAt ( RightT_Number ) / 2 + 2 ;
-					M_Rect.left = pDoc -> RightT_Triangle.GetAt ( RightT_Number ).left - pDoc -> RightT_Thickness.GetAt ( RightT_Number ) / 2 - 2 ;
-					M_Rect.right = pDoc -> RightT_Triangle.GetAt ( RightT_Number ).right + pDoc -> RightT_Thickness.GetAt ( RightT_Number ) / 2 + 2 ;
-
-					M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
-					M_What.Format ( _T ("RightT") ) ; M_Number = RightT_Number ;
-					M_IsDraw = 'o' ;
-					Invalidate () ; break ;
-				}
-				RightT_Number-- ;
-			}
-
-			// 역 직각 삼각형 객체인 경우
-			else if ( pDoc -> What.GetAt (i-1) == _T ("RRightT") ) {
-				if ( pDoc -> RRightT_Triangle.GetAt ( RRightT_Number ).left - 2 <= point.x && pDoc -> RRightT_Triangle.GetAt ( RRightT_Number ).right + 2 >= point.x &&
-					 pDoc -> RRightT_Triangle.GetAt ( RRightT_Number ).top - 2 <= point.y && pDoc -> RRightT_Triangle.GetAt ( RRightT_Number ).bottom + 2 >= point.y ) {
-				
-					M_Rect.top = pDoc -> RRightT_Triangle.GetAt ( RRightT_Number ).top - pDoc -> RRightT_Thickness.GetAt ( RRightT_Number ) / 2 - 2 ;
-					M_Rect.bottom = pDoc -> RRightT_Triangle.GetAt ( RRightT_Number ).bottom + pDoc -> RRightT_Thickness.GetAt ( RRightT_Number ) / 2 + 2 ;
-					M_Rect.left = pDoc -> RRightT_Triangle.GetAt ( RRightT_Number ).left - pDoc -> RRightT_Thickness.GetAt ( RRightT_Number ) / 2 - 2 ;
-					M_Rect.right = pDoc -> RRightT_Triangle.GetAt ( RRightT_Number ).right + pDoc -> RRightT_Thickness.GetAt ( RRightT_Number ) / 2 + 2 ;
-
-					M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
-					M_What.Format ( _T ("RRightT") ) ; M_Number = RRightT_Number ;
-					M_IsDraw = 'o' ;
-					Invalidate () ; break ;
-				}
-				RRightT_Number-- ;
-			}
-
-			// 왼쪽 -> 오른쪽 삼각형 객체인 경우
-			else if ( pDoc -> What.GetAt (i-1) == _T ("LTRT") ) {
-				if ( pDoc -> LTRT_Triangle.GetAt ( LTRT_Number ).left - 2 <= point.x && pDoc -> LTRT_Triangle.GetAt ( LTRT_Number ).right + 2 >= point.x &&
-					 pDoc -> LTRT_Triangle.GetAt ( LTRT_Number ).top - 2 <= point.y && pDoc -> LTRT_Triangle.GetAt ( LTRT_Number ).bottom + 2 >= point.y ) {
-				
-					M_Rect.top = pDoc -> LTRT_Triangle.GetAt ( LTRT_Number ).top - pDoc -> LTRT_Thickness.GetAt ( LTRT_Number ) / 2 - 2 ;
-					M_Rect.bottom = pDoc -> LTRT_Triangle.GetAt ( LTRT_Number ).bottom + pDoc -> LTRT_Thickness.GetAt ( LTRT_Number ) / 2 + 2 ;
-					M_Rect.left = pDoc -> LTRT_Triangle.GetAt ( LTRT_Number ).left - pDoc -> LTRT_Thickness.GetAt ( LTRT_Number ) / 2 - 2 ;
-					M_Rect.right = pDoc -> LTRT_Triangle.GetAt ( LTRT_Number ).right + pDoc -> LTRT_Thickness.GetAt ( LTRT_Number ) / 2 + 2 ;
-
-					M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
-					M_What.Format ( _T ("LTRT") ) ; M_Number = LTRT_Number ;
-					M_IsDraw = 'o' ;
-					Invalidate () ; break ;
-				}
-				LTRT_Number-- ;
-			}
-
-			// 오른쪽 -> 왼쪽 삼각형 객체인 경우
-			else if ( pDoc -> What.GetAt (i-1) == _T ("RTLT") ) {
-				if ( pDoc -> RTLT_Triangle.GetAt ( RTLT_Number ).left - 2 <= point.x && pDoc -> RTLT_Triangle.GetAt ( RTLT_Number ).right + 2 >= point.x &&
-					 pDoc -> RTLT_Triangle.GetAt ( RTLT_Number ).top - 2 <= point.y && pDoc -> RTLT_Triangle.GetAt ( RTLT_Number ).bottom + 2 >= point.y ) {
-				
-					M_Rect.top = pDoc -> RTLT_Triangle.GetAt ( RTLT_Number ).top - pDoc -> RTLT_Thickness.GetAt ( RTLT_Number ) / 2 - 2 ;
-					M_Rect.bottom = pDoc -> RTLT_Triangle.GetAt ( RTLT_Number ).bottom + pDoc -> RTLT_Thickness.GetAt ( RTLT_Number ) / 2 + 2 ;
-					M_Rect.left = pDoc -> RTLT_Triangle.GetAt ( RTLT_Number ).left - pDoc -> RTLT_Thickness.GetAt ( RTLT_Number ) / 2 - 2 ;
-					M_Rect.right = pDoc -> RTLT_Triangle.GetAt ( RTLT_Number ).right + pDoc -> RTLT_Thickness.GetAt ( RTLT_Number ) / 2 + 2 ;
-
-					M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
-					M_What.Format ( _T ("RTLT") ) ; M_Number = RTLT_Number ;
-					M_IsDraw = 'o' ;
-					Invalidate () ; break ;
-				}
-				RTLT_Number-- ;
-			}
-
 		}
 	}
 
@@ -2473,21 +2496,21 @@ void CGraphicEditorView::OnLButtonUp(UINT nFlags, CPoint point)
 			pDoc -> L_Line.GetAt ( M_Number ).Start.y = point.y ;
 			
 			if ( pDoc -> L_Line.GetAt ( M_Number ).Start.x >= pDoc -> L_Line.GetAt ( M_Number ).Last.x ) {
-				M_Rect.left = pDoc -> L_Line.GetAt ( M_Number ).Last.x ;
-				M_Rect.right = pDoc -> L_Line.GetAt ( M_Number ).Start.x ;
+				M_Rect.left = pDoc -> L_Line.GetAt ( M_Number ).Last.x - pDoc -> L_Line.GetAt ( M_Number ).Thickness / 2 ;
+				M_Rect.right = pDoc -> L_Line.GetAt ( M_Number ).Start.x + pDoc -> L_Line.GetAt ( M_Number ).Thickness / 2 ;
 			}
 			else {
-				M_Rect.left = pDoc -> L_Line.GetAt ( M_Number ).Start.x ;
-				M_Rect.right = pDoc -> L_Line.GetAt ( M_Number ).Last.x ;
+				M_Rect.left = pDoc -> L_Line.GetAt ( M_Number ).Start.x - pDoc -> L_Line.GetAt ( M_Number ).Thickness / 2 ;
+				M_Rect.right = pDoc -> L_Line.GetAt ( M_Number ).Last.x + pDoc -> L_Line.GetAt ( M_Number ).Thickness / 2 ;
 			}
 
 			if ( pDoc -> L_Line.GetAt ( M_Number ).Start.y >= pDoc -> L_Line.GetAt ( M_Number ).Last.y ) {
-				M_Rect.top = pDoc -> L_Line.GetAt ( M_Number ).Last.y ;
-				M_Rect.bottom = pDoc -> L_Line.GetAt ( M_Number ).Start.y ;
+				M_Rect.top = pDoc -> L_Line.GetAt ( M_Number ).Last.y - pDoc -> L_Line.GetAt ( M_Number ).Thickness / 2 ;
+				M_Rect.bottom = pDoc -> L_Line.GetAt ( M_Number ).Start.y + pDoc -> L_Line.GetAt ( M_Number ).Thickness / 2 ;
 			}
 			else {
-				M_Rect.top = pDoc -> L_Line.GetAt ( M_Number ).Start.y ;
-				M_Rect.bottom = pDoc -> L_Line.GetAt ( M_Number ).Last.y ;
+				M_Rect.top = pDoc -> L_Line.GetAt ( M_Number ).Start.y - pDoc -> L_Line.GetAt ( M_Number ).Thickness / 2 ;
+				M_Rect.bottom = pDoc -> L_Line.GetAt ( M_Number ).Last.y + pDoc -> L_Line.GetAt ( M_Number ).Thickness / 2 ;
 			}
 		}
 		else {
@@ -2495,28 +2518,26 @@ void CGraphicEditorView::OnLButtonUp(UINT nFlags, CPoint point)
 			pDoc -> L_Line.GetAt ( M_Number ).Last.y = point.y ;
 
 			if ( pDoc -> L_Line.GetAt ( M_Number ).Start.x >= pDoc -> L_Line.GetAt ( M_Number ).Last.x ) {
-				M_Rect.left = pDoc -> L_Line.GetAt ( M_Number ).Last.x ;
-				M_Rect.right = pDoc -> L_Line.GetAt ( M_Number ).Start.x ;
+				M_Rect.left = pDoc -> L_Line.GetAt ( M_Number ).Last.x - pDoc -> L_Line.GetAt ( M_Number ).Thickness / 2 ;
+				M_Rect.right = pDoc -> L_Line.GetAt ( M_Number ).Start.x + pDoc -> L_Line.GetAt ( M_Number ).Thickness / 2 ;
 			}
 			else {
-				M_Rect.left = pDoc -> L_Line.GetAt ( M_Number ).Start.x ;
-				M_Rect.right = pDoc -> L_Line.GetAt ( M_Number ).Last.x ;
+				M_Rect.left = pDoc -> L_Line.GetAt ( M_Number ).Start.x - pDoc -> L_Line.GetAt ( M_Number ).Thickness / 2 ;
+				M_Rect.right = pDoc -> L_Line.GetAt ( M_Number ).Last.x + pDoc -> L_Line.GetAt ( M_Number ).Thickness / 2 ;
 			}
 
 			if ( pDoc -> L_Line.GetAt ( M_Number ).Start.y >= pDoc -> L_Line.GetAt ( M_Number ).Last.y ) {
-				M_Rect.top = pDoc -> L_Line.GetAt ( M_Number ).Last.y ;
-				M_Rect.bottom = pDoc -> L_Line.GetAt ( M_Number ).Start.y ;
+				M_Rect.top = pDoc -> L_Line.GetAt ( M_Number ).Last.y - pDoc -> L_Line.GetAt ( M_Number ).Thickness / 2 ;
+				M_Rect.bottom = pDoc -> L_Line.GetAt ( M_Number ).Start.y + pDoc -> L_Line.GetAt ( M_Number ).Thickness / 2 ;
 			}
 			else {
-				M_Rect.top = pDoc -> L_Line.GetAt ( M_Number ).Start.y ;
-				M_Rect.bottom = pDoc -> L_Line.GetAt ( M_Number ).Last.y ;
+				M_Rect.top = pDoc -> L_Line.GetAt ( M_Number ).Start.y - pDoc -> L_Line.GetAt ( M_Number ).Thickness / 2 ;
+				M_Rect.bottom = pDoc -> L_Line.GetAt ( M_Number ).Last.y + pDoc -> L_Line.GetAt ( M_Number ).Thickness / 2 ;
 			}
 		}
+		M_ChangeLineOnePoint = 'x' ;
 
 		Invalidate () ;
-		M_IsChangeLineStart = 'x' ;
-		M_ChangeLineOnePoint = 'x' ;
-		M_IsLineSelect = 'x' ;
 	}
 	// 객체를 이동시키다 클릭을 땐 경우
 	else if ( M_IsMove == 'o' ) {
@@ -2786,7 +2807,7 @@ BOOL CGraphicEditorView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 		// 평상시엔 기본 커서로 변환 합니다.
 		if ( IsNormal == 'o' )
 			::SetCursor(AfxGetApp()->LoadStandardCursor (IDC_ARROW)) ;
-		else if ( M_IsDraw == 'o' && M_ChangeLineOnePoint == 'o' &&
+		else if ( M_IsDraw == 'o' && M_IsLineSelect == 'o' &&
 			  ((pDoc -> L_Line.GetAt ( M_Number ).Start.x - 15 <= point.x && pDoc -> L_Line.GetAt ( M_Number ).Start.x + 15 >= point.x
 			  && pDoc -> L_Line.GetAt ( M_Number ).Start.y - 15 <= point.y && pDoc -> L_Line.GetAt ( M_Number ).Start.y + 15 >= point.y) ||
 			  (pDoc -> L_Line.GetAt ( M_Number ).Last.x - 15 <= point.x && pDoc -> L_Line.GetAt ( M_Number ).Last.x + 15 >= point.x
@@ -2796,6 +2817,7 @@ BOOL CGraphicEditorView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 		}
 		else if ( M_IsMove == 'o' ) {
 
+			M_IsLineSelect = 'x' ;
 			int L_Number = pDoc -> L_Count - 1;
 			int R_Number = pDoc -> R_Count - 1;
 			int P_Number = pDoc -> P_Count - 1;
@@ -2808,7 +2830,7 @@ BOOL CGraphicEditorView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 			int RTLT_Number = pDoc -> RTLT_Count - 1;
 
 			if ( M_IsDraw == 'o' ) {
-				if ( M_Rect.top <= point.y && M_Rect.bottom >= point.y && M_Rect.left <= point.x && M_Rect.right >= point.x ) {
+			if ( M_Rect.top <= point.y && M_Rect.bottom >= point.y && M_Rect.left <= point.x && M_Rect.right >= point.x ) {
 					::SetCursor(AfxGetApp()->LoadStandardCursor (IDC_SIZEALL)) ;
 				}
 				else {
@@ -3660,8 +3682,1079 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	ASSERT_VALID(pDoc);
 	if (!pDoc)
 		return;
+	
+	// 특정 객체를 클릭한 상태입니다.
+	if ( M_IsDraw == 'o' ) {
+		// Delete 키나 백 스페이스 키를 누르면 해당 객체를 삭제합니다.
+		if ( nChar == VK_DELETE || nChar == VK_BACK ) {
+			if ( M_What == _T ("L") ) {
+				M_IsLineSelect == 'x' ;
+				M_ChangeLineOnePoint = 'x' ;
+				M_IsChangeLineStart = 'x' ;
+				M_IsSelect = 'x' ;
+				M_IsDraw = 'x' ;
+				pDoc -> L_Line.RemoveAt ( M_Number ) ;
+				int location = pDoc -> L_Location.GetAt ( M_Number ) ;
+				pDoc -> L_Count-- ;
+				pDoc -> What.RemoveAt ( pDoc -> L_Location.GetAt ( M_Number ) ) ;
+				pDoc -> L_Location.RemoveAt ( M_Number ) ;
+				for ( int i = M_Number ; i < pDoc -> L_Line.GetCount () ; i++ ) {
+					pDoc -> L_Location.GetAt (i)-- ;
+				}
+				int R_For = 0 ;
+				int P_For = 0 ;
+				int E_For = 0 ;
+				int T_For = 0 ;
+				int RT_For = 0 ;
+				int RightT_For = 0 ;
+				int RRightT_For = 0 ;
+				int LTRT_For = 0 ;
+				int RTLT_For = 0 ;
+				for ( int i = location ; i < pDoc -> What.GetCount () ; i++ ) {
+					if ( pDoc -> What.GetAt (i) == _T ("R") ) {
+						for ( int j = R_For ; j < pDoc -> R_Location.GetCount () ; j++ ) {
+							if ( pDoc -> R_Location.GetAt (j) == i+1 ) {
+								pDoc -> R_Location.SetAt (j, i) ;
+								R_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("P") ) {
+						for ( int j = P_For ; j < pDoc -> P_Location.GetCount () ; j++ ) {
+							if ( pDoc -> P_Location.GetAt (j) == i+1 ) {
+								pDoc -> P_Location.SetAt (j, i) ;
+								P_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("E") ) {
+						for ( int j = E_For ; j < pDoc -> E_Location.GetCount () ; j++ ) {
+							if ( pDoc -> E_Location.GetAt (j) == i+1 ) {
+								pDoc -> E_Location.SetAt (j, i) ;
+								E_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("T") ) {
+						for ( int j = T_For ; j < pDoc -> T_Location.GetCount () ; j++ ) {
+							if ( pDoc -> T_Location.GetAt (j) == i+1 ) {
+								pDoc -> T_Location.SetAt (j, i) ;
+								T_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("RT") ) {
+						for ( int j = RT_For ; j < pDoc -> RT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> RT_Location.GetAt (j) == i+1 ) {
+								pDoc -> RT_Location.SetAt (j, i) ;
+								RT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("RightT") ) {
+						for ( int j = RightT_For ; j < pDoc -> RightT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> RightT_Location.GetAt (j) == i+1 ) {
+								pDoc -> RightT_Location.SetAt (j, i) ;
+								RightT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("RRightT") ) {
+						for ( int j = RRightT_For ; j < pDoc -> RRightT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> RRightT_Location.GetAt (j) == i+1 ) {
+								pDoc -> RRightT_Location.SetAt (j, i) ;
+								RRightT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("LTRT") ) {
+						for ( int j = LTRT_For ; j < pDoc -> LTRT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> LTRT_Location.GetAt (j) == i+1 ) {
+								pDoc -> LTRT_Location.SetAt (j, i) ;
+								LTRT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("RTLT") ) {
+						for ( int j = RTLT_For ; j < pDoc -> RTLT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> RTLT_Location.GetAt (j) == i+1 ) {
+								pDoc -> RTLT_Location.SetAt (j, i) ;
+								RTLT_For = j ;
+								break ;
+							}
+						}
+					}
+				}
+				M_Number = 0 ;
+			}
+			else if ( M_What == _T ("R") ) {
+				M_IsLineSelect == 'x' ;
+				M_ChangeLineOnePoint = 'x' ;
+				M_IsChangeLineStart = 'x' ;
+				M_IsSelect = 'x' ;
+				M_IsDraw = 'x' ;
+				pDoc -> R_Count-- ;
+				int location = pDoc -> R_Location.GetAt ( M_Number ) ;
+				pDoc -> What.RemoveAt ( pDoc -> R_Location.GetAt ( M_Number ) ) ;
+				pDoc -> R_Rec.RemoveAt ( M_Number ) ;
+				pDoc -> R_Location.RemoveAt ( M_Number ) ;
+				for ( int i = M_Number ; i < pDoc -> R_Rec.GetCount () ; i++ ) {
+					pDoc -> R_Location.GetAt (i)-- ;
+				}
 
-	if ( Text_IsContinue == 'o' ) {
+				int L_For = 0 ;
+				int P_For = 0 ;
+				int E_For = 0 ;
+				int T_For = 0 ;
+				int RT_For = 0 ;
+				int RightT_For = 0 ;
+				int RRightT_For = 0 ;
+				int LTRT_For = 0 ;
+				int RTLT_For = 0 ;
+				for ( int i = location ; i < pDoc -> What.GetCount () ; i++ ) {
+					if ( pDoc -> What.GetAt (i) == _T ("L") ) {
+						for ( int j = L_For ; j < pDoc -> L_Location.GetCount () ; j++ ) {
+							if ( pDoc -> L_Location.GetAt (j) == i+1 ) {
+								pDoc -> L_Location.SetAt (j, i) ;
+								L_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("P") ) {
+						for ( int j = P_For ; j < pDoc -> P_Location.GetCount () ; j++ ) {
+							if ( pDoc -> P_Location.GetAt (j) == i+1 ) {
+								pDoc -> P_Location.SetAt (j, i) ;
+								P_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("E") ) {
+						for ( int j = E_For ; j < pDoc -> E_Location.GetCount () ; j++ ) {
+							if ( pDoc -> E_Location.GetAt (j) == i+1 ) {
+								pDoc -> E_Location.SetAt (j, i) ;
+								E_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("T") ) {
+						for ( int j = T_For ; j < pDoc -> T_Location.GetCount () ; j++ ) {
+							if ( pDoc -> T_Location.GetAt (j) == i+1 ) {
+								pDoc -> T_Location.SetAt (j, i) ;
+								T_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("RT") ) {
+						for ( int j = RT_For ; j < pDoc -> RT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> RT_Location.GetAt (j) == i+1 ) {
+								pDoc -> RT_Location.SetAt (j, i) ;
+								RT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("RightT") ) {
+						for ( int j = RightT_For ; j < pDoc -> RightT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> RightT_Location.GetAt (j) == i+1 ) {
+								pDoc -> RightT_Location.SetAt (j, i) ;
+								RightT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("RRightT") ) {
+						for ( int j = RRightT_For ; j < pDoc -> RRightT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> RRightT_Location.GetAt (j) == i+1 ) {
+								pDoc -> RRightT_Location.SetAt (j, i) ;
+								RRightT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("LTRT") ) {
+						for ( int j = LTRT_For ; j < pDoc -> LTRT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> LTRT_Location.GetAt (j) == i+1 ) {
+								pDoc -> LTRT_Location.SetAt (j, i) ;
+								LTRT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("RTLT") ) {
+						for ( int j = RTLT_For ; j < pDoc -> RTLT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> RTLT_Location.GetAt (j) == i+1 ) {
+								pDoc -> RTLT_Location.SetAt (j, i) ;
+								RTLT_For = j ;
+								break ;
+							}
+						}
+					}
+				}
+				M_Number = 0 ;
+			}
+			else if ( M_What == _T ("P") ) {
+				M_IsSelect = 'x' ;
+				M_IsDraw = 'x' ;
+				int location = pDoc -> P_Location.GetAt ( M_Number ) ;
+				pDoc -> P_Poly.RemoveAt ( M_Number ) ;
+				pDoc -> P_Count-- ;
+				pDoc -> What.RemoveAt ( pDoc -> P_Location.GetAt ( M_Number ) ) ;
+				pDoc -> P_Location.RemoveAt ( M_Number ) ;
+				for ( int i = M_Number ; i < pDoc -> P_Poly.GetCount () ; i++ ) {
+					pDoc -> P_Location.GetAt (i)-- ;
+				}
+
+				int R_For = 0 ;
+				int L_For = 0 ;
+				int E_For = 0 ;
+				int T_For = 0 ;
+				int RT_For = 0 ;
+				int RightT_For = 0 ;
+				int RRightT_For = 0 ;
+				int LTRT_For = 0 ;
+				int RTLT_For = 0 ;
+				for ( int i = location ; i < pDoc -> What.GetCount () ; i++ ) {
+					if ( pDoc -> What.GetAt (i) == _T ("R") ) {
+						for ( int j = R_For ; j < pDoc -> R_Location.GetCount () ; j++ ) {
+							if ( pDoc -> R_Location.GetAt (j) == i+1 ) {
+								pDoc -> R_Location.SetAt (j, i) ;
+								R_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("L") ) {
+						for ( int j = L_For ; j < pDoc -> L_Location.GetCount () ; j++ ) {
+							if ( pDoc -> L_Location.GetAt (j) == i+1 ) {
+								pDoc -> L_Location.SetAt (j, i) ;
+								L_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("E") ) {
+						for ( int j = E_For ; j < pDoc -> E_Location.GetCount () ; j++ ) {
+							if ( pDoc -> E_Location.GetAt (j) == i+1 ) {
+								pDoc -> E_Location.SetAt (j, i) ;
+								E_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("T") ) {
+						for ( int j = T_For ; j < pDoc -> T_Location.GetCount () ; j++ ) {
+							if ( pDoc -> T_Location.GetAt (j) == i+1 ) {
+								pDoc -> T_Location.SetAt (j, i) ;
+								T_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("RT") ) {
+						for ( int j = RT_For ; j < pDoc -> RT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> RT_Location.GetAt (j) == i+1 ) {
+								pDoc -> RT_Location.SetAt (j, i) ;
+								RT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("RightT") ) {
+						for ( int j = RightT_For ; j < pDoc -> RightT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> RightT_Location.GetAt (j) == i+1 ) {
+								pDoc -> RightT_Location.SetAt (j, i) ;
+								RightT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("RRightT") ) {
+						for ( int j = RRightT_For ; j < pDoc -> RRightT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> RRightT_Location.GetAt (j) == i+1 ) {
+								pDoc -> RRightT_Location.SetAt (j, i) ;
+								RRightT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("LTRT") ) {
+						for ( int j = LTRT_For ; j < pDoc -> LTRT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> LTRT_Location.GetAt (j) == i+1 ) {
+								pDoc -> LTRT_Location.SetAt (j, i) ;
+								LTRT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("RTLT") ) {
+						for ( int j = RTLT_For ; j < pDoc -> RTLT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> RTLT_Location.GetAt (j) == i+1 ) {
+								pDoc -> RTLT_Location.SetAt (j, i) ;
+								RTLT_For = j ;
+								break ;
+							}
+						}
+					}
+				}
+				M_Number = 0 ;
+			}
+			else if ( M_What == _T ("E") ) {
+				M_IsSelect = 'x' ;
+				M_IsDraw = 'x' ;
+				int location = pDoc -> E_Location.GetAt ( M_Number ) ;
+				pDoc -> E_Ellipse.RemoveAt ( M_Number ) ;
+				pDoc -> E_Count-- ;
+				pDoc -> What.RemoveAt ( pDoc -> E_Location.GetAt ( M_Number ) ) ;
+				pDoc -> E_Location.RemoveAt ( M_Number ) ;
+				for ( int i = M_Number ; i < pDoc -> E_Ellipse.GetCount () ; i++ ) {
+					pDoc -> E_Location.GetAt (i)-- ;
+				}
+
+				int R_For = 0 ;
+				int P_For = 0 ;
+				int L_For = 0 ;
+				int T_For = 0 ;
+				int RT_For = 0 ;
+				int RightT_For = 0 ;
+				int RRightT_For = 0 ;
+				int LTRT_For = 0 ;
+				int RTLT_For = 0 ;
+				for ( int i = location ; i < pDoc -> What.GetCount () ; i++ ) {
+					if ( pDoc -> What.GetAt (i) == _T ("R") ) {
+						for ( int j = R_For ; j < pDoc -> R_Location.GetCount () ; j++ ) {
+							if ( pDoc -> R_Location.GetAt (j) == i+1 ) {
+								pDoc -> R_Location.SetAt (j, i) ;
+								R_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("P") ) {
+						for ( int j = P_For ; j < pDoc -> P_Location.GetCount () ; j++ ) {
+							if ( pDoc -> P_Location.GetAt (j) == i+1 ) {
+								pDoc -> P_Location.SetAt (j, i) ;
+								P_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("L") ) {
+						for ( int j = L_For ; j < pDoc -> L_Location.GetCount () ; j++ ) {
+							if ( pDoc -> L_Location.GetAt (j) == i+1 ) {
+								pDoc -> L_Location.SetAt (j, i) ;
+								L_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("T") ) {
+						for ( int j = T_For ; j < pDoc -> T_Location.GetCount () ; j++ ) {
+							if ( pDoc -> T_Location.GetAt (j) == i+1 ) {
+								pDoc -> T_Location.SetAt (j, i) ;
+								T_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("RT") ) {
+						for ( int j = RT_For ; j < pDoc -> RT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> RT_Location.GetAt (j) == i+1 ) {
+								pDoc -> RT_Location.SetAt (j, i) ;
+								RT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("RightT") ) {
+						for ( int j = RightT_For ; j < pDoc -> RightT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> RightT_Location.GetAt (j) == i+1 ) {
+								pDoc -> RightT_Location.SetAt (j, i) ;
+								RightT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("RRightT") ) {
+						for ( int j = RRightT_For ; j < pDoc -> RRightT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> RRightT_Location.GetAt (j) == i+1 ) {
+								pDoc -> RRightT_Location.SetAt (j, i) ;
+								RRightT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("LTRT") ) {
+						for ( int j = LTRT_For ; j < pDoc -> LTRT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> LTRT_Location.GetAt (j) == i+1 ) {
+								pDoc -> LTRT_Location.SetAt (j, i) ;
+								LTRT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("RTLT") ) {
+						for ( int j = RTLT_For ; j < pDoc -> RTLT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> RTLT_Location.GetAt (j) == i+1 ) {
+								pDoc -> RTLT_Location.SetAt (j, i) ;
+								RTLT_For = j ;
+								break ;
+							}
+						}
+					}
+				}
+				M_Number = 0 ;
+			}
+			else if ( M_What == _T ("T") ) {
+				M_IsSelect = 'x' ;
+				M_IsDraw = 'x' ;
+				int location = pDoc -> T_Location.GetAt ( M_Number ) ;
+				pDoc -> T_Triangle.RemoveAt ( M_Number ) ;
+				pDoc -> T_Count-- ;
+				pDoc -> What.RemoveAt ( pDoc -> T_Location.GetAt ( M_Number ) ) ;
+				pDoc -> T_Location.RemoveAt ( M_Number ) ;
+				for ( int i = M_Number ; i < pDoc -> T_Triangle.GetCount () ; i++ ) {
+					pDoc -> T_Location.GetAt (i)-- ;
+				}
+
+				int R_For = 0 ;
+				int P_For = 0 ;
+				int E_For = 0 ;
+				int L_For = 0 ;
+				int RT_For = 0 ;
+				int RightT_For = 0 ;
+				int RRightT_For = 0 ;
+				int LTRT_For = 0 ;
+				int RTLT_For = 0 ;
+				for ( int i = location ; i < pDoc -> What.GetCount () ; i++ ) {
+					if ( pDoc -> What.GetAt (i) == _T ("R") ) {
+						for ( int j = R_For ; j < pDoc -> R_Location.GetCount () ; j++ ) {
+							if ( pDoc -> R_Location.GetAt (j) == i+1 ) {
+								pDoc -> R_Location.SetAt (j, i) ;
+								R_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("P") ) {
+						for ( int j = P_For ; j < pDoc -> P_Location.GetCount () ; j++ ) {
+							if ( pDoc -> P_Location.GetAt (j) == i+1 ) {
+								pDoc -> P_Location.SetAt (j, i) ;
+								P_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("E") ) {
+						for ( int j = E_For ; j < pDoc -> E_Location.GetCount () ; j++ ) {
+							if ( pDoc -> E_Location.GetAt (j) == i+1 ) {
+								pDoc -> E_Location.SetAt (j, i) ;
+								E_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("L") ) {
+						for ( int j = L_For ; j < pDoc -> L_Location.GetCount () ; j++ ) {
+							if ( pDoc -> L_Location.GetAt (j) == i+1 ) {
+								pDoc -> L_Location.SetAt (j, i) ;
+								L_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("RT") ) {
+						for ( int j = RT_For ; j < pDoc -> RT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> RT_Location.GetAt (j) == i+1 ) {
+								pDoc -> RT_Location.SetAt (j, i) ;
+								RT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("RightT") ) {
+						for ( int j = RightT_For ; j < pDoc -> RightT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> RightT_Location.GetAt (j) == i+1 ) {
+								pDoc -> RightT_Location.SetAt (j, i) ;
+								RightT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("RRightT") ) {
+						for ( int j = RRightT_For ; j < pDoc -> RRightT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> RRightT_Location.GetAt (j) == i+1 ) {
+								pDoc -> RRightT_Location.SetAt (j, i) ;
+								RRightT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("LTRT") ) {
+						for ( int j = LTRT_For ; j < pDoc -> LTRT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> LTRT_Location.GetAt (j) == i+1 ) {
+								pDoc -> LTRT_Location.SetAt (j, i) ;
+								LTRT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("RTLT") ) {
+						for ( int j = RTLT_For ; j < pDoc -> RTLT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> RTLT_Location.GetAt (j) == i+1 ) {
+								pDoc -> RTLT_Location.SetAt (j, i) ;
+								RTLT_For = j ;
+								break ;
+							}
+						}
+					}
+				}
+				M_Number = 0 ;
+			}
+			else if ( M_What == _T ("RT") ) {
+				M_IsSelect = 'x' ;
+				M_IsDraw = 'x' ;
+				int location = pDoc -> RT_Location.GetAt ( M_Number ) ;
+				pDoc -> RT_Triangle.RemoveAt ( M_Number ) ;
+				pDoc -> RT_Count-- ;
+				pDoc -> What.RemoveAt ( pDoc -> RT_Location.GetAt ( M_Number ) ) ;
+				pDoc -> RT_Location.RemoveAt ( M_Number ) ;
+				for ( int i = M_Number ; i < pDoc -> RT_Triangle.GetCount () ; i++ ) {
+					pDoc -> RT_Location.GetAt (i)-- ;
+				}
+
+				int R_For = 0 ;
+				int P_For = 0 ;
+				int E_For = 0 ;
+				int T_For = 0 ;
+				int L_For = 0 ;
+				int RightT_For = 0 ;
+				int RRightT_For = 0 ;
+				int LTRT_For = 0 ;
+				int RTLT_For = 0 ;
+				for ( int i = location ; i < pDoc -> What.GetCount () ; i++ ) {
+					if ( pDoc -> What.GetAt (i) == _T ("R") ) {
+						for ( int j = R_For ; j < pDoc -> R_Location.GetCount () ; j++ ) {
+							if ( pDoc -> R_Location.GetAt (j) == i+1 ) {
+								pDoc -> R_Location.SetAt (j, i) ;
+								R_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("P") ) {
+						for ( int j = P_For ; j < pDoc -> P_Location.GetCount () ; j++ ) {
+							if ( pDoc -> P_Location.GetAt (j) == i+1 ) {
+								pDoc -> P_Location.SetAt (j, i) ;
+								P_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("E") ) {
+						for ( int j = E_For ; j < pDoc -> E_Location.GetCount () ; j++ ) {
+							if ( pDoc -> E_Location.GetAt (j) == i+1 ) {
+								pDoc -> E_Location.SetAt (j, i) ;
+								E_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("T") ) {
+						for ( int j = T_For ; j < pDoc -> T_Location.GetCount () ; j++ ) {
+							if ( pDoc -> T_Location.GetAt (j) == i+1 ) {
+								pDoc -> T_Location.SetAt (j, i) ;
+								T_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("L") ) {
+						for ( int j = L_For ; j < pDoc -> L_Location.GetCount () ; j++ ) {
+							if ( pDoc -> L_Location.GetAt (j) == i+1 ) {
+								pDoc -> L_Location.SetAt (j, i) ;
+								L_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("RightT") ) {
+						for ( int j = RightT_For ; j < pDoc -> RightT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> RightT_Location.GetAt (j) == i+1 ) {
+								pDoc -> RightT_Location.SetAt (j, i) ;
+								RightT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("RRightT") ) {
+						for ( int j = RRightT_For ; j < pDoc -> RRightT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> RRightT_Location.GetAt (j) == i+1 ) {
+								pDoc -> RRightT_Location.SetAt (j, i) ;
+								RRightT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("LTRT") ) {
+						for ( int j = LTRT_For ; j < pDoc -> LTRT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> LTRT_Location.GetAt (j) == i+1 ) {
+								pDoc -> LTRT_Location.SetAt (j, i) ;
+								LTRT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("RTLT") ) {
+						for ( int j = RTLT_For ; j < pDoc -> RTLT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> RTLT_Location.GetAt (j) == i+1 ) {
+								pDoc -> RTLT_Location.SetAt (j, i) ;
+								RTLT_For = j ;
+								break ;
+							}
+						}
+					}
+				}
+				M_Number = 0 ;
+			}
+			else if ( M_What == _T ("RightT") ) {
+				M_IsSelect = 'x' ;
+				M_IsDraw = 'x' ;
+				int location = pDoc -> RightT_Location.GetAt ( M_Number ) ;
+				pDoc -> RightT_Triangle.RemoveAt ( M_Number ) ;
+				pDoc -> RightT_Count-- ;
+				pDoc -> What.RemoveAt ( pDoc -> RightT_Location.GetAt ( M_Number ) ) ;
+				pDoc -> RightT_Location.RemoveAt ( M_Number ) ;
+				for ( int i = M_Number ; i < pDoc -> RightT_Triangle.GetCount () ; i++ ) {
+					pDoc -> RightT_Location.GetAt (i)-- ;
+				}
+
+				int R_For = 0 ;
+				int P_For = 0 ;
+				int E_For = 0 ;
+				int T_For = 0 ;
+				int RT_For = 0 ;
+				int L_For = 0 ;
+				int RRightT_For = 0 ;
+				int LTRT_For = 0 ;
+				int RTLT_For = 0 ;
+				for ( int i = location ; i < pDoc -> What.GetCount () ; i++ ) {
+					if ( pDoc -> What.GetAt (i) == _T ("R") ) {
+						for ( int j = R_For ; j < pDoc -> R_Location.GetCount () ; j++ ) {
+							if ( pDoc -> R_Location.GetAt (j) == i+1 ) {
+								pDoc -> R_Location.SetAt (j, i) ;
+								R_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("P") ) {
+						for ( int j = P_For ; j < pDoc -> P_Location.GetCount () ; j++ ) {
+							if ( pDoc -> P_Location.GetAt (j) == i+1 ) {
+								pDoc -> P_Location.SetAt (j, i) ;
+								P_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("E") ) {
+						for ( int j = E_For ; j < pDoc -> E_Location.GetCount () ; j++ ) {
+							if ( pDoc -> E_Location.GetAt (j) == i+1 ) {
+								pDoc -> E_Location.SetAt (j, i) ;
+								E_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("T") ) {
+						for ( int j = T_For ; j < pDoc -> T_Location.GetCount () ; j++ ) {
+							if ( pDoc -> T_Location.GetAt (j) == i+1 ) {
+								pDoc -> T_Location.SetAt (j, i) ;
+								T_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("RT") ) {
+						for ( int j = RT_For ; j < pDoc -> RT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> RT_Location.GetAt (j) == i+1 ) {
+								pDoc -> RT_Location.SetAt (j, i) ;
+								RT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("L") ) {
+						for ( int j = L_For ; j < pDoc -> L_Location.GetCount () ; j++ ) {
+							if ( pDoc -> L_Location.GetAt (j) == i+1 ) {
+								pDoc -> L_Location.SetAt (j, i) ;
+								L_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("RRightT") ) {
+						for ( int j = RRightT_For ; j < pDoc -> RRightT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> RRightT_Location.GetAt (j) == i+1 ) {
+								pDoc -> RRightT_Location.SetAt (j, i) ;
+								RRightT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("LTRT") ) {
+						for ( int j = LTRT_For ; j < pDoc -> LTRT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> LTRT_Location.GetAt (j) == i+1 ) {
+								pDoc -> LTRT_Location.SetAt (j, i) ;
+								LTRT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("RTLT") ) {
+						for ( int j = RTLT_For ; j < pDoc -> RTLT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> RTLT_Location.GetAt (j) == i+1 ) {
+								pDoc -> RTLT_Location.SetAt (j, i) ;
+								RTLT_For = j ;
+								break ;
+							}
+						}
+					}
+				}
+				M_Number = 0 ;
+			}
+			else if ( M_What == _T ("RRightT") ) {
+				M_IsSelect = 'x' ;
+				M_IsDraw = 'x' ;
+				int location = pDoc -> RRightT_Location.GetAt ( M_Number ) ;
+				pDoc -> RRightT_Triangle.RemoveAt ( M_Number ) ;
+				pDoc -> RRightT_Count-- ;
+				pDoc -> What.RemoveAt ( pDoc -> RRightT_Location.GetAt ( M_Number ) ) ;
+				pDoc -> RRightT_Location.RemoveAt ( M_Number ) ;
+				for ( int i = M_Number ; i < pDoc -> RRightT_Triangle.GetCount () ; i++ ) {
+					pDoc -> RRightT_Location.GetAt (i)-- ;
+				}
+
+				int R_For = 0 ;
+				int P_For = 0 ;
+				int E_For = 0 ;
+				int T_For = 0 ;
+				int RT_For = 0 ;
+				int RightT_For = 0 ;
+				int L_For = 0 ;
+				int LTRT_For = 0 ;
+				int RTLT_For = 0 ;
+				for ( int i = location ; i < pDoc -> What.GetCount () ; i++ ) {
+					if ( pDoc -> What.GetAt (i) == _T ("R") ) {
+						for ( int j = R_For ; j < pDoc -> R_Location.GetCount () ; j++ ) {
+							if ( pDoc -> R_Location.GetAt (j) == i+1 ) {
+								pDoc -> R_Location.SetAt (j, i) ;
+								R_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("P") ) {
+						for ( int j = P_For ; j < pDoc -> P_Location.GetCount () ; j++ ) {
+							if ( pDoc -> P_Location.GetAt (j) == i+1 ) {
+								pDoc -> P_Location.SetAt (j, i) ;
+								P_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("E") ) {
+						for ( int j = E_For ; j < pDoc -> E_Location.GetCount () ; j++ ) {
+							if ( pDoc -> E_Location.GetAt (j) == i+1 ) {
+								pDoc -> E_Location.SetAt (j, i) ;
+								E_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("T") ) {
+						for ( int j = T_For ; j < pDoc -> T_Location.GetCount () ; j++ ) {
+							if ( pDoc -> T_Location.GetAt (j) == i+1 ) {
+								pDoc -> T_Location.SetAt (j, i) ;
+								T_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("RT") ) {
+						for ( int j = RT_For ; j < pDoc -> RT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> RT_Location.GetAt (j) == i+1 ) {
+								pDoc -> RT_Location.SetAt (j, i) ;
+								RT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("RightT") ) {
+						for ( int j = RightT_For ; j < pDoc -> RightT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> RightT_Location.GetAt (j) == i+1 ) {
+								pDoc -> RightT_Location.SetAt (j, i) ;
+								RightT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("L") ) {
+						for ( int j = L_For ; j < pDoc -> L_Location.GetCount () ; j++ ) {
+							if ( pDoc -> L_Location.GetAt (j) == i+1 ) {
+								pDoc -> L_Location.SetAt (j, i) ;
+								L_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("LTRT") ) {
+						for ( int j = LTRT_For ; j < pDoc -> LTRT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> LTRT_Location.GetAt (j) == i+1 ) {
+								pDoc -> LTRT_Location.SetAt (j, i) ;
+								LTRT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("RTLT") ) {
+						for ( int j = RTLT_For ; j < pDoc -> RTLT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> RTLT_Location.GetAt (j) == i+1 ) {
+								pDoc -> RTLT_Location.SetAt (j, i) ;
+								RTLT_For = j ;
+								break ;
+							}
+						}
+					}
+				}
+				M_Number = 0 ;
+			}
+			else if ( M_What == _T ("LTRT") ) {
+				M_IsSelect = 'x' ;
+				M_IsDraw = 'x' ;
+				int location = pDoc -> LTRT_Location.GetAt ( M_Number ) ;
+				pDoc -> LTRT_Triangle.RemoveAt ( M_Number ) ;
+				pDoc -> LTRT_Count-- ;
+				pDoc -> What.RemoveAt ( pDoc -> LTRT_Location.GetAt ( M_Number ) ) ;
+				pDoc -> LTRT_Location.RemoveAt ( M_Number ) ;
+				for ( int i = M_Number ; i < pDoc -> LTRT_Triangle.GetCount () ; i++ ) {
+					pDoc -> LTRT_Location.GetAt (i)-- ;
+				}
+
+				int R_For = 0 ;
+				int P_For = 0 ;
+				int E_For = 0 ;
+				int T_For = 0 ;
+				int RT_For = 0 ;
+				int RightT_For = 0 ;
+				int RRightT_For = 0 ;
+				int L_For = 0 ;
+				int RTLT_For = 0 ;
+				for ( int i = location ; i < pDoc -> What.GetCount () ; i++ ) {
+					if ( pDoc -> What.GetAt (i) == _T ("R") ) {
+						for ( int j = R_For ; j < pDoc -> R_Location.GetCount () ; j++ ) {
+							if ( pDoc -> R_Location.GetAt (j) == i+1 ) {
+								pDoc -> R_Location.SetAt (j, i) ;
+								R_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("P") ) {
+						for ( int j = P_For ; j < pDoc -> P_Location.GetCount () ; j++ ) {
+							if ( pDoc -> P_Location.GetAt (j) == i+1 ) {
+								pDoc -> P_Location.SetAt (j, i) ;
+								P_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("E") ) {
+						for ( int j = E_For ; j < pDoc -> E_Location.GetCount () ; j++ ) {
+							if ( pDoc -> E_Location.GetAt (j) == i+1 ) {
+								pDoc -> E_Location.SetAt (j, i) ;
+								E_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("T") ) {
+						for ( int j = T_For ; j < pDoc -> T_Location.GetCount () ; j++ ) {
+							if ( pDoc -> T_Location.GetAt (j) == i+1 ) {
+								pDoc -> T_Location.SetAt (j, i) ;
+								T_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("RT") ) {
+						for ( int j = RT_For ; j < pDoc -> RT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> RT_Location.GetAt (j) == i+1 ) {
+								pDoc -> RT_Location.SetAt (j, i) ;
+								RT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("RightT") ) {
+						for ( int j = RightT_For ; j < pDoc -> RightT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> RightT_Location.GetAt (j) == i+1 ) {
+								pDoc -> RightT_Location.SetAt (j, i) ;
+								RightT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("RRightT") ) {
+						for ( int j = RRightT_For ; j < pDoc -> RRightT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> RRightT_Location.GetAt (j) == i+1 ) {
+								pDoc -> RRightT_Location.SetAt (j, i) ;
+								RRightT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("L") ) {
+						for ( int j = L_For ; j < pDoc -> L_Location.GetCount () ; j++ ) {
+							if ( pDoc -> L_Location.GetAt (j) == i+1 ) {
+								pDoc -> L_Location.SetAt (j, i) ;
+								L_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("RTLT") ) {
+						for ( int j = RTLT_For ; j < pDoc -> RTLT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> RTLT_Location.GetAt (j) == i+1 ) {
+								pDoc -> RTLT_Location.SetAt (j, i) ;
+								RTLT_For = j ;
+								break ;
+							}
+						}
+					}
+				}
+				M_Number = 0 ;
+			}
+			else if ( M_What == _T ("RTLT") ) {
+				M_IsSelect = 'x' ;
+				M_IsDraw = 'x' ;
+				int location = pDoc -> RTLT_Location.GetAt ( M_Number ) ;
+				pDoc -> RTLT_Triangle.RemoveAt ( M_Number ) ;
+				pDoc -> RTLT_Count-- ;
+				pDoc -> What.RemoveAt ( pDoc -> RTLT_Location.GetAt ( M_Number ) ) ;
+				pDoc -> RTLT_Location.RemoveAt ( M_Number ) ;
+				for ( int i = M_Number ; i < pDoc -> RTLT_Triangle.GetCount () ; i++ ) {
+					pDoc -> RTLT_Location.GetAt (i)-- ;
+				}
+
+				int R_For = 0 ;
+				int P_For = 0 ;
+				int E_For = 0 ;
+				int T_For = 0 ;
+				int RT_For = 0 ;
+				int RightT_For = 0 ;
+				int RRightT_For = 0 ;
+				int LTRT_For = 0 ;
+				int L_For = 0 ;
+				for ( int i = location ; i < pDoc -> What.GetCount () ; i++ ) {
+					if ( pDoc -> What.GetAt (i) == _T ("R") ) {
+						for ( int j = R_For ; j < pDoc -> R_Location.GetCount () ; j++ ) {
+							if ( pDoc -> R_Location.GetAt (j) == i+1 ) {
+								pDoc -> R_Location.SetAt (j, i) ;
+								R_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("P") ) {
+						for ( int j = P_For ; j < pDoc -> P_Location.GetCount () ; j++ ) {
+							if ( pDoc -> P_Location.GetAt (j) == i+1 ) {
+								pDoc -> P_Location.SetAt (j, i) ;
+								P_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("E") ) {
+						for ( int j = E_For ; j < pDoc -> E_Location.GetCount () ; j++ ) {
+							if ( pDoc -> E_Location.GetAt (j) == i+1 ) {
+								pDoc -> E_Location.SetAt (j, i) ;
+								E_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("T") ) {
+						for ( int j = T_For ; j < pDoc -> T_Location.GetCount () ; j++ ) {
+							if ( pDoc -> T_Location.GetAt (j) == i+1 ) {
+								pDoc -> T_Location.SetAt (j, i) ;
+								T_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("RT") ) {
+						for ( int j = RT_For ; j < pDoc -> RT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> RT_Location.GetAt (j) == i+1 ) {
+								pDoc -> RT_Location.SetAt (j, i) ;
+								RT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("RightT") ) {
+						for ( int j = RightT_For ; j < pDoc -> RightT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> RightT_Location.GetAt (j) == i+1 ) {
+								pDoc -> RightT_Location.SetAt (j, i) ;
+								RightT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("RRightT") ) {
+						for ( int j = RRightT_For ; j < pDoc -> RRightT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> RRightT_Location.GetAt (j) == i+1 ) {
+								pDoc -> RRightT_Location.SetAt (j, i) ;
+								RRightT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("LTRT") ) {
+						for ( int j = LTRT_For ; j < pDoc -> LTRT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> LTRT_Location.GetAt (j) == i+1 ) {
+								pDoc -> LTRT_Location.SetAt (j, i) ;
+								LTRT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("L") ) {
+						for ( int j = L_For ; j < pDoc -> L_Location.GetCount () ; j++ ) {
+							if ( pDoc -> L_Location.GetAt (j) == i+1 ) {
+								pDoc -> L_Location.SetAt (j, i) ;
+								L_For = j ;
+								break ;
+							}
+						}
+					}
+				}
+				M_Number = 0 ;
+			}
+
+			Invalidate () ;
+		}
 	}
 
 	CScrollView::OnKeyDown(nChar, nRepCnt, nFlags);
