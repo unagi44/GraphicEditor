@@ -37,6 +37,10 @@ public:
 	CRect M_Rect ;
 	CPoint M_Start ;
 	int M_Number ;
+	int M_PMin_x ;
+	int M_PMax_x ;
+	int M_PMin_y ;
+	int M_PMax_y ;
 	CString M_What ;
 	char M_IsMove ;
 	char M_IsSelect ;

@@ -2025,7 +2025,6 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 
 				// 상자 객체인 경우
 				else if ( pDoc -> What.GetAt (i-1) == _T ("R") ) {
-					M_IsLineSelect == 'x' ;
 					if ( pDoc -> R_Rec.GetAt ( R_Number ).left - 2 <= point.x && pDoc -> R_Rec.GetAt ( R_Number ).right + 2 >= point.x &&
 						pDoc -> R_Rec.GetAt ( R_Number ).top - 2 <= point.y && pDoc -> R_Rec.GetAt ( R_Number ).bottom + 2 >= point.y ) {
 
@@ -2044,29 +2043,28 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 
 				// PolyLine 객체인 경우
 				else if ( pDoc -> What.GetAt (i-1) == _T ("P") ) {
-					M_IsLineSelect == 'x' ;
-					int MAX_x = pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (0).x ;
-					int MAX_y = pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (0).y ;
-					int MIN_x = MAX_x ;
-					int MIN_y = MAX_y ;
+					M_PMax_x = pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (0).x ;
+					M_PMax_y = pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (0).y ;
+					M_PMin_x = M_PMax_x ;
+					M_PMin_y = M_PMax_y ;
 
 					for ( int i = 1 ; i < pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetCount () ; i++ ) {
-						if ( MAX_x < pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (i).x )
-							MAX_x = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (i).x ;
-						else if ( MIN_x > pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (i).x )
-							MIN_x = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (i).x ;
+						if ( M_PMax_x < pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (i).x )
+							M_PMax_x = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (i).x ;
+						else if ( M_PMin_x > pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (i).x )
+							M_PMin_x = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (i).x ;
 
-						if ( MAX_y < pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (i).y )
-							MAX_y = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (i).y ;
-						else if ( MIN_y > pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (i).y )
-							MIN_y = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (i).y ;
+						if ( M_PMax_y < pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (i).y )
+							M_PMax_y = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (i).y ;
+						else if ( M_PMin_y > pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (i).y )
+							M_PMin_y = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (i).y ;
 					}
 
-					if ( MAX_x >= point.x && MIN_x <= point.x && MAX_y >= point.y && MIN_y <= point.y ) {
-						M_Rect.top = MIN_y ;
-						M_Rect.bottom = MAX_y ;
-						M_Rect.left = MIN_x ;
-						M_Rect.right = MAX_x ;
+					if ( M_PMax_x >= point.x && M_PMin_x <= point.x && M_PMax_y >= point.y && M_PMin_y <= point.y ) {
+						M_Rect.top = M_PMin_y  - pDoc -> P_Poly.GetAt ( P_Number ).thickness / 2 ;
+						M_Rect.bottom = M_PMax_y + pDoc -> P_Poly.GetAt ( P_Number ).thickness / 2 ;
+						M_Rect.left = M_PMin_x - pDoc -> P_Poly.GetAt ( P_Number ).thickness / 2 ;
+						M_Rect.right = M_PMax_x + pDoc -> P_Poly.GetAt ( P_Number ).thickness / 2 ;
 
 						M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
 						M_What.Format ( _T ("P") ) ; M_Number = P_Number ;
@@ -2078,7 +2076,6 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 
 				// 원 객체인 경우
 				else if ( pDoc -> What.GetAt (i-1) == _T ("E") ) {
-					M_IsLineSelect == 'x' ;
 					if ( pDoc -> E_Ellipse.GetAt ( E_Number ).left - 2 <= point.x && pDoc -> E_Ellipse.GetAt ( E_Number ).right + 2 >= point.x &&
 						pDoc -> E_Ellipse.GetAt ( E_Number ).top - 2 <= point.y && pDoc -> E_Ellipse.GetAt ( E_Number ).bottom + 2 >= point.y ) {
 
@@ -2098,7 +2095,6 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 
 				// 세모 객체인 경우
 				else if ( pDoc -> What.GetAt (i-1) == _T ("T") ) {
-					M_IsLineSelect == 'x' ;
 					if ( pDoc -> T_Triangle.GetAt ( T_Number ).left - 2 <= point.x && pDoc -> T_Triangle.GetAt ( T_Number ).right + 2 >= point.x &&
 						pDoc -> T_Triangle.GetAt ( T_Number ).top - 2 <= point.y && pDoc -> T_Triangle.GetAt ( T_Number ).bottom + 2 >= point.y ) {
 
@@ -2117,7 +2113,6 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 
 				// 역 삼각형 객체인 경우
 				else if ( pDoc -> What.GetAt (i-1) == _T ("RT") ) {
-					M_IsLineSelect == 'x' ;
 					if ( pDoc -> RT_Triangle.GetAt ( RT_Number ).left - 2 <= point.x && pDoc -> RT_Triangle.GetAt ( RT_Number ).right + 2 >= point.x &&
 						pDoc -> RT_Triangle.GetAt ( RT_Number ).top - 2 <= point.y && pDoc -> RT_Triangle.GetAt ( RT_Number ).bottom + 2 >= point.y ) {
 
@@ -2136,7 +2131,6 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 
 				// 직각 삼각형 객체인 경우
 				else if ( pDoc -> What.GetAt (i-1) == _T ("RightT") ) {
-					M_IsLineSelect == 'x' ;
 					if ( pDoc -> RightT_Triangle.GetAt ( RightT_Number ).left - 2 <= point.x && pDoc -> RightT_Triangle.GetAt ( RightT_Number ).right + 2 >= point.x &&
 						pDoc -> RightT_Triangle.GetAt ( RightT_Number ).top - 2 <= point.y && pDoc -> RightT_Triangle.GetAt ( RightT_Number ).bottom + 2 >= point.y ) {
 
@@ -2155,7 +2149,6 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 
 				// 역 직각 삼각형 객체인 경우
 				else if ( pDoc -> What.GetAt (i-1) == _T ("RRightT") ) {
-					M_IsLineSelect == 'x' ;
 					if ( pDoc -> RRightT_Triangle.GetAt ( RRightT_Number ).left - 2 <= point.x && pDoc -> RRightT_Triangle.GetAt ( RRightT_Number ).right + 2 >= point.x &&
 						pDoc -> RRightT_Triangle.GetAt ( RRightT_Number ).top - 2 <= point.y && pDoc -> RRightT_Triangle.GetAt ( RRightT_Number ).bottom + 2 >= point.y ) {
 
@@ -2174,7 +2167,6 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 
 				// 왼쪽 -> 오른쪽 삼각형 객체인 경우
 				else if ( pDoc -> What.GetAt (i-1) == _T ("LTRT") ) {
-					M_IsLineSelect == 'x' ;
 					if ( pDoc -> LTRT_Triangle.GetAt ( LTRT_Number ).left - 2 <= point.x && pDoc -> LTRT_Triangle.GetAt ( LTRT_Number ).right + 2 >= point.x &&
 						pDoc -> LTRT_Triangle.GetAt ( LTRT_Number ).top - 2 <= point.y && pDoc -> LTRT_Triangle.GetAt ( LTRT_Number ).bottom + 2 >= point.y ) {
 
@@ -2193,7 +2185,6 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 
 				// 오른쪽 -> 왼쪽 삼각형 객체인 경우
 				else if ( pDoc -> What.GetAt (i-1) == _T ("RTLT") ) {
-					M_IsLineSelect == 'x' ;
 					if ( pDoc -> RTLT_Triangle.GetAt ( RTLT_Number ).left - 2 <= point.x && pDoc -> RTLT_Triangle.GetAt ( RTLT_Number ).right + 2 >= point.x &&
 						pDoc -> RTLT_Triangle.GetAt ( RTLT_Number ).top - 2 <= point.y && pDoc -> RTLT_Triangle.GetAt ( RTLT_Number ).bottom + 2 >= point.y ) {
 
@@ -2807,7 +2798,7 @@ BOOL CGraphicEditorView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 		// 평상시엔 기본 커서로 변환 합니다.
 		if ( IsNormal == 'o' )
 			::SetCursor(AfxGetApp()->LoadStandardCursor (IDC_ARROW)) ;
-		else if ( M_IsDraw == 'o' && M_IsLineSelect == 'o' &&
+		if ( M_IsDraw == 'o' && M_IsLineSelect == 'o' &&
 			  ((pDoc -> L_Line.GetAt ( M_Number ).Start.x - 15 <= point.x && pDoc -> L_Line.GetAt ( M_Number ).Start.x + 15 >= point.x
 			  && pDoc -> L_Line.GetAt ( M_Number ).Start.y - 15 <= point.y && pDoc -> L_Line.GetAt ( M_Number ).Start.y + 15 >= point.y) ||
 			  (pDoc -> L_Line.GetAt ( M_Number ).Last.x - 15 <= point.x && pDoc -> L_Line.GetAt ( M_Number ).Last.x + 15 >= point.x
@@ -2817,7 +2808,8 @@ BOOL CGraphicEditorView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 		}
 		else if ( M_IsMove == 'o' ) {
 
-			M_IsLineSelect = 'x' ;
+			if ( M_IsDraw == 'x' ) 
+				M_IsLineSelect = 'x' ;
 			int L_Number = pDoc -> L_Count - 1;
 			int R_Number = pDoc -> R_Count - 1;
 			int P_Number = pDoc -> P_Count - 1;
@@ -3515,12 +3507,123 @@ void CGraphicEditorView::OnDrawreversetri()
 void CGraphicEditorView::OnThickness()
 {
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+
+	CGraphicEditorDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	if (!pDoc)
+		return;
+
 	CThickness dlg ;
-	
-	if( dlg.DoModal() == IDOK )
-	{
-		m_Thickness = dlg.GetThickness () ;
-		m_IsThickness = 'o' ;
+
+	if ( M_IsDraw != 'o' ) {
+		if( dlg.DoModal() == IDOK )
+		{
+			m_Thickness = dlg.GetThickness () ;
+			m_IsThickness = 'o' ;
+		}
+	}
+	else {
+		if ( dlg.DoModal () == IDOK )
+		{
+			m_Thickness = dlg.GetThickness () ;
+			m_IsThickness = 'o' ;
+
+			if ( M_What == _T ("L") ) {
+				pDoc -> L_Line.GetAt ( M_Number ).Thickness = m_Thickness ;
+				
+				if ( pDoc -> L_Line.GetAt ( M_Number ).Start.x >= pDoc -> L_Line.GetAt ( M_Number ).Last.x ) {
+					M_Rect.left = pDoc -> L_Line.GetAt ( M_Number ).Last.x - pDoc -> L_Line.GetAt ( M_Number ).Thickness / 2 ;
+					M_Rect.right = pDoc -> L_Line.GetAt ( M_Number ).Start.x + pDoc -> L_Line.GetAt ( M_Number ).Thickness / 2 ;
+				}
+				else {
+					M_Rect.left = pDoc -> L_Line.GetAt ( M_Number ).Start.x - pDoc -> L_Line.GetAt ( M_Number ).Thickness / 2 ;
+					M_Rect.right = pDoc -> L_Line.GetAt ( M_Number ).Last.x + pDoc -> L_Line.GetAt ( M_Number ).Thickness / 2 ;
+				}
+
+				if ( pDoc -> L_Line.GetAt ( M_Number ).Start.y >= pDoc -> L_Line.GetAt ( M_Number ).Last.y ) {
+					M_Rect.top = pDoc -> L_Line.GetAt ( M_Number ).Last.y - pDoc -> L_Line.GetAt ( M_Number ).Thickness / 2 ;
+					M_Rect.bottom = pDoc -> L_Line.GetAt ( M_Number ).Start.y + pDoc -> L_Line.GetAt ( M_Number ).Thickness / 2 ;
+				}
+				else {
+					M_Rect.top = pDoc -> L_Line.GetAt ( M_Number ).Start.y - pDoc -> L_Line.GetAt ( M_Number ).Thickness / 2 ;
+					M_Rect.bottom = pDoc -> L_Line.GetAt ( M_Number ).Last.y + pDoc -> L_Line.GetAt ( M_Number ).Thickness / 2 ;
+				}
+			}
+			else if ( M_What == _T ("R") ) {
+				pDoc -> R_Thickness.GetAt ( M_Number ) = m_Thickness ;
+
+				M_Rect.top = pDoc -> R_Rec.GetAt ( M_Number ).top - pDoc -> R_Thickness.GetAt ( M_Number ) / 2 - 2 ;
+				M_Rect.bottom = pDoc -> R_Rec.GetAt ( M_Number ).bottom + pDoc -> R_Thickness.GetAt ( M_Number ) / 2 + 2 ;
+				M_Rect.left = pDoc -> R_Rec.GetAt ( M_Number ).left - pDoc -> R_Thickness.GetAt ( M_Number ) / 2 - 2 ;
+				M_Rect.right = pDoc -> R_Rec.GetAt ( M_Number ).right + pDoc -> R_Thickness.GetAt ( M_Number ) / 2 + 2 ;
+			}
+			else if ( M_What == _T ("P") ) {
+				pDoc -> P_Poly.GetAt ( M_Number ).thickness = m_Thickness ;
+				
+				M_Rect.top = M_PMin_y - pDoc -> P_Poly.GetAt ( M_Number ).thickness / 2 ;
+				M_Rect.bottom = M_PMax_y + pDoc -> P_Poly.GetAt ( M_Number ).thickness / 2 ;
+				M_Rect.left = M_PMin_x - pDoc -> P_Poly.GetAt ( M_Number ).thickness / 2 ;
+				M_Rect.right = M_PMax_x + pDoc -> P_Poly.GetAt ( M_Number ).thickness / 2 ;
+			}
+			else if ( M_What == _T ("E") ) {
+				pDoc -> E_Thickness.GetAt ( M_Number ) = m_Thickness ;
+
+				M_Rect.top = pDoc -> E_Ellipse.GetAt ( M_Number ).top - pDoc -> E_Thickness.GetAt ( M_Number ) / 2 ;
+				M_Rect.bottom = pDoc -> E_Ellipse.GetAt ( M_Number ).bottom + pDoc -> E_Thickness.GetAt ( M_Number ) / 2 ;
+				M_Rect.left = pDoc -> E_Ellipse.GetAt ( M_Number ).left - pDoc -> E_Thickness.GetAt ( M_Number ) / 2 ;
+				M_Rect.right = pDoc -> E_Ellipse.GetAt ( M_Number ).right + pDoc -> E_Thickness.GetAt ( M_Number ) / 2 ;
+			}
+			else if ( M_What == _T ("T") ) {
+				pDoc -> T_Thickness.GetAt ( M_Number ) = m_Thickness ;
+
+				M_Rect.top = pDoc -> T_Triangle.GetAt ( M_Number ).top - pDoc -> T_Thickness.GetAt ( M_Number ) / 2 ;
+				M_Rect.bottom = pDoc -> T_Triangle.GetAt ( M_Number ).bottom + pDoc -> T_Thickness.GetAt ( M_Number ) / 2 ;
+				M_Rect.left = pDoc -> T_Triangle.GetAt ( M_Number ).left - pDoc -> T_Thickness.GetAt ( M_Number ) / 2 ;
+				M_Rect.right = pDoc -> T_Triangle.GetAt ( M_Number ).right + pDoc -> T_Thickness.GetAt ( M_Number ) / 2 ;
+			}
+			else if ( M_What == _T ("RT") ) {
+				pDoc -> RT_Thickness.GetAt ( M_Number ) = m_Thickness ;
+
+				M_Rect.top = pDoc -> RT_Triangle.GetAt ( M_Number ).top - pDoc -> RT_Thickness.GetAt ( M_Number ) / 2 ;
+				M_Rect.bottom = pDoc -> RT_Triangle.GetAt ( M_Number ).bottom + pDoc -> RT_Thickness.GetAt ( M_Number ) / 2 ;
+				M_Rect.left = pDoc -> RT_Triangle.GetAt ( M_Number ).left - pDoc -> RT_Thickness.GetAt ( M_Number ) / 2 ;
+				M_Rect.right = pDoc -> RT_Triangle.GetAt ( M_Number ).right + pDoc -> RT_Thickness.GetAt ( M_Number ) / 2 ;
+			}
+			else if ( M_What == _T ("RightT") ) {
+				pDoc -> RightT_Thickness.GetAt ( M_Number ) = m_Thickness ;
+
+				M_Rect.top = pDoc -> RightT_Triangle.GetAt ( M_Number ).top - pDoc -> RightT_Thickness.GetAt ( M_Number ) / 2 ;
+				M_Rect.bottom = pDoc -> RightT_Triangle.GetAt ( M_Number ).bottom + pDoc -> RightT_Thickness.GetAt ( M_Number ) / 2 ;
+				M_Rect.left = pDoc -> RightT_Triangle.GetAt ( M_Number ).left - pDoc -> RightT_Thickness.GetAt ( M_Number ) / 2 ;
+				M_Rect.right = pDoc -> RightT_Triangle.GetAt ( M_Number ).right + pDoc -> RightT_Thickness.GetAt ( M_Number ) / 2 ;
+			}
+			else if ( M_What == _T ("RRightT") ) {
+				pDoc -> RRightT_Thickness.GetAt ( M_Number ) = m_Thickness ;
+
+				M_Rect.top = pDoc -> RRightT_Triangle.GetAt ( M_Number ).top - pDoc -> RRightT_Thickness.GetAt ( M_Number ) / 2 ;
+				M_Rect.bottom = pDoc -> RRightT_Triangle.GetAt ( M_Number ).bottom + pDoc -> RRightT_Thickness.GetAt ( M_Number ) / 2 ;
+				M_Rect.left = pDoc -> RRightT_Triangle.GetAt ( M_Number ).left - pDoc -> RRightT_Thickness.GetAt ( M_Number ) / 2 ;
+				M_Rect.right = pDoc -> RRightT_Triangle.GetAt ( M_Number ).right + pDoc -> RRightT_Thickness.GetAt ( M_Number ) / 2 ;
+			}
+			else if ( M_What == _T ("LTRT") ) {
+				pDoc -> LTRT_Thickness.GetAt ( M_Number ) = m_Thickness ;
+
+				M_Rect.top = pDoc -> LTRT_Triangle.GetAt ( M_Number ).top - pDoc -> LTRT_Thickness.GetAt ( M_Number ) / 2 ;
+				M_Rect.bottom = pDoc -> LTRT_Triangle.GetAt ( M_Number ).bottom + pDoc -> LTRT_Thickness.GetAt ( M_Number ) / 2 ;
+				M_Rect.left = pDoc -> LTRT_Triangle.GetAt ( M_Number ).left - pDoc -> LTRT_Thickness.GetAt ( M_Number ) / 2 ;
+				M_Rect.right = pDoc -> LTRT_Triangle.GetAt ( M_Number ).right + pDoc -> LTRT_Thickness.GetAt ( M_Number ) / 2 ;
+			}
+			else if ( M_What == _T ("RTLT") ) {
+				pDoc -> RTLT_Thickness.GetAt ( M_Number ) = m_Thickness ;
+
+				M_Rect.top = pDoc -> RTLT_Triangle.GetAt ( M_Number ).top - pDoc -> RTLT_Thickness.GetAt ( M_Number ) / 2 ;
+				M_Rect.bottom = pDoc -> RTLT_Triangle.GetAt ( M_Number ).bottom + pDoc -> RTLT_Thickness.GetAt ( M_Number ) / 2 ;
+				M_Rect.left = pDoc -> RTLT_Triangle.GetAt ( M_Number ).left - pDoc -> RTLT_Thickness.GetAt ( M_Number ) / 2 ;
+				M_Rect.right = pDoc -> RTLT_Triangle.GetAt ( M_Number ).right + pDoc -> RTLT_Thickness.GetAt ( M_Number ) / 2 ;
+			}
+
+			Invalidate () ;
+		}
 	}
 }
 
