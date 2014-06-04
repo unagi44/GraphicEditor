@@ -11,9 +11,9 @@
 
 IMPLEMENT_DYNAMIC(CThickness, CDialog)
 
-CThickness::CThickness(CWnd* pParent /*=NULL*/)
-	: CDialog(CThickness::IDD, pParent)
-	, Thickness(1)
+CThickness::CThickness(CGraphicEditorView *View)
+	: CDialog(CThickness::IDD, NULL)
+	, Thickness(View->m_Thickness)
 {
 }
 

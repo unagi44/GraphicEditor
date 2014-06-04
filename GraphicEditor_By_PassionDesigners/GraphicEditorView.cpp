@@ -69,6 +69,7 @@ CGraphicEditorView::CGraphicEditorView()
 	m_IsColor = 'x' ;
 	m_IsFillColor = 'x' ;
 	m_IsThickness = 'x' ;
+	m_Thickness = 1 ;
 
 	// 이동 툴바에 필요한 변수 초기화
 	M_IsMove = 'x' ;
@@ -303,9 +304,21 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 					pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
 					pDC->SelectObject(Draw_Pen);
 				}
+				
+				// 만약 이동시키고 있는 중이라면
+				if ( M_Number == P_Number && M_IsDraw == 'o' && M_What == _T ("P") ) {
+					CPen pen ( PS_DOT, 1.8, RGB (0, 0, 150) ) ;
+					CPen *Draw_Pen = pDC -> SelectObject(&pen);
+					pDC -> SelectStockObject ( NULL_BRUSH ) ;
+					pDC -> Rectangle ( M_Rect.left, M_Rect.top, M_Rect.right, M_Rect.bottom ) ;
+					pDC -> SelectObject ( Draw_Pen ) ;
+				}
 
-				// 현재 그리고 있는 PolyLine의 Skeleton을 보여줍니다.
-				if ( pDoc -> P_Poly.GetCount ()  == P_Number + 1 && P_IsDraw == 'o' && P_Insert.Poly_point.GetSize () > 0 ) {
+				// 현재 그리고 있거나 PolyLine을 변경하는 상태라면 Skeleton을 보여줍니다.
+				if ( (pDoc -> P_Poly.GetCount ()  == P_Number + 1 && P_IsDraw == 'o' && P_Insert.Poly_point.GetSize () > 0)
+					 || (M_Number == P_Number && M_IsDraw == 'o' && M_What == _T ("P")) ) {
+
+					pDC -> SelectStockObject ( NULL ) ;
 					CPen pen ( PS_SOLID, 1.8, RGB (0,0,0) ) ;
 					CPen *Draw_Pen = pDC -> SelectObject(&pen) ;
 
@@ -326,15 +339,6 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 
 					pDC -> Rectangle ( ChangeRect ) ;
 				}
-			}
-
-			// 만약 이동시키고 있는 중이라면
-			if ( M_Number == P_Number && M_IsDraw == 'o' && M_What == _T ("P") ) {
-				CPen pen ( PS_DOT, 1.8, RGB (0, 0, 150) ) ;
-				CPen *Draw_Pen = pDC -> SelectObject(&pen);
-				pDC -> SelectStockObject ( NULL_BRUSH ) ;
-				pDC -> Rectangle ( M_Rect.left, M_Rect.top, M_Rect.right, M_Rect.bottom ) ;
-				pDC -> SelectObject ( Draw_Pen ) ;
 			}
 
 			P_Number++ ;
@@ -659,8 +663,8 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 				pDC -> SelectObject ( Draw_Pen ) ;
 			}
 
-			// 만약 역 삼각형을 그리고 있는 상태라면 테두리 직사각형을 그려줍니다.
-			if ( pDoc -> RT_Triangle.GetCount () - 1 == RT_Number && RT_CanMove == 'o' ) {
+			// 만약 역 삼각형을 그리고 있는 상태, 변경하는 상태라면 테두리 직사각형을 그려줍니다.
+			if ( pDoc -> RT_Triangle.GetCount () - 1 == RT_Number && RT_CanMove == 'o') {
 				CPen pen ( PS_DOT, 1.8, RGB (100, 100, 255) );
 				CPen *Draw_Pen = pDC -> SelectObject(&pen);
 				// 상단 꼭지점이 top에 생기는 경우
@@ -1454,8 +1458,8 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 		else if ( m_IsThickness == 'x' )
 			pDoc -> R_Thickness.Add (1) ;
 	}
-	// PolyLine을 계속해서 그리는 경우
-	else if ( P_IsContinue == 'o') {
+	// PolyLine을 계속해서 그리거나 변경하는 경우
+	else if ( (P_IsContinue == 'o') || (M_IsDraw == 'o' && P_IsContinue == 'o') ) {
 		// PolyLine의 Skeleton이 2개일 경우
 		if ( P_CurrentPoint == 1 ) {
 			// 원점과 마지막점에서 변경하려는 경우엔 계속 그릴수 있게 한다.
@@ -1851,7 +1855,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 									M_Rect.right = pDoc -> L_Line.GetAt ( L_Number ).Start.x ;
 									M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
 									M_What.Format ( _T ("L") ) ; M_Number = L_Number ;
-									M_IsDraw = 'o' ;
+									M_IsDraw = 'o' ; P_IsContinue = 'x' ;
 									if ( M_Rect.left <= M_Rect.right ) {
 										M_Rect.right += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
 										M_Rect.left -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
@@ -1901,7 +1905,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 									M_Rect.right = pDoc -> L_Line.GetAt ( L_Number ).Start.x ;
 									M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
 									M_What.Format ( _T ("L") ) ; M_Number = L_Number ;
-									M_IsDraw = 'o' ;
+									M_IsDraw = 'o' ; P_IsContinue = 'x' ;
 									if ( M_Rect.left <= M_Rect.right ) {
 										M_Rect.right += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
 										M_Rect.left -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
@@ -1953,7 +1957,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 									M_Rect.right = pDoc -> L_Line.GetAt ( L_Number ).Last.x ;
 									M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
 									M_What.Format ( _T ("L") ) ; M_Number = L_Number ;
-									M_IsDraw = 'o' ;
+									M_IsDraw = 'o' ; P_IsContinue = 'x' ;
 									if ( M_Rect.left <= M_Rect.right ) {
 										M_Rect.right += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
 										M_Rect.left -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
@@ -1991,7 +1995,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 									M_Rect.right = pDoc -> L_Line.GetAt ( L_Number ).Last.x ;
 									M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
 									M_What.Format ( _T ("L") ) ; M_Number = L_Number ;
-									M_IsDraw = 'o' ;
+									M_IsDraw = 'o' ; P_IsContinue = 'x' ;
 									if ( M_Rect.left <= M_Rect.right ) {
 										M_Rect.right += pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
 										M_Rect.left -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
@@ -2035,7 +2039,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 
 							M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
 							M_What.Format ( _T ("R") ) ; M_Number = R_Number ;
-							M_IsDraw = 'o' ;
+							M_IsDraw = 'o' ; P_IsContinue = 'x' ;
 							Invalidate () ; break ;
 					}
 					R_Number-- ;
@@ -2069,7 +2073,14 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 						M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
 						M_What.Format ( _T ("P") ) ; M_Number = P_Number ;
 						M_IsDraw = 'o' ;
-						Invalidate () ; break ;
+						P_Current = M_Number ;
+						for ( int i = 0 ; i < pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetCount () ; i++ ) {
+							P_Insert.Poly_point.Add ( pDoc -> P_Poly.GetAt ( M_Number ).Poly_point.GetAt (i) ) ;
+						}
+						P_Insert.P_Color = pDoc -> P_Poly.GetAt ( M_Number ).P_Color ;
+						P_Insert.thickness = pDoc -> P_Poly.GetAt ( M_Number ).thickness ;
+						P_CurrentPoint = pDoc -> P_Poly.GetAt ( M_Number ).Poly_point.GetCount () - 1 ;
+						Invalidate () ; P_IsContinue = 'o' ; break ;
 					}
 					P_Number-- ;
 				}
@@ -2086,7 +2097,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 
 							M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
 							M_What.Format ( _T ("E") ) ; M_Number = E_Number ;
-							M_IsDraw = 'o' ;
+							M_IsDraw = 'o' ; P_IsContinue = 'x' ;
 							Invalidate () ; break ;
 					}
 					E_Number-- ;
@@ -2105,7 +2116,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 
 							M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
 							M_What.Format ( _T ("T") ) ; M_Number = T_Number ;
-							M_IsDraw = 'o' ;
+							M_IsDraw = 'o' ; P_IsContinue = 'x' ;
 							Invalidate () ; break ;
 					}
 					T_Number-- ;
@@ -2123,7 +2134,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 
 							M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
 							M_What.Format ( _T ("RT") ) ; M_Number = RT_Number ;
-							M_IsDraw = 'o' ;
+							M_IsDraw = 'o' ; P_IsContinue = 'x' ;
 							Invalidate () ; break ;
 					}
 					RT_Number-- ;
@@ -2141,7 +2152,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 
 							M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
 							M_What.Format ( _T ("RightT") ) ; M_Number = RightT_Number ;
-							M_IsDraw = 'o' ;
+							M_IsDraw = 'o' ; P_IsContinue = 'x' ;
 							Invalidate () ; break ;
 					}
 					RightT_Number-- ;
@@ -2159,7 +2170,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 
 							M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
 							M_What.Format ( _T ("RRightT") ) ; M_Number = RRightT_Number ;
-							M_IsDraw = 'o' ;
+							M_IsDraw = 'o' ; P_IsContinue = 'x' ;
 							Invalidate () ; break ;
 					}
 					RRightT_Number-- ;
@@ -2177,7 +2188,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 
 							M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
 							M_What.Format ( _T ("LTRT") ) ; M_Number = LTRT_Number ;
-							M_IsDraw = 'o' ;
+							M_IsDraw = 'o' ; P_IsContinue = 'x' ;
 							Invalidate () ; break ;
 					}
 					LTRT_Number-- ;
@@ -2195,7 +2206,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 
 							M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
 							M_What.Format ( _T ("RTLT") ) ; M_Number = RTLT_Number ;
-							M_IsDraw = 'o' ;
+							M_IsDraw = 'o' ; P_IsContinue = 'x' ;
 							Invalidate () ; break ;
 					}
 					RTLT_Number-- ;
@@ -2390,6 +2401,24 @@ void CGraphicEditorView::OnMouseMove(UINT nFlags, CPoint point)
 				pDoc -> P_Poly.GetAt ( M_Number).Poly_point.GetAt (i).y += point.y - M_Start.y ;
 			}
 
+			if ( M_Start.x <= point.x ) {
+				M_PMax_x += point.x - M_Start.x ;
+				M_PMin_x -= M_Start.x - point.x ;
+			}
+			else {
+				M_PMax_x -= M_Start.x - point.x ;
+				M_PMin_x += point.x - M_Start.x ;
+			}
+
+			if ( M_Start.y <= point.y ) {
+				M_PMax_y += point.y - M_Start.y ;
+				M_PMin_y -= M_Start.y - point.y ;
+			}
+			else {
+				M_PMax_y -= M_Start.y - point.y ;
+				M_PMin_y += point.y - M_Start.y ;
+			}
+
 			M_Start.x = point.x ;
 			M_Start.y = point.y ;
 		}
@@ -2530,8 +2559,83 @@ void CGraphicEditorView::OnLButtonUp(UINT nFlags, CPoint point)
 
 		Invalidate () ;
 	}
+	// PolyLine을 변경하다 클릭을 뗀 경우
+	else if ( M_IsDraw == 'o' && P_IsContinue == 'o' && P_CanMove == 'o' ) {
+		// 만약 같은 좌표에 클릭, 땠을 경우 그리기 취소
+		if ( P_IsMove == 'x' ) {
+			P_CanMove = 'x' ; P_IsStart = 'x' ;
+			P_Insert.Poly_point.RemoveAll () ;
+			P_CanMove = 'x' ;
+			P_IsContinue = 'x' ;
+			Invalidate () ;
+		}
+		// 같은 좌표에 클릭, 땐 경우가 아니라면 그리기 모드
+		else {
+			// 만약 마지막 Skeleton을 변경한 경우
+			if ( P_IsStart == 'x' && P_ChangeSkeleton == 0 ) {
+				P_Insert.Poly_point.SetAt ( P_CurrentPoint, point ) ;
+				pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.SetAt ( P_CurrentPoint, point ) ;
+
+				if ( pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt ( P_CurrentPoint ).x + pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 >= M_Rect.right )
+					M_Rect.right = pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt ( P_CurrentPoint).x + pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 ;
+				
+				else if ( pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt ( P_CurrentPoint ).x - pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 <= M_Rect.left )
+					M_Rect.left = pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt ( P_CurrentPoint ).x - pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 ;
+
+				if ( pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt ( P_CurrentPoint ).y + pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 >= M_Rect.bottom )
+					M_Rect.bottom = pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt ( P_CurrentPoint ).y + pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 ;
+				else if ( pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt ( P_CurrentPoint ).y - pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 <= M_Rect.top )
+					M_Rect.top = pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt ( P_CurrentPoint ).y - pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 ;
+				Invalidate () ;
+			}
+			// 만약 첫번째 Skeleton을 변경한 경우
+			else if ( P_IsStart == 'o' ) {
+				P_Insert.Poly_point.SetAt ( 0, point ) ;
+				pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.SetAt ( 0, point ) ;
+				Invalidate () ;
+				P_IsStart = 'x' ;
+				P_IsSkeletonStart = 'x' ;
+
+				if ( pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt ( 0 ).x + pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 >= M_Rect.right )
+					M_Rect.right = pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt ( P_CurrentPoint).x + pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 ;
+				else if ( pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt ( 0 ).x - pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 <= M_Rect.left )
+					M_Rect.left = pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt ( 0 ).x - pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 ;
+
+				if ( pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt ( 0 ).y + pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 >= M_Rect.bottom )
+					M_Rect.bottom = pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt ( 0 ).y + pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 ;
+				else if ( pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt ( 0 ).y - pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 <= M_Rect.top )
+					M_Rect.top = pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt ( 0 ).y - pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 ;
+
+			}
+			// 만약 첫번째, 마지막 Skeleton외 다른 Skeleton을 변경한 경우
+			else if ( P_ChangeSkeleton > 0 ) {
+				P_Insert.Poly_point.SetAt ( P_ChangeSkeleton, point ) ;
+				pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.SetAt ( P_ChangeSkeleton, point ) ;
+				Invalidate () ;
+
+				if ( pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt ( P_ChangeSkeleton ).x + pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 >= M_Rect.right )
+					M_Rect.right = pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt ( P_ChangeSkeleton).x + pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 ;
+				else if ( pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt ( P_ChangeSkeleton ).x - pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 <= M_Rect.left )
+					M_Rect.left = pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt ( P_ChangeSkeleton ).x - pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 ;
+
+				if ( pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt ( P_ChangeSkeleton ).y + pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 >= M_Rect.bottom )
+					M_Rect.bottom = pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt ( P_ChangeSkeleton ).y + pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 ;
+				else if ( pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt ( P_ChangeSkeleton ).y - pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 <= M_Rect.top )
+					M_Rect.top = pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt ( P_ChangeSkeleton ).y - pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 ;
+
+				P_ChangeSkeleton = 0 ;
+			}
+			P_CanMove = 'x' ;
+			P_IsMove = 'x' ;
+			M_IsSelect = 'x' ;
+		}
+	}
 	// 객체를 이동시키다 클릭을 땐 경우
 	else if ( M_IsMove == 'o' ) {
+		if ( M_What == 'P' ) {
+			for ( int i = 0 ; i < pDoc -> P_Poly.GetAt ( M_Number ).Poly_point.GetCount () ; i++ )
+				P_Insert.Poly_point.SetAt ( i, pDoc -> P_Poly.GetAt ( M_Number ).Poly_point.GetAt (i) ) ;
+		}
 		Invalidate () ;
 		M_IsSelect = 'x' ;
 	}
@@ -2589,12 +2693,14 @@ void CGraphicEditorView::OnLButtonUp(UINT nFlags, CPoint point)
 			if ( P_IsStart == 'x' && P_ChangeSkeleton == 0 ) {
 				P_Insert.Poly_point.SetAt ( P_CurrentPoint, point ) ;
 				pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.SetAt ( P_CurrentPoint, point ) ;
+
 				Invalidate () ;
 			}
 			// 만약 첫번째 Skeleton을 변경한 경우
 			else if ( P_IsStart == 'o' ) {
 				P_Insert.Poly_point.SetAt ( 0, point ) ;
 				pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.SetAt ( 0, point ) ;
+
 				Invalidate () ;
 				P_IsStart = 'x' ;
 				P_IsSkeletonStart = 'x' ;
@@ -2604,10 +2710,12 @@ void CGraphicEditorView::OnLButtonUp(UINT nFlags, CPoint point)
 				P_Insert.Poly_point.SetAt ( P_ChangeSkeleton, point ) ;
 				pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.SetAt ( P_ChangeSkeleton, point ) ;
 				Invalidate () ;
+
 				P_ChangeSkeleton = 0 ;
 			}
 			P_CanMove = 'x' ;
 			P_IsMove = 'x' ;
+			M_IsSelect = 'x' ;
 		}
 	}
 	// 원을 그리다 클릭을 땐 경우
@@ -2790,6 +2898,8 @@ BOOL CGraphicEditorView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 	if (!pDoc)
 		return CScrollView::OnSetCursor(pWnd, nHitTest, message);
 
+	char Flag = 'x' ;
+
 	if (nHitTest == HTCLIENT) {
 		CPoint point ;
 		::GetCursorPos ( &point ) ;	// 스크린 좌표
@@ -2798,6 +2908,7 @@ BOOL CGraphicEditorView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 		// 평상시엔 기본 커서로 변환 합니다.
 		if ( IsNormal == 'o' )
 			::SetCursor(AfxGetApp()->LoadStandardCursor (IDC_ARROW)) ;
+		
 		if ( M_IsDraw == 'o' && M_IsLineSelect == 'o' &&
 			  ((pDoc -> L_Line.GetAt ( M_Number ).Start.x - 15 <= point.x && pDoc -> L_Line.GetAt ( M_Number ).Start.x + 15 >= point.x
 			  && pDoc -> L_Line.GetAt ( M_Number ).Start.y - 15 <= point.y && pDoc -> L_Line.GetAt ( M_Number ).Start.y + 15 >= point.y) ||
@@ -2806,10 +2917,10 @@ BOOL CGraphicEditorView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 
 			::SetCursor(AfxGetApp()->LoadStandardCursor (IDC_SIZEALL)) ;
 		}
-		else if ( M_IsMove == 'o' ) {
-
+		else if ( M_IsMove == 'o' && Flag == 'x' ) {
 			if ( M_IsDraw == 'x' ) 
 				M_IsLineSelect = 'x' ;
+
 			int L_Number = pDoc -> L_Count - 1;
 			int R_Number = pDoc -> R_Count - 1;
 			int P_Number = pDoc -> P_Count - 1;
@@ -3513,13 +3624,16 @@ void CGraphicEditorView::OnThickness()
 	if (!pDoc)
 		return;
 
-	CThickness dlg ;
+	CThickness dlg (this) ;
 
 	if ( M_IsDraw != 'o' ) {
 		if( dlg.DoModal() == IDOK )
 		{
 			m_Thickness = dlg.GetThickness () ;
 			m_IsThickness = 'o' ;
+			P_Insert.Poly_point.RemoveAll () ;
+			P_CanMove = 'x' ;
+			P_IsContinue = 'x' ;
 		}
 	}
 	else {

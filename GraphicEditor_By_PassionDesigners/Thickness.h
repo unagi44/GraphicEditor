@@ -1,7 +1,7 @@
 #pragma once
 #include "afxwin.h"
 #include "afxcmn.h"
-
+#include "GraphicEditorView.h"
 // CThickness 대화 상자입니다.
 
 class CThickness : public CDialog
@@ -9,7 +9,7 @@ class CThickness : public CDialog
 	DECLARE_DYNAMIC(CThickness)
 
 public:
-	CThickness(CWnd* pParent = NULL);   // 표준 생성자입니다.
+	CThickness(CGraphicEditorView *VIewCWnd);   // 표준 생성자입니다.
 	virtual ~CThickness();
 	int GetThickness () ;
 

@@ -9,6 +9,7 @@
 #include "CLine.h"	// 선을 그리기 위한 헤더파일 참조
 #include "CPolyLine.h"	// PolyLine을 그리기 위한 헤더파일 참조
 #include "CText.h"		// 텍스트 삽입을 위한 헤더파일 참조
+#include "GraphicEditorDoc.h"
 
 #pragma once
 
