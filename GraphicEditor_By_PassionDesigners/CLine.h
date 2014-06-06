@@ -8,5 +8,6 @@ public:
 	CLine ( CPoint Start, CPoint Last ) ;
 	CPoint Start, Last ;
 	COLORREF L_Color ;
+	int Pattern ;
 	int Thickness ;
 };

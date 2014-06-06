@@ -102,6 +102,11 @@
     <None Include="res\IDB_BRUSHPTN.bmp" />
     <None Include="res\IDB_LINEPTN.bmp" />
     <None Include="res\images.bmp" />
+    <None Include="res\LinePattern1.bmp" />
+    <None Include="res\LinePattern2.bmp" />
+    <None Include="res\LinePattern3.bmp" />
+    <None Include="res\LinePattern4.bmp" />
+    <None Include="res\LinePattern5.bmp" />
     <None Include="res\Pattern1.bmp" />
     <None Include="res\Pattern2.bmp" />
     <None Include="res\Pattern3.bmp" />
@@ -121,6 +126,7 @@
     <ClInclude Include="GraphicEditor.h" />
     <ClInclude Include="GraphicEditorDoc.h" />
     <ClInclude Include="GraphicEditorView.h" />
+    <ClInclude Include="LinePattern.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
@@ -136,6 +142,7 @@
     <ClCompile Include="GraphicEditor.cpp" />
     <ClCompile Include="GraphicEditorDoc.cpp" />
     <ClCompile Include="GraphicEditorView.cpp" />
+    <ClCompile Include="LinePattern.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

@@ -152,6 +152,24 @@ void CGraphicEditorDoc::Serialize(CArchive& ar)
 		RRightT_IsNoFill.Serialize (ar) ;
 		LTRT_IsNoFill.Serialize (ar) ;
 		RTLT_IsNoFill.Serialize (ar) ;
+
+		R_FillPattern.Serialize (ar) ;
+		E_FillPattern.Serialize (ar) ;
+		T_FillPattern.Serialize (ar) ;
+		RT_FillPattern.Serialize (ar) ;
+		RightT_FillPattern.Serialize (ar) ;		// 채우기 패턴이 무엇인지 확인해주는 변수
+		RRightT_FillPattern.Serialize (ar) ;
+		LTRT_FillPattern.Serialize (ar) ;
+		RTLT_FillPattern.Serialize (ar) ;
+
+		R_LinePattern.Serialize (ar) ;
+		E_LinePattern.Serialize (ar) ;
+		T_LinePattern.Serialize (ar) ;
+		RT_LinePattern.Serialize (ar) ;
+		RightT_LinePattern.Serialize (ar) ;		// 선 패턴이 무엇인지 확인해주는 변수
+		RRightT_LinePattern.Serialize (ar) ;
+		LTRT_LinePattern.Serialize (ar) ;
+		RTLT_LinePattern.Serialize (ar) ;
 	}
 	else
 	{
@@ -226,6 +244,32 @@ void CGraphicEditorDoc::Serialize(CArchive& ar)
 		LTRT_Location.Serialize (ar) ;			// 그린 모든 객체 중 왼쪽 -> 오른쪽 삼각형 객체의 각 Index 불러오기
 		RTLT_Location.Serialize (ar) ;			// 그린 모든 객체 중 오른쪽 -> 왼쪽 객체의 각 Index 불러오기
 		Text_Location.Serialize (ar) ;			// 그린 모든 객체 중 Text 객체의 각 Index 불러오기
+		R_IsNoFill.Serialize (ar) ;
+		E_IsNoFill.Serialize (ar) ;
+		T_IsNoFill.Serialize (ar) ;
+		RT_IsNoFill.Serialize (ar) ;
+		RightT_IsNoFill.Serialize (ar) ;		// 채우기 색상이 없는지 확인해주는 변수
+		RRightT_IsNoFill.Serialize (ar) ;
+		LTRT_IsNoFill.Serialize (ar) ;
+		RTLT_IsNoFill.Serialize (ar) ;
+
+		R_FillPattern.Serialize (ar) ;
+		E_FillPattern.Serialize (ar) ;
+		T_FillPattern.Serialize (ar) ;
+		RT_FillPattern.Serialize (ar) ;
+		RightT_FillPattern.Serialize (ar) ;		// 채우기 패턴이 무엇인지 확인해주는 변수
+		RRightT_FillPattern.Serialize (ar) ;
+		LTRT_FillPattern.Serialize (ar) ;
+		RTLT_FillPattern.Serialize (ar) ;
+
+		R_LinePattern.Serialize (ar) ;
+		E_LinePattern.Serialize (ar) ;
+		T_LinePattern.Serialize (ar) ;
+		RT_LinePattern.Serialize (ar) ;
+		RightT_LinePattern.Serialize (ar) ;		// 선 패턴이 무엇인지 확인해주는 변수
+		RRightT_LinePattern.Serialize (ar) ;
+		LTRT_LinePattern.Serialize (ar) ;
+		RTLT_LinePattern.Serialize (ar) ;
 	}
 }
 

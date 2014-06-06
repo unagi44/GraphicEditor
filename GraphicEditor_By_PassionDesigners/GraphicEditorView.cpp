@@ -18,6 +18,7 @@
 #include "GraphicEditorView.h"
 #include "Thickness.h"
 #include "FillPattern.h"
+#include "LinePattern.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -58,6 +59,7 @@ ON_COMMAND(ID_Text, &CGraphicEditorView::OnText)
 ON_WM_KEYDOWN()
 ON_WM_CHAR()
 ON_COMMAND(ID_FillPattern, &CGraphicEditorView::OnFillpattern)
+ON_COMMAND(ID_LinePattern, &CGraphicEditorView::OnLinepattern)
 END_MESSAGE_MAP()
 
 // CGraphicEditorView 생성/소멸
@@ -194,23 +196,99 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 		if ( pDoc -> What.GetAt (i) == _T ("L") ) {
 			// 색상을 가지지 않을 경우의 출력
 			if ( pDoc -> L_Line.GetAt (L_Number).L_Color == RGB (0,0,0) ) {
-				CPen pen ( PS_SOLID, pDoc -> L_Line.GetAt (L_Number).Thickness, RGB (0, 0, 0) ) ;
-				CPen *Draw_Pen = pDC -> SelectObject(&pen);
-				L_Insert.Start = pDoc -> L_Line.GetAt (L_Number).Start ;
-				L_Insert.Last = pDoc -> L_Line.GetAt (L_Number).Last ;
-				pDC -> MoveTo ( L_Insert.Start ) ;	// 선의 시작위치
-				pDC -> LineTo ( L_Insert.Last ) ;	// 선의 종착점
-				pDC->SelectObject(Draw_Pen);
+				if ( pDoc -> L_Line.GetAt (L_Number).Pattern == 1 ) {
+					CPen pen ( PS_SOLID, pDoc -> L_Line.GetAt (L_Number).Thickness, RGB (0, 0, 0) ) ;
+					CPen *Draw_Pen = pDC -> SelectObject(&pen);
+					L_Insert.Start = pDoc -> L_Line.GetAt (L_Number).Start ;
+					L_Insert.Last = pDoc -> L_Line.GetAt (L_Number).Last ;
+					pDC -> MoveTo ( L_Insert.Start ) ;	// 선의 시작위치
+					pDC -> LineTo ( L_Insert.Last ) ;	// 선의 종착점
+					pDC->SelectObject(Draw_Pen);
+				}
+				else if ( pDoc -> L_Line.GetAt (L_Number).Pattern == 2 ) {
+					CPen pen ( PS_DASH, pDoc -> L_Line.GetAt (L_Number).Thickness, RGB (0, 0, 0) ) ;
+					CPen *Draw_Pen = pDC -> SelectObject(&pen);
+					L_Insert.Start = pDoc -> L_Line.GetAt (L_Number).Start ;
+					L_Insert.Last = pDoc -> L_Line.GetAt (L_Number).Last ;
+					pDC -> MoveTo ( L_Insert.Start ) ;	// 선의 시작위치
+					pDC -> LineTo ( L_Insert.Last ) ;	// 선의 종착점
+					pDC->SelectObject(Draw_Pen);
+				}
+				else if ( pDoc -> L_Line.GetAt (L_Number).Pattern == 3 ) {
+					CPen pen ( PS_DOT, pDoc -> L_Line.GetAt (L_Number).Thickness, RGB (0, 0, 0) ) ;
+					CPen *Draw_Pen = pDC -> SelectObject(&pen);
+					L_Insert.Start = pDoc -> L_Line.GetAt (L_Number).Start ;
+					L_Insert.Last = pDoc -> L_Line.GetAt (L_Number).Last ;
+					pDC -> MoveTo ( L_Insert.Start ) ;	// 선의 시작위치
+					pDC -> LineTo ( L_Insert.Last ) ;	// 선의 종착점
+					pDC->SelectObject(Draw_Pen);
+				}
+				else if ( pDoc -> L_Line.GetAt (L_Number).Pattern == 4 ) {
+					CPen pen ( PS_DASHDOT, pDoc -> L_Line.GetAt (L_Number).Thickness, RGB (0, 0, 0) ) ;
+					CPen *Draw_Pen = pDC -> SelectObject(&pen);
+					L_Insert.Start = pDoc -> L_Line.GetAt (L_Number).Start ;
+					L_Insert.Last = pDoc -> L_Line.GetAt (L_Number).Last ;
+					pDC -> MoveTo ( L_Insert.Start ) ;	// 선의 시작위치
+					pDC -> LineTo ( L_Insert.Last ) ;	// 선의 종착점
+					pDC->SelectObject(Draw_Pen);
+				}
+				else if ( pDoc -> L_Line.GetAt (L_Number).Pattern == 5 ) {
+					CPen pen ( PS_DASHDOTDOT, pDoc -> L_Line.GetAt (L_Number).Thickness, RGB (0, 0, 0) ) ;
+					CPen *Draw_Pen = pDC -> SelectObject(&pen);
+					L_Insert.Start = pDoc -> L_Line.GetAt (L_Number).Start ;
+					L_Insert.Last = pDoc -> L_Line.GetAt (L_Number).Last ;
+					pDC -> MoveTo ( L_Insert.Start ) ;	// 선의 시작위치
+					pDC -> LineTo ( L_Insert.Last ) ;	// 선의 종착점
+					pDC->SelectObject(Draw_Pen);
+				}
 			}
 			// 특정 색상을 가졌을 경우의 출력
 			else {
-				CPen pen ( PS_SOLID, pDoc -> L_Line.GetAt (L_Number).Thickness, pDoc -> L_Line.GetAt (L_Number).L_Color ) ;
-				CPen *Draw_Pen = pDC -> SelectObject(&pen);
-				L_Insert.Start = pDoc -> L_Line.GetAt (L_Number).Start ;
-				L_Insert.Last = pDoc -> L_Line.GetAt (L_Number).Last ;
-				pDC -> MoveTo ( L_Insert.Start ) ;	// 선의 시작위치
-				pDC -> LineTo ( L_Insert.Last ) ;	// 선의 종착점
-				pDC->SelectObject(Draw_Pen);
+				if ( pDoc -> L_Line.GetAt (L_Number).Pattern == 1 ) {
+					CPen pen ( PS_SOLID, pDoc -> L_Line.GetAt (L_Number).Thickness, pDoc -> L_Line.GetAt (L_Number).L_Color ) ;
+					CPen *Draw_Pen = pDC -> SelectObject(&pen);
+					L_Insert.Start = pDoc -> L_Line.GetAt (L_Number).Start ;
+					L_Insert.Last = pDoc -> L_Line.GetAt (L_Number).Last ;
+					pDC -> MoveTo ( L_Insert.Start ) ;	// 선의 시작위치
+					pDC -> LineTo ( L_Insert.Last ) ;	// 선의 종착점
+					pDC->SelectObject(Draw_Pen);
+				}
+				else if (pDoc -> L_Line.GetAt (L_Number).Pattern == 2 ) {
+					CPen pen ( PS_DASH, pDoc -> L_Line.GetAt (L_Number).Thickness, pDoc -> L_Line.GetAt (L_Number).L_Color ) ;
+					CPen *Draw_Pen = pDC -> SelectObject(&pen);
+					L_Insert.Start = pDoc -> L_Line.GetAt (L_Number).Start ;
+					L_Insert.Last = pDoc -> L_Line.GetAt (L_Number).Last ;
+					pDC -> MoveTo ( L_Insert.Start ) ;	// 선의 시작위치
+					pDC -> LineTo ( L_Insert.Last ) ;	// 선의 종착점
+					pDC->SelectObject(Draw_Pen);
+				}
+				else if (pDoc -> L_Line.GetAt (L_Number).Pattern == 3 ) {
+					CPen pen ( PS_DOT, pDoc -> L_Line.GetAt (L_Number).Thickness, pDoc -> L_Line.GetAt (L_Number).L_Color ) ;
+					CPen *Draw_Pen = pDC -> SelectObject(&pen);
+					L_Insert.Start = pDoc -> L_Line.GetAt (L_Number).Start ;
+					L_Insert.Last = pDoc -> L_Line.GetAt (L_Number).Last ;
+					pDC -> MoveTo ( L_Insert.Start ) ;	// 선의 시작위치
+					pDC -> LineTo ( L_Insert.Last ) ;	// 선의 종착점
+					pDC->SelectObject(Draw_Pen);
+				}
+				else if (pDoc -> L_Line.GetAt (L_Number).Pattern == 4 ) {
+					CPen pen ( PS_DASHDOT, pDoc -> L_Line.GetAt (L_Number).Thickness, pDoc -> L_Line.GetAt (L_Number).L_Color ) ;
+					CPen *Draw_Pen = pDC -> SelectObject(&pen);
+					L_Insert.Start = pDoc -> L_Line.GetAt (L_Number).Start ;
+					L_Insert.Last = pDoc -> L_Line.GetAt (L_Number).Last ;
+					pDC -> MoveTo ( L_Insert.Start ) ;	// 선의 시작위치
+					pDC -> LineTo ( L_Insert.Last ) ;	// 선의 종착점
+					pDC->SelectObject(Draw_Pen);
+				}
+				else if (pDoc -> L_Line.GetAt (L_Number).Pattern == 5 ) {
+					CPen pen ( PS_DASHDOTDOT, pDoc -> L_Line.GetAt (L_Number).Thickness, pDoc -> L_Line.GetAt (L_Number).L_Color ) ;
+					CPen *Draw_Pen = pDC -> SelectObject(&pen);
+					L_Insert.Start = pDoc -> L_Line.GetAt (L_Number).Start ;
+					L_Insert.Last = pDoc -> L_Line.GetAt (L_Number).Last ;
+					pDC -> MoveTo ( L_Insert.Start ) ;	// 선의 시작위치
+					pDC -> LineTo ( L_Insert.Last ) ;	// 선의 종착점
+					pDC->SelectObject(Draw_Pen);
+				}
 			}
 
 			// 만약 이동시키고 있는 중이라면
@@ -267,24 +345,174 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 
 				// 채우기 색상을 가지지 않았을 경우의 출력
 				if ( pDoc -> R_IsNoFill.GetAt (R_Number) == 'o' ) {
-					CPen pen;
-					pen.CreatePen( PS_SOLID, pDoc -> R_Thickness.GetAt (R_Number), RGB (0,0,0) ) ;
-					CPen* oldPen = pDC->SelectObject( &pen ) ;
-					pDC -> SelectStockObject ( NULL_BRUSH ) ;
-					pDC -> Rectangle ( pDoc -> R_Rec [R_Number].left, pDoc -> R_Rec [R_Number].top, pDoc -> R_Rec [R_Number].right, pDoc -> R_Rec [R_Number].bottom ) ;
-					pDC -> SelectObject ( oldPen ) ;
+					if ( pDoc -> R_LinePattern.GetAt (R_Number) == 1 ) {
+						CPen pen;
+						pen.CreatePen( PS_SOLID, pDoc -> R_Thickness.GetAt (R_Number), RGB (0,0,0) ) ;
+						CPen* oldPen = pDC->SelectObject( &pen ) ;
+						pDC -> SelectStockObject ( NULL_BRUSH ) ;
+						pDC -> Rectangle ( pDoc -> R_Rec [R_Number].left, pDoc -> R_Rec [R_Number].top, pDoc -> R_Rec [R_Number].right, pDoc -> R_Rec [R_Number].bottom ) ;
+						pDC -> SelectObject ( oldPen ) ;
+					}
+					else if ( pDoc -> R_LinePattern.GetAt (R_Number) == 2 ) {
+						CPen pen;
+						pen.CreatePen( PS_DASH, pDoc -> R_Thickness.GetAt (R_Number), RGB (0,0,0) ) ;
+						CPen* oldPen = pDC->SelectObject( &pen ) ;
+						pDC -> SelectStockObject ( NULL_BRUSH ) ;
+						pDC -> Rectangle ( pDoc -> R_Rec [R_Number].left, pDoc -> R_Rec [R_Number].top, pDoc -> R_Rec [R_Number].right, pDoc -> R_Rec [R_Number].bottom ) ;
+						pDC -> SelectObject ( oldPen ) ;
+					}
+					else if ( pDoc -> R_LinePattern.GetAt (R_Number) == 3 ) {
+						CPen pen;
+						pen.CreatePen( PS_DOT, pDoc -> R_Thickness.GetAt (R_Number), RGB (0,0,0) ) ;
+						CPen* oldPen = pDC->SelectObject( &pen ) ;
+						pDC -> SelectStockObject ( NULL_BRUSH ) ;
+						pDC -> Rectangle ( pDoc -> R_Rec [R_Number].left, pDoc -> R_Rec [R_Number].top, pDoc -> R_Rec [R_Number].right, pDoc -> R_Rec [R_Number].bottom ) ;
+						pDC -> SelectObject ( oldPen ) ;
+					}
+					else if ( pDoc -> R_LinePattern.GetAt (R_Number) == 4 ) {
+						CPen pen;
+						pen.CreatePen( PS_DASHDOT, pDoc -> R_Thickness.GetAt (R_Number), RGB (0,0,0) ) ;
+						CPen* oldPen = pDC->SelectObject( &pen ) ;
+						pDC -> SelectStockObject ( NULL_BRUSH ) ;
+						pDC -> Rectangle ( pDoc -> R_Rec [R_Number].left, pDoc -> R_Rec [R_Number].top, pDoc -> R_Rec [R_Number].right, pDoc -> R_Rec [R_Number].bottom ) ;
+						pDC -> SelectObject ( oldPen ) ;
+					}
+					else if ( pDoc -> R_LinePattern.GetAt (R_Number) == 5 ) {
+						CPen pen;
+						pen.CreatePen( PS_DASHDOTDOT, pDoc -> R_Thickness.GetAt (R_Number), RGB (0,0,0) ) ;
+						CPen* oldPen = pDC->SelectObject( &pen ) ;
+						pDC -> SelectStockObject ( NULL_BRUSH ) ;
+						pDC -> Rectangle ( pDoc -> R_Rec [R_Number].left, pDoc -> R_Rec [R_Number].top, pDoc -> R_Rec [R_Number].right, pDoc -> R_Rec [R_Number].bottom ) ;
+						pDC -> SelectObject ( oldPen ) ;
+					}
 				}
 				// 채우기 색상을 가졌을 경우의 출력
 				else {
-					CPen pen;
-					pen.CreatePen( PS_SOLID, pDoc -> R_Thickness.GetAt (R_Number), RGB (0,0,0) ) ;
-					CPen* oldPen = pDC->SelectObject( &pen ) ;
-					CBrush brush;
-					brush.CreateSolidBrush( pDoc -> R_FillColor.GetAt (R_Number) ) ;
-					CBrush* oldBrush = pDC->SelectObject( &brush ) ;
-					pDC -> Rectangle ( pDoc -> R_Rec [R_Number].left, pDoc -> R_Rec [R_Number].top, pDoc -> R_Rec [R_Number].right, pDoc -> R_Rec [R_Number].bottom ) ;
-					pDC -> SelectObject ( oldBrush ) ;
-					pDC -> SelectObject ( oldPen ) ;
+					if ( pDoc -> R_LinePattern.GetAt (R_Number) == 1 ) {
+						CPen pen;
+						pen.CreatePen( PS_SOLID, pDoc -> R_Thickness.GetAt (R_Number), RGB (0,0,0) ) ;
+						CPen* oldPen = pDC->SelectObject( &pen ) ;
+						CBrush brush;
+						if ( pDoc -> R_FillPattern.GetAt (R_Number) == 1 )
+							brush.CreateSolidBrush( pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 2 )
+							brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 3 )
+							brush.CreateHatchBrush ( HS_CROSS, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 4 )
+							brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 5 )
+							brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 6 )
+							brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 7 )
+							brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+
+						CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+						pDC -> Rectangle ( pDoc -> R_Rec [R_Number].left, pDoc -> R_Rec [R_Number].top, pDoc -> R_Rec [R_Number].right, pDoc -> R_Rec [R_Number].bottom ) ;
+						pDC -> SelectObject ( oldBrush ) ;
+						pDC -> SelectObject ( oldPen ) ;
+					}
+					else if ( pDoc -> R_LinePattern.GetAt (R_Number) == 2 ) {
+						CPen pen;
+						pen.CreatePen( PS_DASH, pDoc -> R_Thickness.GetAt (R_Number), RGB (0,0,0) ) ;
+						CPen* oldPen = pDC->SelectObject( &pen ) ;
+						CBrush brush;
+						if ( pDoc -> R_FillPattern.GetAt (R_Number) == 1 )
+							brush.CreateSolidBrush( pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 2 )
+							brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 3 )
+							brush.CreateHatchBrush ( HS_CROSS, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 4 )
+							brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 5 )
+							brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 6 )
+							brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 7 )
+							brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+
+						CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+						pDC -> Rectangle ( pDoc -> R_Rec [R_Number].left, pDoc -> R_Rec [R_Number].top, pDoc -> R_Rec [R_Number].right, pDoc -> R_Rec [R_Number].bottom ) ;
+						pDC -> SelectObject ( oldBrush ) ;
+						pDC -> SelectObject ( oldPen ) ;
+					}
+					else if ( pDoc -> R_LinePattern.GetAt (R_Number) == 3 ) {
+						CPen pen;
+						pen.CreatePen( PS_DOT, pDoc -> R_Thickness.GetAt (R_Number), RGB (0,0,0) ) ;
+						CPen* oldPen = pDC->SelectObject( &pen ) ;
+						CBrush brush;
+						if ( pDoc -> R_FillPattern.GetAt (R_Number) == 1 )
+							brush.CreateSolidBrush( pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 2 )
+							brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 3 )
+							brush.CreateHatchBrush ( HS_CROSS, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 4 )
+							brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 5 )
+							brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 6 )
+							brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 7 )
+							brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+
+						CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+						pDC -> Rectangle ( pDoc -> R_Rec [R_Number].left, pDoc -> R_Rec [R_Number].top, pDoc -> R_Rec [R_Number].right, pDoc -> R_Rec [R_Number].bottom ) ;
+						pDC -> SelectObject ( oldBrush ) ;
+						pDC -> SelectObject ( oldPen ) ;
+					}
+					else if ( pDoc -> R_LinePattern.GetAt (R_Number) == 4 ) {
+						CPen pen;
+						pen.CreatePen( PS_DASHDOT, pDoc -> R_Thickness.GetAt (R_Number), RGB (0,0,0) ) ;
+						CPen* oldPen = pDC->SelectObject( &pen ) ;
+						CBrush brush;
+						if ( pDoc -> R_FillPattern.GetAt (R_Number) == 1 )
+							brush.CreateSolidBrush( pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 2 )
+							brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 3 )
+							brush.CreateHatchBrush ( HS_CROSS, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 4 )
+							brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 5 )
+							brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 6 )
+							brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 7 )
+							brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+
+						CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+						pDC -> Rectangle ( pDoc -> R_Rec [R_Number].left, pDoc -> R_Rec [R_Number].top, pDoc -> R_Rec [R_Number].right, pDoc -> R_Rec [R_Number].bottom ) ;
+						pDC -> SelectObject ( oldBrush ) ;
+						pDC -> SelectObject ( oldPen ) ;
+					}
+					else if ( pDoc -> R_LinePattern.GetAt (R_Number) == 5 ) {
+						CPen pen;
+						pen.CreatePen( PS_DASHDOTDOT, pDoc -> R_Thickness.GetAt (R_Number), RGB (0,0,0) ) ;
+						CPen* oldPen = pDC->SelectObject( &pen ) ;
+						CBrush brush;
+						if ( pDoc -> R_FillPattern.GetAt (R_Number) == 1 )
+							brush.CreateSolidBrush( pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 2 )
+							brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 3 )
+							brush.CreateHatchBrush ( HS_CROSS, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 4 )
+							brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 5 )
+							brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 6 )
+							brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 7 )
+							brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+
+						CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+						pDC -> Rectangle ( pDoc -> R_Rec [R_Number].left, pDoc -> R_Rec [R_Number].top, pDoc -> R_Rec [R_Number].right, pDoc -> R_Rec [R_Number].bottom ) ;
+						pDC -> SelectObject ( oldBrush ) ;
+						pDC -> SelectObject ( oldPen ) ;
+					}
 				}
 			}
 			// 특정 선 색상을 가졌을 경우의 출력
@@ -292,24 +520,174 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 
 				// 채우기 색상을 가지지 않았을 경우의 출력
 				if ( pDoc -> R_IsNoFill.GetAt (R_Number) == 'o' ) {
-					CPen pen;
-					pen.CreatePen( PS_SOLID, pDoc -> R_Thickness.GetAt (R_Number), pDoc -> R_Color.GetAt (R_Number) ) ;
-					CPen* oldPen = pDC->SelectObject( &pen ) ;
-					pDC -> SelectStockObject ( NULL_BRUSH ) ;
-					pDC -> Rectangle ( pDoc -> R_Rec [R_Number].left, pDoc -> R_Rec [R_Number].top, pDoc -> R_Rec [R_Number].right, pDoc -> R_Rec [R_Number].bottom ) ;
-					pDC ->SelectObject ( oldPen ) ;
+					if ( pDoc -> R_LinePattern.GetAt (R_Number) == 1 ) {
+						CPen pen;
+						pen.CreatePen( PS_SOLID, pDoc -> R_Thickness.GetAt (R_Number), pDoc -> R_Color.GetAt (R_Number) ) ;
+						CPen* oldPen = pDC->SelectObject( &pen ) ;
+						pDC -> SelectStockObject ( NULL_BRUSH ) ;
+						pDC -> Rectangle ( pDoc -> R_Rec [R_Number].left, pDoc -> R_Rec [R_Number].top, pDoc -> R_Rec [R_Number].right, pDoc -> R_Rec [R_Number].bottom ) ;
+						pDC ->SelectObject ( oldPen ) ;
+					}
+					else if ( pDoc -> R_LinePattern.GetAt (R_Number) == 2 ) {
+						CPen pen;
+						pen.CreatePen( PS_DASH, pDoc -> R_Thickness.GetAt (R_Number), pDoc -> R_Color.GetAt (R_Number) ) ;
+						CPen* oldPen = pDC->SelectObject( &pen ) ;
+						pDC -> SelectStockObject ( NULL_BRUSH ) ;
+						pDC -> Rectangle ( pDoc -> R_Rec [R_Number].left, pDoc -> R_Rec [R_Number].top, pDoc -> R_Rec [R_Number].right, pDoc -> R_Rec [R_Number].bottom ) ;
+						pDC ->SelectObject ( oldPen ) ;
+					}
+					else if ( pDoc -> R_LinePattern.GetAt (R_Number) == 3 ) {
+						CPen pen;
+						pen.CreatePen( PS_DOT, pDoc -> R_Thickness.GetAt (R_Number), pDoc -> R_Color.GetAt (R_Number) ) ;
+						CPen* oldPen = pDC->SelectObject( &pen ) ;
+						pDC -> SelectStockObject ( NULL_BRUSH ) ;
+						pDC -> Rectangle ( pDoc -> R_Rec [R_Number].left, pDoc -> R_Rec [R_Number].top, pDoc -> R_Rec [R_Number].right, pDoc -> R_Rec [R_Number].bottom ) ;
+						pDC ->SelectObject ( oldPen ) ;
+					}
+					else if ( pDoc -> R_LinePattern.GetAt (R_Number) == 4 ) {
+						CPen pen;
+						pen.CreatePen( PS_DASHDOT, pDoc -> R_Thickness.GetAt (R_Number), pDoc -> R_Color.GetAt (R_Number) ) ;
+						CPen* oldPen = pDC->SelectObject( &pen ) ;
+						pDC -> SelectStockObject ( NULL_BRUSH ) ;
+						pDC -> Rectangle ( pDoc -> R_Rec [R_Number].left, pDoc -> R_Rec [R_Number].top, pDoc -> R_Rec [R_Number].right, pDoc -> R_Rec [R_Number].bottom ) ;
+						pDC ->SelectObject ( oldPen ) ;
+					}
+					else if ( pDoc -> R_LinePattern.GetAt (R_Number) == 5 ) {
+						CPen pen;
+						pen.CreatePen( PS_DASHDOTDOT, pDoc -> R_Thickness.GetAt (R_Number), pDoc -> R_Color.GetAt (R_Number) ) ;
+						CPen* oldPen = pDC->SelectObject( &pen ) ;
+						pDC -> SelectStockObject ( NULL_BRUSH ) ;
+						pDC -> Rectangle ( pDoc -> R_Rec [R_Number].left, pDoc -> R_Rec [R_Number].top, pDoc -> R_Rec [R_Number].right, pDoc -> R_Rec [R_Number].bottom ) ;
+						pDC ->SelectObject ( oldPen ) ;
+					}
 				}
 				// 채우기 색상을 가졌을 경우의 출력
 				else {
-					CPen pen;
-					pen.CreatePen( PS_SOLID, pDoc -> R_Thickness.GetAt (R_Number), pDoc -> R_Color.GetAt (R_Number) ) ;
-					CPen* oldPen = pDC->SelectObject( &pen ) ;
-					CBrush brush;
-					brush.CreateSolidBrush( pDoc -> R_FillColor.GetAt (R_Number) ) ;
-					CBrush* oldBrush = pDC->SelectObject( &brush ) ;
-					pDC -> Rectangle ( pDoc -> R_Rec [R_Number].left, pDoc -> R_Rec [R_Number].top, pDoc -> R_Rec [R_Number].right, pDoc -> R_Rec [R_Number].bottom ) ;
-					pDC -> SelectObject ( oldPen ) ;
-					pDC -> SelectObject ( oldBrush ) ;
+					if ( pDoc -> R_LinePattern.GetAt (R_Number) == 1 ) {
+						CPen pen;
+						pen.CreatePen( PS_SOLID, pDoc -> R_Thickness.GetAt (R_Number), pDoc -> R_Color.GetAt (R_Number) ) ;
+						CPen* oldPen = pDC->SelectObject( &pen ) ;
+						CBrush brush;
+						if ( pDoc -> R_FillPattern.GetAt (R_Number) == 1 )
+							brush.CreateSolidBrush( pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 2 )
+							brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 3 )
+							brush.CreateHatchBrush ( HS_CROSS, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 4 )
+							brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 5 )
+							brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 6 )
+							brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 7 )
+							brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+
+						CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+						pDC -> Rectangle ( pDoc -> R_Rec [R_Number].left, pDoc -> R_Rec [R_Number].top, pDoc -> R_Rec [R_Number].right, pDoc -> R_Rec [R_Number].bottom ) ;
+						pDC -> SelectObject ( oldPen ) ;
+						pDC -> SelectObject ( oldBrush ) ;
+					}
+					else if ( pDoc -> R_LinePattern.GetAt (R_Number) == 2 ) {
+						CPen pen;
+						pen.CreatePen( PS_DASH, pDoc -> R_Thickness.GetAt (R_Number), pDoc -> R_Color.GetAt (R_Number) ) ;
+						CPen* oldPen = pDC->SelectObject( &pen ) ;
+						CBrush brush;
+						if ( pDoc -> R_FillPattern.GetAt (R_Number) == 1 )
+							brush.CreateSolidBrush( pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 2 )
+							brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 3 )
+							brush.CreateHatchBrush ( HS_CROSS, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 4 )
+							brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 5 )
+							brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 6 )
+							brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 7 )
+							brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+
+						CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+						pDC -> Rectangle ( pDoc -> R_Rec [R_Number].left, pDoc -> R_Rec [R_Number].top, pDoc -> R_Rec [R_Number].right, pDoc -> R_Rec [R_Number].bottom ) ;
+						pDC -> SelectObject ( oldPen ) ;
+						pDC -> SelectObject ( oldBrush ) ;
+					}
+					else if ( pDoc -> R_LinePattern.GetAt (R_Number) == 3 ) {
+						CPen pen;
+						pen.CreatePen( PS_DOT, pDoc -> R_Thickness.GetAt (R_Number), pDoc -> R_Color.GetAt (R_Number) ) ;
+						CPen* oldPen = pDC->SelectObject( &pen ) ;
+						CBrush brush;
+						if ( pDoc -> R_FillPattern.GetAt (R_Number) == 1 )
+							brush.CreateSolidBrush( pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 2 )
+							brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 3 )
+							brush.CreateHatchBrush ( HS_CROSS, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 4 )
+							brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 5 )
+							brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 6 )
+							brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 7 )
+							brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+
+						CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+						pDC -> Rectangle ( pDoc -> R_Rec [R_Number].left, pDoc -> R_Rec [R_Number].top, pDoc -> R_Rec [R_Number].right, pDoc -> R_Rec [R_Number].bottom ) ;
+						pDC -> SelectObject ( oldPen ) ;
+						pDC -> SelectObject ( oldBrush ) ;
+					}
+					else if ( pDoc -> R_LinePattern.GetAt (R_Number) == 4 ) {
+						CPen pen;
+						pen.CreatePen( PS_DASHDOT, pDoc -> R_Thickness.GetAt (R_Number), pDoc -> R_Color.GetAt (R_Number) ) ;
+						CPen* oldPen = pDC->SelectObject( &pen ) ;
+						CBrush brush;
+						if ( pDoc -> R_FillPattern.GetAt (R_Number) == 1 )
+							brush.CreateSolidBrush( pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 2 )
+							brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 3 )
+							brush.CreateHatchBrush ( HS_CROSS, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 4 )
+							brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 5 )
+							brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 6 )
+							brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 7 )
+							brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+
+						CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+						pDC -> Rectangle ( pDoc -> R_Rec [R_Number].left, pDoc -> R_Rec [R_Number].top, pDoc -> R_Rec [R_Number].right, pDoc -> R_Rec [R_Number].bottom ) ;
+						pDC -> SelectObject ( oldPen ) ;
+						pDC -> SelectObject ( oldBrush ) ;
+					}
+					else if ( pDoc -> R_LinePattern.GetAt (R_Number) == 5 ) {
+						CPen pen;
+						pen.CreatePen( PS_DASHDOTDOT, pDoc -> R_Thickness.GetAt (R_Number), pDoc -> R_Color.GetAt (R_Number) ) ;
+						CPen* oldPen = pDC->SelectObject( &pen ) ;
+						CBrush brush;
+						if ( pDoc -> R_FillPattern.GetAt (R_Number) == 1 )
+							brush.CreateSolidBrush( pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 2 )
+							brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 3 )
+							brush.CreateHatchBrush ( HS_CROSS, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 4 )
+							brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 5 )
+							brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 6 )
+							brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						else if ( pDoc -> R_FillPattern.GetAt (R_Number) == 7 )
+							brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> R_FillColor.GetAt (R_Number) ) ;
+
+						CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+						pDC -> Rectangle ( pDoc -> R_Rec [R_Number].left, pDoc -> R_Rec [R_Number].top, pDoc -> R_Rec [R_Number].right, pDoc -> R_Rec [R_Number].bottom ) ;
+						pDC -> SelectObject ( oldPen ) ;
+						pDC -> SelectObject ( oldBrush ) ;
+					}
 				}
 			}
 
@@ -384,24 +762,100 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 
 				// PolyLine이 색상을 가지지 않을 경우의 출력
 				if ( pDoc -> P_Poly.GetAt (P_Number).P_Color == RGB (0,0,0) ) {
-					CPen pen ( PS_SOLID, pDoc -> P_Poly.GetAt (P_Number).thickness, RGB (0, 0, 0) );
-					CPen *Draw_Pen = pDC -> SelectObject(&pen);
-					P_PointStart = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (j) ;
-					P_PointLast = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (j+1) ;
-					pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
-					pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
-					pDC->SelectObject(Draw_Pen);
+					if ( pDoc -> P_Poly.GetAt (P_Number).Pattern == 1 ) {
+						CPen pen ( PS_SOLID, pDoc -> P_Poly.GetAt (P_Number).thickness, RGB (0, 0, 0) );
+						CPen *Draw_Pen = pDC -> SelectObject(&pen);
+						P_PointStart = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (j) ;
+						P_PointLast = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (j+1) ;
+						pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+						pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+						pDC->SelectObject(Draw_Pen);
+					}
+					else if ( pDoc -> P_Poly.GetAt (P_Number).Pattern == 2 ) {
+						CPen pen ( PS_DASH, pDoc -> P_Poly.GetAt (P_Number).thickness, RGB (0, 0, 0) );
+						CPen *Draw_Pen = pDC -> SelectObject(&pen);
+						P_PointStart = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (j) ;
+						P_PointLast = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (j+1) ;
+						pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+						pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+						pDC->SelectObject(Draw_Pen);
+					}
+					else if ( pDoc -> P_Poly.GetAt (P_Number).Pattern == 3 ) {
+						CPen pen ( PS_DOT, pDoc -> P_Poly.GetAt (P_Number).thickness, RGB (0, 0, 0) );
+						CPen *Draw_Pen = pDC -> SelectObject(&pen);
+						P_PointStart = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (j) ;
+						P_PointLast = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (j+1) ;
+						pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+						pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+						pDC->SelectObject(Draw_Pen);
+					}
+					else if ( pDoc -> P_Poly.GetAt (P_Number).Pattern == 4 ) {
+						CPen pen ( PS_DASHDOT, pDoc -> P_Poly.GetAt (P_Number).thickness, RGB (0, 0, 0) );
+						CPen *Draw_Pen = pDC -> SelectObject(&pen);
+						P_PointStart = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (j) ;
+						P_PointLast = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (j+1) ;
+						pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+						pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+						pDC->SelectObject(Draw_Pen);
+					}
+					else if ( pDoc -> P_Poly.GetAt (P_Number).Pattern == 5 ) {
+						CPen pen ( PS_DASHDOTDOT, pDoc -> P_Poly.GetAt (P_Number).thickness, RGB (0, 0, 0) );
+						CPen *Draw_Pen = pDC -> SelectObject(&pen);
+						P_PointStart = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (j) ;
+						P_PointLast = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (j+1) ;
+						pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+						pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+						pDC->SelectObject(Draw_Pen);
+					}
 
 				}
 				// PolyLine이 지정된 색상을 가졌을 경우의 출력
 				else {
-					CPen pen ( PS_SOLID, pDoc -> P_Poly.GetAt (P_Number).thickness, pDoc -> P_Poly.GetAt (P_Number).P_Color ) ;
-					CPen *Draw_Pen = pDC -> SelectObject(&pen) ;
-					P_PointStart = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (j) ;
-					P_PointLast = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (j+1) ;
-					pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
-					pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
-					pDC->SelectObject(Draw_Pen);
+					if ( pDoc -> P_Poly.GetAt (P_Number).Pattern == 1 ) {
+						CPen pen ( PS_SOLID, pDoc -> P_Poly.GetAt (P_Number).thickness, pDoc -> P_Poly.GetAt (P_Number).P_Color ) ;
+						CPen *Draw_Pen = pDC -> SelectObject(&pen) ;
+						P_PointStart = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (j) ;
+						P_PointLast = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (j+1) ;
+						pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+						pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+						pDC->SelectObject(Draw_Pen);
+					}
+					else if ( pDoc -> P_Poly.GetAt (P_Number).Pattern == 2 ) {
+						CPen pen ( PS_DASH, pDoc -> P_Poly.GetAt (P_Number).thickness, pDoc -> P_Poly.GetAt (P_Number).P_Color ) ;
+						CPen *Draw_Pen = pDC -> SelectObject(&pen) ;
+						P_PointStart = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (j) ;
+						P_PointLast = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (j+1) ;
+						pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+						pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+						pDC->SelectObject(Draw_Pen);
+					}
+					else if ( pDoc -> P_Poly.GetAt (P_Number).Pattern == 3 ) {
+						CPen pen ( PS_DOT, pDoc -> P_Poly.GetAt (P_Number).thickness, pDoc -> P_Poly.GetAt (P_Number).P_Color ) ;
+						CPen *Draw_Pen = pDC -> SelectObject(&pen) ;
+						P_PointStart = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (j) ;
+						P_PointLast = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (j+1) ;
+						pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+						pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+						pDC->SelectObject(Draw_Pen);
+					}
+					else if ( pDoc -> P_Poly.GetAt (P_Number).Pattern == 4 ) {
+						CPen pen ( PS_DASHDOT, pDoc -> P_Poly.GetAt (P_Number).thickness, pDoc -> P_Poly.GetAt (P_Number).P_Color ) ;
+						CPen *Draw_Pen = pDC -> SelectObject(&pen) ;
+						P_PointStart = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (j) ;
+						P_PointLast = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (j+1) ;
+						pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+						pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+						pDC->SelectObject(Draw_Pen);
+					}
+					else if ( pDoc -> P_Poly.GetAt (P_Number).Pattern == 5 ) {
+						CPen pen ( PS_DASHDOTDOT, pDoc -> P_Poly.GetAt (P_Number).thickness, pDoc -> P_Poly.GetAt (P_Number).P_Color ) ;
+						CPen *Draw_Pen = pDC -> SelectObject(&pen) ;
+						P_PointStart = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (j) ;
+						P_PointLast = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (j+1) ;
+						pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+						pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+						pDC->SelectObject(Draw_Pen);
+					}
 				}
 				
 				// 만약 이동시키고 있는 중이라면
@@ -470,48 +924,348 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 			if ( pDoc -> E_Color.GetAt (E_Number) == RGB (0,0,0) ) {
 				// 채우기 색상을 가지지 않았을 경우의 출력
 				if ( pDoc -> E_IsNoFill.GetAt (E_Number) == 'o' ) {
-					CPen pen;
-					pen.CreatePen( PS_SOLID, pDoc -> E_Thickness.GetAt (E_Number), RGB (0,0,0) ) ;
-					CPen* oldPen = pDC->SelectObject( &pen ) ;
-					pDC -> SelectStockObject ( NULL_BRUSH ) ;
-					pDC -> Ellipse ( pDoc -> E_Ellipse [E_Number].left, pDoc -> E_Ellipse [E_Number].top, pDoc -> E_Ellipse [E_Number].right, pDoc -> E_Ellipse [E_Number].bottom ) ;
-					pDC -> SelectObject ( oldPen ) ;
+					if ( pDoc -> E_LinePattern.GetAt (E_Number) == 1 ) {
+						CPen pen;
+						pen.CreatePen( PS_SOLID, pDoc -> E_Thickness.GetAt (E_Number), RGB (0,0,0) ) ;
+						CPen* oldPen = pDC->SelectObject( &pen ) ;
+						pDC -> SelectStockObject ( NULL_BRUSH ) ;
+						pDC -> Ellipse ( pDoc -> E_Ellipse [E_Number].left, pDoc -> E_Ellipse [E_Number].top, pDoc -> E_Ellipse [E_Number].right, pDoc -> E_Ellipse [E_Number].bottom ) ;
+						pDC -> SelectObject ( oldPen ) ;
+					}
+					else if ( pDoc -> E_LinePattern.GetAt (E_Number) == 2 ) {
+						CPen pen;
+						pen.CreatePen( PS_DASH, pDoc -> E_Thickness.GetAt (E_Number), RGB (0,0,0) ) ;
+						CPen* oldPen = pDC->SelectObject( &pen ) ;
+						pDC -> SelectStockObject ( NULL_BRUSH ) ;
+						pDC -> Ellipse ( pDoc -> E_Ellipse [E_Number].left, pDoc -> E_Ellipse [E_Number].top, pDoc -> E_Ellipse [E_Number].right, pDoc -> E_Ellipse [E_Number].bottom ) ;
+						pDC -> SelectObject ( oldPen ) ;
+					}
+					else if ( pDoc -> E_LinePattern.GetAt (E_Number) == 3 ) {
+						CPen pen;
+						pen.CreatePen( PS_DOT, pDoc -> E_Thickness.GetAt (E_Number), RGB (0,0,0) ) ;
+						CPen* oldPen = pDC->SelectObject( &pen ) ;
+						pDC -> SelectStockObject ( NULL_BRUSH ) ;
+						pDC -> Ellipse ( pDoc -> E_Ellipse [E_Number].left, pDoc -> E_Ellipse [E_Number].top, pDoc -> E_Ellipse [E_Number].right, pDoc -> E_Ellipse [E_Number].bottom ) ;
+						pDC -> SelectObject ( oldPen ) ;
+					}
+					else if ( pDoc -> E_LinePattern.GetAt (E_Number) == 4 ) {
+						CPen pen;
+						pen.CreatePen( PS_DASHDOT, pDoc -> E_Thickness.GetAt (E_Number), RGB (0,0,0) ) ;
+						CPen* oldPen = pDC->SelectObject( &pen ) ;
+						pDC -> SelectStockObject ( NULL_BRUSH ) ;
+						pDC -> Ellipse ( pDoc -> E_Ellipse [E_Number].left, pDoc -> E_Ellipse [E_Number].top, pDoc -> E_Ellipse [E_Number].right, pDoc -> E_Ellipse [E_Number].bottom ) ;
+						pDC -> SelectObject ( oldPen ) ;
+					}
+					else if ( pDoc -> E_LinePattern.GetAt (E_Number) == 5 ) {
+						CPen pen;
+						pen.CreatePen( PS_DASHDOTDOT, pDoc -> E_Thickness.GetAt (E_Number), RGB (0,0,0) ) ;
+						CPen* oldPen = pDC->SelectObject( &pen ) ;
+						pDC -> SelectStockObject ( NULL_BRUSH ) ;
+						pDC -> Ellipse ( pDoc -> E_Ellipse [E_Number].left, pDoc -> E_Ellipse [E_Number].top, pDoc -> E_Ellipse [E_Number].right, pDoc -> E_Ellipse [E_Number].bottom ) ;
+						pDC -> SelectObject ( oldPen ) ;
+					}
 				}
 				// 채우기 색상을 가졌을 경우의 출력
 				else {
-					CPen pen;
-					pen.CreatePen( PS_SOLID, pDoc -> E_Thickness.GetAt (E_Number), RGB (0,0,0) ) ;
-					CPen* oldPen = pDC->SelectObject( &pen ) ;
-					CBrush brush;
-					brush.CreateSolidBrush( pDoc -> E_FillColor.GetAt (E_Number) ) ;
-					CBrush* oldBrush = pDC->SelectObject( &brush ) ;
-					pDC -> Ellipse ( pDoc -> E_Ellipse [E_Number].left, pDoc -> E_Ellipse [E_Number].top, pDoc -> E_Ellipse [E_Number].right, pDoc -> E_Ellipse [E_Number].bottom ) ;
-					pDC -> SelectObject ( oldBrush ) ;
-					pDC -> SelectObject ( oldPen ) ;
+					if ( pDoc -> E_LinePattern.GetAt (E_Number) == 1 ) {
+						CPen pen;
+						pen.CreatePen( PS_SOLID, pDoc -> E_Thickness.GetAt (E_Number), RGB (0,0,0) ) ;
+						CPen* oldPen = pDC->SelectObject( &pen ) ;
+						CBrush brush;
+						if ( pDoc -> E_FillPattern.GetAt (E_Number) == 1 )
+							brush.CreateSolidBrush( pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 2 )
+							brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 3 )
+							brush.CreateHatchBrush ( HS_CROSS, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 4 )
+							brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 5 )
+							brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 6 )
+							brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 7 )
+							brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+
+						CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+						pDC -> Ellipse ( pDoc -> E_Ellipse [E_Number].left, pDoc -> E_Ellipse [E_Number].top, pDoc -> E_Ellipse [E_Number].right, pDoc -> E_Ellipse [E_Number].bottom ) ;
+						pDC -> SelectObject ( oldBrush ) ;
+						pDC -> SelectObject ( oldPen ) ;
+					}
+					else if ( pDoc -> E_LinePattern.GetAt (E_Number) == 2 ) {
+						CPen pen;
+						pen.CreatePen( PS_DASH, pDoc -> E_Thickness.GetAt (E_Number), RGB (0,0,0) ) ;
+						CPen* oldPen = pDC->SelectObject( &pen ) ;
+						CBrush brush;
+						if ( pDoc -> E_FillPattern.GetAt (E_Number) == 1 )
+							brush.CreateSolidBrush( pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 2 )
+							brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 3 )
+							brush.CreateHatchBrush ( HS_CROSS, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 4 )
+							brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 5 )
+							brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 6 )
+							brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 7 )
+							brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+
+						CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+						pDC -> Ellipse ( pDoc -> E_Ellipse [E_Number].left, pDoc -> E_Ellipse [E_Number].top, pDoc -> E_Ellipse [E_Number].right, pDoc -> E_Ellipse [E_Number].bottom ) ;
+						pDC -> SelectObject ( oldBrush ) ;
+						pDC -> SelectObject ( oldPen ) ;
+					}
+					else if ( pDoc -> E_LinePattern.GetAt (E_Number) == 3 ) {
+						CPen pen;
+						pen.CreatePen( PS_DOT, pDoc -> E_Thickness.GetAt (E_Number), RGB (0,0,0) ) ;
+						CPen* oldPen = pDC->SelectObject( &pen ) ;
+						CBrush brush;
+						if ( pDoc -> E_FillPattern.GetAt (E_Number) == 1 )
+							brush.CreateSolidBrush( pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 2 )
+							brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 3 )
+							brush.CreateHatchBrush ( HS_CROSS, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 4 )
+							brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 5 )
+							brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 6 )
+							brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 7 )
+							brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+
+						CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+						pDC -> Ellipse ( pDoc -> E_Ellipse [E_Number].left, pDoc -> E_Ellipse [E_Number].top, pDoc -> E_Ellipse [E_Number].right, pDoc -> E_Ellipse [E_Number].bottom ) ;
+						pDC -> SelectObject ( oldBrush ) ;
+						pDC -> SelectObject ( oldPen ) ;
+					}
+					else if ( pDoc -> E_LinePattern.GetAt (E_Number) == 4 ) {
+						CPen pen;
+						pen.CreatePen( PS_DASHDOT, pDoc -> E_Thickness.GetAt (E_Number), RGB (0,0,0) ) ;
+						CPen* oldPen = pDC->SelectObject( &pen ) ;
+						CBrush brush;
+						if ( pDoc -> E_FillPattern.GetAt (E_Number) == 1 )
+							brush.CreateSolidBrush( pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 2 )
+							brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 3 )
+							brush.CreateHatchBrush ( HS_CROSS, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 4 )
+							brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 5 )
+							brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 6 )
+							brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 7 )
+							brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+
+						CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+						pDC -> Ellipse ( pDoc -> E_Ellipse [E_Number].left, pDoc -> E_Ellipse [E_Number].top, pDoc -> E_Ellipse [E_Number].right, pDoc -> E_Ellipse [E_Number].bottom ) ;
+						pDC -> SelectObject ( oldBrush ) ;
+						pDC -> SelectObject ( oldPen ) ;
+					}
+					else if ( pDoc -> E_LinePattern.GetAt (E_Number) == 5 ) {
+						CPen pen;
+						pen.CreatePen( PS_DASHDOTDOT, pDoc -> E_Thickness.GetAt (E_Number), RGB (0,0,0) ) ;
+						CPen* oldPen = pDC->SelectObject( &pen ) ;
+						CBrush brush;
+						if ( pDoc -> E_FillPattern.GetAt (E_Number) == 1 )
+							brush.CreateSolidBrush( pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 2 )
+							brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 3 )
+							brush.CreateHatchBrush ( HS_CROSS, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 4 )
+							brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 5 )
+							brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 6 )
+							brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 7 )
+							brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+
+						CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+						pDC -> Ellipse ( pDoc -> E_Ellipse [E_Number].left, pDoc -> E_Ellipse [E_Number].top, pDoc -> E_Ellipse [E_Number].right, pDoc -> E_Ellipse [E_Number].bottom ) ;
+						pDC -> SelectObject ( oldBrush ) ;
+						pDC -> SelectObject ( oldPen ) ;
+					}
 				}
 			}
 			// 특정 선 색상을 가졌을 경우의 출력
 			else {
 				// 채우기 색상을 가지지 않았을 경우의 출력
 				if ( pDoc -> E_IsNoFill.GetAt (E_Number) == 'o' ) {
-					CPen pen;
-					pen.CreatePen( PS_SOLID, pDoc -> E_Thickness.GetAt (E_Number), pDoc -> E_Color.GetAt (E_Number) ) ;
-					CPen* oldPen = pDC->SelectObject( &pen ) ;
-					pDC -> SelectStockObject ( NULL_BRUSH ) ;
-					pDC -> Ellipse ( pDoc -> E_Ellipse [E_Number].left, pDoc -> E_Ellipse [E_Number].top, pDoc -> E_Ellipse [E_Number].right, pDoc -> E_Ellipse [E_Number].bottom ) ;
-					pDC -> SelectObject ( oldPen ) ;
+					if ( pDoc -> E_LinePattern.GetAt (E_Number) == 1 ) {
+						CPen pen;
+						pen.CreatePen( PS_SOLID, pDoc -> E_Thickness.GetAt (E_Number), pDoc -> E_Color.GetAt (E_Number) ) ;
+						CPen* oldPen = pDC->SelectObject( &pen ) ;
+						pDC -> SelectStockObject ( NULL_BRUSH ) ;
+						pDC -> Ellipse ( pDoc -> E_Ellipse [E_Number].left, pDoc -> E_Ellipse [E_Number].top, pDoc -> E_Ellipse [E_Number].right, pDoc -> E_Ellipse [E_Number].bottom ) ;
+						pDC -> SelectObject ( oldPen ) ;
+					}
+					else if ( pDoc -> E_LinePattern.GetAt (E_Number) == 2 ) {
+						CPen pen;
+						pen.CreatePen( PS_DASH, pDoc -> E_Thickness.GetAt (E_Number), pDoc -> E_Color.GetAt (E_Number) ) ;
+						CPen* oldPen = pDC->SelectObject( &pen ) ;
+						pDC -> SelectStockObject ( NULL_BRUSH ) ;
+						pDC -> Ellipse ( pDoc -> E_Ellipse [E_Number].left, pDoc -> E_Ellipse [E_Number].top, pDoc -> E_Ellipse [E_Number].right, pDoc -> E_Ellipse [E_Number].bottom ) ;
+						pDC -> SelectObject ( oldPen ) ;
+					}
+					else if ( pDoc -> E_LinePattern.GetAt (E_Number) == 3 ) {
+						CPen pen;
+						pen.CreatePen( PS_DOT, pDoc -> E_Thickness.GetAt (E_Number), pDoc -> E_Color.GetAt (E_Number) ) ;
+						CPen* oldPen = pDC->SelectObject( &pen ) ;
+						pDC -> SelectStockObject ( NULL_BRUSH ) ;
+						pDC -> Ellipse ( pDoc -> E_Ellipse [E_Number].left, pDoc -> E_Ellipse [E_Number].top, pDoc -> E_Ellipse [E_Number].right, pDoc -> E_Ellipse [E_Number].bottom ) ;
+						pDC -> SelectObject ( oldPen ) ;
+					}
+					else if ( pDoc -> E_LinePattern.GetAt (E_Number) == 4 ) {
+						CPen pen;
+						pen.CreatePen( PS_DASHDOT, pDoc -> E_Thickness.GetAt (E_Number), pDoc -> E_Color.GetAt (E_Number) ) ;
+						CPen* oldPen = pDC->SelectObject( &pen ) ;
+						pDC -> SelectStockObject ( NULL_BRUSH ) ;
+						pDC -> Ellipse ( pDoc -> E_Ellipse [E_Number].left, pDoc -> E_Ellipse [E_Number].top, pDoc -> E_Ellipse [E_Number].right, pDoc -> E_Ellipse [E_Number].bottom ) ;
+						pDC -> SelectObject ( oldPen ) ;
+					}
+					else if ( pDoc -> E_LinePattern.GetAt (E_Number) == 5 ) {
+						CPen pen;
+						pen.CreatePen( PS_DASHDOTDOT, pDoc -> E_Thickness.GetAt (E_Number), pDoc -> E_Color.GetAt (E_Number) ) ;
+						CPen* oldPen = pDC->SelectObject( &pen ) ;
+						pDC -> SelectStockObject ( NULL_BRUSH ) ;
+						pDC -> Ellipse ( pDoc -> E_Ellipse [E_Number].left, pDoc -> E_Ellipse [E_Number].top, pDoc -> E_Ellipse [E_Number].right, pDoc -> E_Ellipse [E_Number].bottom ) ;
+						pDC -> SelectObject ( oldPen ) ;
+					}
 				}
 				// 채우기 색상을 가졌을 경우의 출력
 				else {
-					CPen pen;
-					pen.CreatePen( PS_SOLID, pDoc -> E_Thickness.GetAt (E_Number), pDoc -> E_Color.GetAt (E_Number) ) ;
-					CPen* oldPen = pDC->SelectObject( &pen ) ;
-					CBrush brush;
-					brush.CreateSolidBrush( pDoc -> E_FillColor.GetAt (E_Number) ) ;
-					CBrush* oldBrush = pDC->SelectObject( &brush ) ;
-					pDC -> Ellipse ( pDoc -> E_Ellipse [E_Number].left, pDoc -> E_Ellipse [E_Number].top, pDoc -> E_Ellipse [E_Number].right, pDoc -> E_Ellipse [E_Number].bottom ) ;
-					pDC -> SelectObject ( oldPen ) ;
-					pDC -> SelectObject ( oldBrush ) ;
+					if ( pDoc -> E_LinePattern.GetAt (E_Number) == 1 ) {
+						CPen pen;
+						pen.CreatePen( PS_SOLID, pDoc -> E_Thickness.GetAt (E_Number), pDoc -> E_Color.GetAt (E_Number) ) ;
+						CPen* oldPen = pDC->SelectObject( &pen ) ;
+						CBrush brush;
+						if ( pDoc -> E_FillPattern.GetAt (E_Number) == 1 )
+							brush.CreateSolidBrush( pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 2 )
+							brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 3 )
+							brush.CreateHatchBrush ( HS_CROSS, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 4 )
+							brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 5 )
+							brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 6 )
+							brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 7 )
+							brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+
+						CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+						pDC -> Ellipse ( pDoc -> E_Ellipse [E_Number].left, pDoc -> E_Ellipse [E_Number].top, pDoc -> E_Ellipse [E_Number].right, pDoc -> E_Ellipse [E_Number].bottom ) ;
+						pDC -> SelectObject ( oldPen ) ;
+						pDC -> SelectObject ( oldBrush ) ;
+					}
+					else if ( pDoc -> E_LinePattern.GetAt (E_Number) == 2 ) {
+						CPen pen;
+						pen.CreatePen( PS_DASH, pDoc -> E_Thickness.GetAt (E_Number), pDoc -> E_Color.GetAt (E_Number) ) ;
+						CPen* oldPen = pDC->SelectObject( &pen ) ;
+						CBrush brush;
+						if ( pDoc -> E_FillPattern.GetAt (E_Number) == 1 )
+							brush.CreateSolidBrush( pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 2 )
+							brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 3 )
+							brush.CreateHatchBrush ( HS_CROSS, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 4 )
+							brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 5 )
+							brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 6 )
+							brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 7 )
+							brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+
+						CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+						pDC -> Ellipse ( pDoc -> E_Ellipse [E_Number].left, pDoc -> E_Ellipse [E_Number].top, pDoc -> E_Ellipse [E_Number].right, pDoc -> E_Ellipse [E_Number].bottom ) ;
+						pDC -> SelectObject ( oldPen ) ;
+						pDC -> SelectObject ( oldBrush ) ;
+					}
+					else if ( pDoc -> E_LinePattern.GetAt (E_Number) == 3 ) {
+						CPen pen;
+						pen.CreatePen( PS_DOT, pDoc -> E_Thickness.GetAt (E_Number), pDoc -> E_Color.GetAt (E_Number) ) ;
+						CPen* oldPen = pDC->SelectObject( &pen ) ;
+						CBrush brush;
+						if ( pDoc -> E_FillPattern.GetAt (E_Number) == 1 )
+							brush.CreateSolidBrush( pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 2 )
+							brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 3 )
+							brush.CreateHatchBrush ( HS_CROSS, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 4 )
+							brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 5 )
+							brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 6 )
+							brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 7 )
+							brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+
+						CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+						pDC -> Ellipse ( pDoc -> E_Ellipse [E_Number].left, pDoc -> E_Ellipse [E_Number].top, pDoc -> E_Ellipse [E_Number].right, pDoc -> E_Ellipse [E_Number].bottom ) ;
+						pDC -> SelectObject ( oldPen ) ;
+						pDC -> SelectObject ( oldBrush ) ;
+					}
+					else if ( pDoc -> E_LinePattern.GetAt (E_Number) == 4 ) {
+						CPen pen;
+						pen.CreatePen( PS_DASHDOT, pDoc -> E_Thickness.GetAt (E_Number), pDoc -> E_Color.GetAt (E_Number) ) ;
+						CPen* oldPen = pDC->SelectObject( &pen ) ;
+						CBrush brush;
+						if ( pDoc -> E_FillPattern.GetAt (E_Number) == 1 )
+							brush.CreateSolidBrush( pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 2 )
+							brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 3 )
+							brush.CreateHatchBrush ( HS_CROSS, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 4 )
+							brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 5 )
+							brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 6 )
+							brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 7 )
+							brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+
+						CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+						pDC -> Ellipse ( pDoc -> E_Ellipse [E_Number].left, pDoc -> E_Ellipse [E_Number].top, pDoc -> E_Ellipse [E_Number].right, pDoc -> E_Ellipse [E_Number].bottom ) ;
+						pDC -> SelectObject ( oldPen ) ;
+						pDC -> SelectObject ( oldBrush ) ;
+					}
+					else if ( pDoc -> E_LinePattern.GetAt (E_Number) == 5 ) {
+						CPen pen;
+						pen.CreatePen( PS_DASHDOTDOT, pDoc -> E_Thickness.GetAt (E_Number), pDoc -> E_Color.GetAt (E_Number) ) ;
+						CPen* oldPen = pDC->SelectObject( &pen ) ;
+						CBrush brush;
+						if ( pDoc -> E_FillPattern.GetAt (E_Number) == 1 )
+							brush.CreateSolidBrush( pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 2 )
+							brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 3 )
+							brush.CreateHatchBrush ( HS_CROSS, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 4 )
+							brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 5 )
+							brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 6 )
+							brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						else if ( pDoc -> E_FillPattern.GetAt (E_Number) == 7 )
+							brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> E_FillColor.GetAt (E_Number) ) ;
+
+						CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+						pDC -> Ellipse ( pDoc -> E_Ellipse [E_Number].left, pDoc -> E_Ellipse [E_Number].top, pDoc -> E_Ellipse [E_Number].right, pDoc -> E_Ellipse [E_Number].bottom ) ;
+						pDC -> SelectObject ( oldPen ) ;
+						pDC -> SelectObject ( oldBrush ) ;
+					}
 				}
 			}
 
@@ -589,7 +1343,7 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 				pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
 				pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
 				pDC->SelectObject(Draw_Pen);
-				;
+				
 				CPen *Draw_Pen2 = pDC -> SelectObject(&pen);
 				P_PointStart.x = pDoc -> E_Ellipse.GetAt (E_Number).left - pDoc -> E_Thickness.GetAt (E_Number) / 2 ;
 				P_PointStart.y = pDoc -> E_Ellipse.GetAt (E_Number).top - pDoc -> E_Thickness.GetAt (E_Number) / 2 ;
@@ -649,7 +1403,21 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 				// 채우기 색상을 가졌을 경우의 출력
 				else {
 					CBrush brush;
-					brush.CreateSolidBrush( pDoc -> T_FillColor.GetAt (T_Number) ) ;
+					if ( pDoc -> T_FillPattern.GetAt (T_Number) == 1 )
+						brush.CreateSolidBrush( pDoc -> T_FillColor.GetAt (T_Number) ) ;
+					else if ( pDoc -> T_FillPattern.GetAt (T_Number) == 2 )
+						brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> T_FillColor.GetAt (T_Number) ) ;
+					else if ( pDoc -> T_FillPattern.GetAt (T_Number) == 3 )
+						brush.CreateHatchBrush ( HS_CROSS, pDoc -> T_FillColor.GetAt (T_Number) ) ;
+					else if ( pDoc -> T_FillPattern.GetAt (T_Number) == 4 )
+						brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> T_FillColor.GetAt (T_Number) ) ;
+					else if ( pDoc -> T_FillPattern.GetAt (T_Number) == 5 )
+						brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> T_FillColor.GetAt (T_Number) ) ;
+					else if ( pDoc -> T_FillPattern.GetAt (T_Number) == 6 )
+						brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> T_FillColor.GetAt (T_Number) ) ;
+					else if ( pDoc -> T_FillPattern.GetAt (T_Number) == 7 )
+						brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> T_FillColor.GetAt (T_Number) ) ;
+
 					CBrush* oldBrush = pDC->SelectObject( &brush ) ;
 					CPen pen ( PS_SOLID, pDoc -> T_Thickness.GetAt (T_Number), RGB (0, 0, 0) ) ;
 					CPen *Draw_Pen = pDC -> SelectObject(&pen);
@@ -678,7 +1446,21 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 					CPen pen ( PS_SOLID, pDoc -> T_Thickness.GetAt (T_Number), pDoc -> T_Color.GetAt (T_Number) );
 					CPen *Draw_Pen = pDC -> SelectObject(&pen);
 					CBrush brush;
-					brush.CreateSolidBrush( pDoc -> T_FillColor.GetAt (T_Number) ) ;
+					if ( pDoc -> T_FillPattern.GetAt (T_Number) == 1 )
+						brush.CreateSolidBrush( pDoc -> T_FillColor.GetAt (T_Number) ) ;
+					else if ( pDoc -> T_FillPattern.GetAt (T_Number) == 2 )
+						brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> T_FillColor.GetAt (T_Number) ) ;
+					else if ( pDoc -> T_FillPattern.GetAt (T_Number) == 3 )
+						brush.CreateHatchBrush ( HS_CROSS, pDoc -> T_FillColor.GetAt (T_Number) ) ;
+					else if ( pDoc -> T_FillPattern.GetAt (T_Number) == 4 )
+						brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> T_FillColor.GetAt (T_Number) ) ;
+					else if ( pDoc -> T_FillPattern.GetAt (T_Number) == 5 )
+						brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> T_FillColor.GetAt (T_Number) ) ;
+					else if ( pDoc -> T_FillPattern.GetAt (T_Number) == 6 )
+						brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> T_FillColor.GetAt (T_Number) ) ;
+					else if ( pDoc -> T_FillPattern.GetAt (T_Number) == 7 )
+						brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> T_FillColor.GetAt (T_Number) ) ;
+
 					CBrush* oldBrush = pDC->SelectObject( &brush ) ;
 
 					pDC -> Polygon ( T_Point, 3 ) ;
@@ -765,7 +1547,7 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 					pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
 					pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
 					pDC->SelectObject(Draw_Pen);
-					;
+					
 					CPen *Draw_Pen2 = pDC -> SelectObject(&pen);
 					P_PointStart.x = pDoc -> T_Triangle.GetAt (T_Number).left - pDoc -> T_Thickness.GetAt (T_Number) / 2 ;
 					P_PointStart.y = pDoc -> T_Triangle.GetAt (T_Number).top - pDoc -> T_Thickness.GetAt (T_Number) / 2 ;
@@ -817,7 +1599,21 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 				// 채우기 색상을 가졌을 경우의 출력
 				else {
 					CBrush brush;
-					brush.CreateSolidBrush( pDoc -> RT_FillColor.GetAt (RT_Number) ) ;
+					if ( pDoc -> RT_FillPattern.GetAt (RT_Number) == 1 )
+						brush.CreateSolidBrush( pDoc -> RT_FillColor.GetAt (RT_Number) ) ;
+					else if ( pDoc -> RT_FillPattern.GetAt (RT_Number) == 2 )
+						brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> RT_FillColor.GetAt (RT_Number) ) ;
+					else if ( pDoc -> RT_FillPattern.GetAt (RT_Number) == 3 )
+						brush.CreateHatchBrush ( HS_CROSS, pDoc -> RT_FillColor.GetAt (RT_Number) ) ;
+					else if ( pDoc -> RT_FillPattern.GetAt (RT_Number) == 4 )
+						brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> RT_FillColor.GetAt (RT_Number) ) ;
+					else if ( pDoc -> RT_FillPattern.GetAt (RT_Number) == 5 )
+						brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> RT_FillColor.GetAt (RT_Number) ) ;
+					else if ( pDoc -> RT_FillPattern.GetAt (RT_Number) == 6 )
+						brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> RT_FillColor.GetAt (RT_Number) ) ;
+					else if ( pDoc -> RT_FillPattern.GetAt (RT_Number) == 7 )
+						brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> RT_FillColor.GetAt (RT_Number) ) ;
+
 					CBrush* oldBrush = pDC->SelectObject( &brush ) ;
 					CPen pen ( PS_SOLID, pDoc -> RT_Thickness.GetAt (RT_Number), RGB (0, 0, 0) );
 					CPen *Draw_Pen = pDC -> SelectObject(&pen);
@@ -846,7 +1642,21 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 					CPen pen ( PS_SOLID, pDoc -> RT_Thickness.GetAt (RT_Number), pDoc -> RT_Color.GetAt (RT_Number) );
 					CPen *Draw_Pen = pDC -> SelectObject(&pen) ;
 					CBrush brush;
-					brush.CreateSolidBrush ( pDoc -> RT_FillColor.GetAt (RT_Number) ) ;
+					if ( pDoc -> RT_FillPattern.GetAt (RT_Number) == 1 )
+						brush.CreateSolidBrush( pDoc -> RT_FillColor.GetAt (RT_Number) ) ;
+					else if ( pDoc -> RT_FillPattern.GetAt (RT_Number) == 2 )
+						brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> RT_FillColor.GetAt (RT_Number) ) ;
+					else if ( pDoc -> RT_FillPattern.GetAt (RT_Number) == 3 )
+						brush.CreateHatchBrush ( HS_CROSS, pDoc -> RT_FillColor.GetAt (RT_Number) ) ;
+					else if ( pDoc -> RT_FillPattern.GetAt (RT_Number) == 4 )
+						brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> RT_FillColor.GetAt (RT_Number) ) ;
+					else if ( pDoc -> RT_FillPattern.GetAt (RT_Number) == 5 )
+						brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> RT_FillColor.GetAt (RT_Number) ) ;
+					else if ( pDoc -> RT_FillPattern.GetAt (RT_Number) == 6 )
+						brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> RT_FillColor.GetAt (RT_Number) ) ;
+					else if ( pDoc -> RT_FillPattern.GetAt (RT_Number) == 7 )
+						brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> RT_FillColor.GetAt (RT_Number) ) ;
+
 					CBrush* oldBrush = pDC->SelectObject( &brush ) ;
 
 					pDC -> Polygon ( RT_Point, 3 ) ;
@@ -991,7 +1801,21 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 				// 채우기 색상을 가졌을 경우의 출력
 				else {
 					CBrush brush;
-					brush.CreateSolidBrush( pDoc -> RightT_FillColor.GetAt (RightT_Number) ) ;
+					if ( pDoc -> RightT_FillPattern.GetAt (RightT_Number) == 1 )
+						brush.CreateSolidBrush( pDoc -> RightT_FillColor.GetAt (RightT_Number) ) ;
+					else if ( pDoc -> RightT_FillPattern.GetAt (RightT_Number) == 2 )
+						brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> RightT_FillColor.GetAt (RightT_Number) ) ;
+					else if ( pDoc -> RightT_FillPattern.GetAt (RightT_Number) == 3 )
+						brush.CreateHatchBrush ( HS_CROSS, pDoc -> RightT_FillColor.GetAt (RightT_Number) ) ;
+					else if ( pDoc -> RightT_FillPattern.GetAt (RightT_Number) == 4 )
+						brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> RightT_FillColor.GetAt (RightT_Number) ) ;
+					else if ( pDoc -> RightT_FillPattern.GetAt (RightT_Number) == 5 )
+						brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> RightT_FillColor.GetAt (RightT_Number) ) ;
+					else if ( pDoc -> RightT_FillPattern.GetAt (RightT_Number) == 6 )
+						brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> RightT_FillColor.GetAt (RightT_Number) ) ;
+					else if ( pDoc -> RightT_FillPattern.GetAt (RightT_Number) == 7 )
+						brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> RightT_FillColor.GetAt (RightT_Number) ) ;
+
 					CBrush* oldBrush = pDC->SelectObject( &brush ) ;
 					CPen pen ( PS_SOLID, pDoc -> RightT_Thickness.GetAt (RightT_Number), RGB (0, 0, 0) );
 					CPen *Draw_Pen = pDC -> SelectObject(&pen);
@@ -1020,7 +1844,21 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 					CPen pen ( PS_SOLID, pDoc -> RightT_Thickness.GetAt (RightT_Number), pDoc -> RightT_Color.GetAt (RightT_Number) ) ;
 					CPen *Draw_Pen = pDC -> SelectObject(&pen);
 					CBrush brush;
-					brush.CreateSolidBrush( pDoc -> RightT_FillColor.GetAt (RightT_Number) ) ;
+					if ( pDoc -> RightT_FillPattern.GetAt (RightT_Number) == 1 )
+						brush.CreateSolidBrush( pDoc -> RightT_FillColor.GetAt (RightT_Number) ) ;
+					else if ( pDoc -> RightT_FillPattern.GetAt (RightT_Number) == 2 )
+						brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> RightT_FillColor.GetAt (RightT_Number) ) ;
+					else if ( pDoc -> RightT_FillPattern.GetAt (RightT_Number) == 3 )
+						brush.CreateHatchBrush ( HS_CROSS, pDoc -> RightT_FillColor.GetAt (RightT_Number) ) ;
+					else if ( pDoc -> RightT_FillPattern.GetAt (RightT_Number) == 4 )
+						brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> RightT_FillColor.GetAt (RightT_Number) ) ;
+					else if ( pDoc -> RightT_FillPattern.GetAt (RightT_Number) == 5 )
+						brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> RightT_FillColor.GetAt (RightT_Number) ) ;
+					else if ( pDoc -> RightT_FillPattern.GetAt (RightT_Number) == 6 )
+						brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> RightT_FillColor.GetAt (RightT_Number) ) ;
+					else if ( pDoc -> RightT_FillPattern.GetAt (RightT_Number) == 7 )
+						brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> RightT_FillColor.GetAt (RightT_Number) ) ;
+
 					CBrush* oldBrush = pDC->SelectObject( &brush ) ;
 
 					pDC -> Polygon ( RightT_Point, 3 ) ;
@@ -1120,7 +1958,7 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 						pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
 						pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
 						pDC->SelectObject(Draw_Pen);
-						;
+						
 						CPen *Draw_Pen2 = pDC -> SelectObject(&pen);
 						P_PointStart.x = pDoc -> RightT_Triangle.GetAt (RightT_Number).right - pDoc -> RightT_Thickness.GetAt (RightT_Number) / 2 ;
 						P_PointStart.y = pDoc -> RightT_Triangle.GetAt (RightT_Number).top - pDoc -> RightT_Thickness.GetAt (RightT_Number) / 2 ;
@@ -1139,7 +1977,7 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 						pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
 						pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
 						pDC->SelectObject(Draw_Pen);
-						;
+						
 						CPen *Draw_Pen2 = pDC -> SelectObject(&pen);
 						P_PointStart.x = pDoc -> RightT_Triangle.GetAt (RightT_Number).left - pDoc -> RightT_Thickness.GetAt (RightT_Number) / 2 ;
 						P_PointStart.y = pDoc -> RightT_Triangle.GetAt (RightT_Number).top - pDoc -> RightT_Thickness.GetAt (RightT_Number) / 2 ;
@@ -1188,7 +2026,21 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 				// 채우기 색상을 가졌을 경우의 출력
 				else {
 					CBrush brush;
-					brush.CreateSolidBrush( pDoc -> RRightT_FillColor.GetAt (RRightT_Number) ) ;
+					if ( pDoc -> RRightT_FillPattern.GetAt (RRightT_Number) == 1 )
+						brush.CreateSolidBrush( pDoc -> RRightT_FillColor.GetAt (RRightT_Number) ) ;
+					else if ( pDoc -> RRightT_FillPattern.GetAt (RRightT_Number) == 2 )
+						brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> RRightT_FillColor.GetAt (RRightT_Number) ) ;
+					else if ( pDoc -> RRightT_FillPattern.GetAt (RRightT_Number) == 3 )
+						brush.CreateHatchBrush ( HS_CROSS, pDoc -> RRightT_FillColor.GetAt (RRightT_Number) ) ;
+					else if ( pDoc -> RRightT_FillPattern.GetAt (RRightT_Number) == 4 )
+						brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> RRightT_FillColor.GetAt (RRightT_Number) ) ;
+					else if ( pDoc -> RRightT_FillPattern.GetAt (RRightT_Number) == 5 )
+						brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> RRightT_FillColor.GetAt (RRightT_Number) ) ;
+					else if ( pDoc -> RRightT_FillPattern.GetAt (RRightT_Number) == 6 )
+						brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> RRightT_FillColor.GetAt (RRightT_Number) ) ;
+					else if ( pDoc -> RRightT_FillPattern.GetAt (RRightT_Number) == 7 )
+						brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> RRightT_FillColor.GetAt (RRightT_Number) ) ;
+
 					CBrush* oldBrush = pDC->SelectObject( &brush ) ;
 					CPen pen ( PS_SOLID, pDoc -> RRightT_Thickness.GetAt (RRightT_Number), RGB (0, 0, 0) );
 					CPen *Draw_Pen = pDC -> SelectObject(&pen);
@@ -1217,7 +2069,21 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 					CPen pen ( PS_SOLID, pDoc -> RRightT_Thickness.GetAt (RRightT_Number), pDoc -> RRightT_Color.GetAt (RRightT_Number) );
 					CPen *Draw_Pen = pDC -> SelectObject(&pen);
 					CBrush brush;
-					brush.CreateSolidBrush( pDoc -> RRightT_FillColor.GetAt (RRightT_Number) ) ;
+					if ( pDoc -> RRightT_FillPattern.GetAt (RRightT_Number) == 1 )
+						brush.CreateSolidBrush( pDoc -> RRightT_FillColor.GetAt (RRightT_Number) ) ;
+					else if ( pDoc -> RRightT_FillPattern.GetAt (RRightT_Number) == 2 )
+						brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> RRightT_FillColor.GetAt (RRightT_Number) ) ;
+					else if ( pDoc -> RRightT_FillPattern.GetAt (RRightT_Number) == 3 )
+						brush.CreateHatchBrush ( HS_CROSS, pDoc -> RRightT_FillColor.GetAt (RRightT_Number) ) ;
+					else if ( pDoc -> RRightT_FillPattern.GetAt (RRightT_Number) == 4 )
+						brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> RRightT_FillColor.GetAt (RRightT_Number) ) ;
+					else if ( pDoc -> RRightT_FillPattern.GetAt (RRightT_Number) == 5 )
+						brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> RRightT_FillColor.GetAt (RRightT_Number) ) ;
+					else if ( pDoc -> RRightT_FillPattern.GetAt (RRightT_Number) == 6 )
+						brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> RRightT_FillColor.GetAt (RRightT_Number) ) ;
+					else if ( pDoc -> RRightT_FillPattern.GetAt (RRightT_Number) == 7 )
+						brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> RRightT_FillColor.GetAt (RRightT_Number) ) ;
+
 					CBrush* oldBrush = pDC->SelectObject( &brush ) ;
 
 					pDC -> Polygon ( RRightT_Point, 3 ) ;
@@ -1318,7 +2184,7 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 						pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
 						pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
 						pDC->SelectObject(Draw_Pen);
-						;
+						
 						CPen *Draw_Pen2 = pDC -> SelectObject(&pen);
 						P_PointStart.x = pDoc -> RRightT_Triangle.GetAt (RRightT_Number).right - pDoc -> RRightT_Thickness.GetAt (RRightT_Number) / 2 ;
 						P_PointStart.y = pDoc -> RRightT_Triangle.GetAt (RRightT_Number).bottom + pDoc -> RRightT_Thickness.GetAt (RRightT_Number) / 2 ;
@@ -1337,7 +2203,7 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 						pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
 						pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
 						pDC->SelectObject(Draw_Pen);
-						;
+						
 						CPen *Draw_Pen2 = pDC -> SelectObject(&pen);
 						P_PointStart.x = pDoc -> RRightT_Triangle.GetAt (RRightT_Number).left - pDoc -> RRightT_Thickness.GetAt (RRightT_Number) / 2 ;
 						P_PointStart.y = pDoc -> RRightT_Triangle.GetAt (RRightT_Number).bottom + pDoc -> RRightT_Thickness.GetAt (RRightT_Number) / 2 ;
@@ -1381,7 +2247,21 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 				// 채우기 색상을 가졌을 경우의 출력
 				else {
 					CBrush brush;
-					brush.CreateSolidBrush( pDoc -> LTRT_FillColor.GetAt (LTRT_Number) ) ;
+					if ( pDoc -> LTRT_FillPattern.GetAt (LTRT_Number) == 1 )
+						brush.CreateSolidBrush( pDoc -> LTRT_FillColor.GetAt (LTRT_Number) ) ;
+					else if ( pDoc -> LTRT_FillPattern.GetAt (LTRT_Number) == 2 )
+						brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> LTRT_FillColor.GetAt (LTRT_Number) ) ;
+					else if ( pDoc -> LTRT_FillPattern.GetAt (LTRT_Number) == 3 )
+						brush.CreateHatchBrush ( HS_CROSS, pDoc -> LTRT_FillColor.GetAt (LTRT_Number) ) ;
+					else if ( pDoc -> LTRT_FillPattern.GetAt (LTRT_Number) == 4 )
+						brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> LTRT_FillColor.GetAt (LTRT_Number) ) ;
+					else if ( pDoc -> LTRT_FillPattern.GetAt (LTRT_Number) == 5 )
+						brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> LTRT_FillColor.GetAt (LTRT_Number) ) ;
+					else if ( pDoc -> LTRT_FillPattern.GetAt (LTRT_Number) == 6 )
+						brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> LTRT_FillColor.GetAt (LTRT_Number) ) ;
+					else if ( pDoc -> LTRT_FillPattern.GetAt (LTRT_Number) == 7 )
+						brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> LTRT_FillColor.GetAt (LTRT_Number) ) ;
+
 					CBrush* oldBrush = pDC->SelectObject( &brush ) ;
 					CPen pen ( PS_SOLID, pDoc -> LTRT_Thickness.GetAt (LTRT_Number), RGB (0, 0, 0) );
 					CPen *Draw_Pen = pDC -> SelectObject(&pen);
@@ -1410,7 +2290,21 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 					CPen pen ( PS_SOLID, pDoc -> LTRT_Thickness.GetAt (LTRT_Number), pDoc -> LTRT_Color.GetAt (LTRT_Number) );
 					CPen *Draw_Pen = pDC -> SelectObject(&pen);
 					CBrush brush;
-					brush.CreateSolidBrush( pDoc -> LTRT_FillColor.GetAt (LTRT_Number) ) ;
+					if ( pDoc -> LTRT_FillPattern.GetAt (LTRT_Number) == 1 )
+						brush.CreateSolidBrush( pDoc -> LTRT_FillColor.GetAt (LTRT_Number) ) ;
+					else if ( pDoc -> LTRT_FillPattern.GetAt (LTRT_Number) == 2 )
+						brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> LTRT_FillColor.GetAt (LTRT_Number) ) ;
+					else if ( pDoc -> LTRT_FillPattern.GetAt (LTRT_Number) == 3 )
+						brush.CreateHatchBrush ( HS_CROSS, pDoc -> LTRT_FillColor.GetAt (LTRT_Number) ) ;
+					else if ( pDoc -> LTRT_FillPattern.GetAt (LTRT_Number) == 4 )
+						brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> LTRT_FillColor.GetAt (LTRT_Number) ) ;
+					else if ( pDoc -> LTRT_FillPattern.GetAt (LTRT_Number) == 5 )
+						brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> LTRT_FillColor.GetAt (LTRT_Number) ) ;
+					else if ( pDoc -> LTRT_FillPattern.GetAt (LTRT_Number) == 6 )
+						brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> LTRT_FillColor.GetAt (LTRT_Number) ) ;
+					else if ( pDoc -> LTRT_FillPattern.GetAt (LTRT_Number) == 7 )
+						brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> LTRT_FillColor.GetAt (LTRT_Number) ) ;
+
 					CBrush* oldBrush = pDC->SelectObject( &brush ) ;
 
 					pDC -> Polygon ( LTRT_Point, 3 ) ;
@@ -1550,7 +2444,21 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 				// 채우기 색상을 가졌을 경우의 출력
 				else {
 					CBrush brush;
-					brush.CreateSolidBrush( pDoc -> RTLT_FillColor.GetAt (RTLT_Number) ) ;
+					if ( pDoc -> RTLT_FillPattern.GetAt (RTLT_Number) == 1 )
+						brush.CreateSolidBrush( pDoc -> RTLT_FillColor.GetAt (RTLT_Number) ) ;
+					else if ( pDoc -> RTLT_FillPattern.GetAt (RTLT_Number) == 2 )
+						brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> RTLT_FillColor.GetAt (RTLT_Number) ) ;
+					else if ( pDoc -> RTLT_FillPattern.GetAt (RTLT_Number) == 3 )
+						brush.CreateHatchBrush ( HS_CROSS, pDoc -> RTLT_FillColor.GetAt (RTLT_Number) ) ;
+					else if ( pDoc -> RTLT_FillPattern.GetAt (RTLT_Number) == 4 )
+						brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> RTLT_FillColor.GetAt (RTLT_Number) ) ;
+					else if ( pDoc -> RTLT_FillPattern.GetAt (RTLT_Number) == 5 )
+						brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> RTLT_FillColor.GetAt (RTLT_Number) ) ;
+					else if ( pDoc -> RTLT_FillPattern.GetAt (RTLT_Number) == 6 )
+						brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> RTLT_FillColor.GetAt (RTLT_Number) ) ;
+					else if ( pDoc -> RTLT_FillPattern.GetAt (RTLT_Number) == 7 )
+						brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> RTLT_FillColor.GetAt (RTLT_Number) ) ;
+
 					CBrush* oldBrush = pDC->SelectObject( &brush ) ;
 					CPen pen ( PS_SOLID, pDoc -> RTLT_Thickness.GetAt (RTLT_Number), RGB (0, 0, 0) );
 					CPen *Draw_Pen = pDC -> SelectObject(&pen);
@@ -1579,7 +2487,21 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 					CPen pen ( PS_SOLID, pDoc -> RTLT_Thickness.GetAt (RTLT_Number), pDoc -> RTLT_Color.GetAt (RTLT_Number) );
 					CPen *Draw_Pen = pDC -> SelectObject(&pen);
 					CBrush brush;
-					brush.CreateSolidBrush( pDoc -> RTLT_FillColor.GetAt (RTLT_Number) ) ;
+					if ( pDoc -> RTLT_FillPattern.GetAt (RTLT_Number) == 1 )
+						brush.CreateSolidBrush( pDoc -> RTLT_FillColor.GetAt (RTLT_Number) ) ;
+					else if ( pDoc -> RTLT_FillPattern.GetAt (RTLT_Number) == 2 )
+						brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> RTLT_FillColor.GetAt (RTLT_Number) ) ;
+					else if ( pDoc -> RTLT_FillPattern.GetAt (RTLT_Number) == 3 )
+						brush.CreateHatchBrush ( HS_CROSS, pDoc -> RTLT_FillColor.GetAt (RTLT_Number) ) ;
+					else if ( pDoc -> RTLT_FillPattern.GetAt (RTLT_Number) == 4 )
+						brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> RTLT_FillColor.GetAt (RTLT_Number) ) ;
+					else if ( pDoc -> RTLT_FillPattern.GetAt (RTLT_Number) == 5 )
+						brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> RTLT_FillColor.GetAt (RTLT_Number) ) ;
+					else if ( pDoc -> RTLT_FillPattern.GetAt (RTLT_Number) == 6 )
+						brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> RTLT_FillColor.GetAt (RTLT_Number) ) ;
+					else if ( pDoc -> RTLT_FillPattern.GetAt (RTLT_Number) == 7 )
+						brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> RTLT_FillColor.GetAt (RTLT_Number) ) ;
+
 					CBrush* oldBrush = pDC->SelectObject( &brush ) ;
 
 					pDC -> Polygon ( RTLT_Point, 3 ) ;
@@ -1835,6 +2757,17 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 		// 두께 설정을 하지 않은 경우
 		else if ( m_IsThickness == 'x' )
 			pDoc -> R_Thickness.Add (1) ;
+
+		if ( m_IsFillPattern == 'o' )
+			pDoc -> R_FillPattern.Add ( m_FillPattern ) ;
+		else
+			pDoc -> R_FillPattern.Add ( 1 ) ;
+
+		if ( m_IsLinePattern == 'o' )
+			pDoc -> R_LinePattern.Add ( m_LinePattern ) ;
+		else
+			pDoc -> R_LinePattern.Add ( 1 ) ;
+
 	}
 	// PolyLine을 계속해서 그리거나 변경하는 경우
 	else if ( (P_IsContinue == 'o') || (M_IsDraw == 'o' && P_IsContinue == 'o') ) {
@@ -1925,6 +2858,11 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 			pDoc -> P_Poly.GetAt ( P_Current ).thickness = m_Thickness ;
 		else if ( m_IsThickness == 'x' )
 			pDoc -> P_Poly.GetAt ( P_Current ).thickness = 1 ;
+
+		if ( m_IsLinePattern == 'o' )
+			pDoc -> P_Poly.GetAt ( P_Current ).Pattern = m_LinePattern ;
+		else
+			pDoc -> P_Poly.GetAt ( P_Current ).Pattern = 1 ;
 	}
 	// 원을 그리는 경우
 	else if ( E_IsDraw == 'o' ) {
@@ -1962,6 +2900,17 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 		// 두께 설정을 하지 않은 경우
 		else if ( m_IsThickness == 'x' )
 			pDoc -> E_Thickness.Add (1) ;
+
+		if ( m_IsFillPattern == 'o' )
+			pDoc -> E_FillPattern.Add ( m_FillPattern ) ;
+		else
+			pDoc -> E_FillPattern.Add ( 1 ) ;
+
+		if ( m_IsLinePattern == 'o' )
+			pDoc -> E_LinePattern.Add ( m_LinePattern ) ;
+		else
+			pDoc -> E_LinePattern.Add ( 1 ) ;
+
 	}
 	// 세모를 그리는 경우
 	else if ( T_IsDraw == 'o' ) {
@@ -1999,6 +2948,16 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 		// 두께 설정을 하지 않은 경우
 		else if ( m_IsThickness == 'x' )
 			pDoc -> T_Thickness.Add (1) ;
+
+		if ( m_IsFillPattern == 'o' )
+			pDoc -> T_FillPattern.Add ( m_FillPattern ) ;
+		else
+			pDoc -> T_FillPattern.Add ( 1 ) ;
+
+		if ( m_IsLinePattern == 'o' )
+			pDoc -> T_LinePattern.Add ( m_LinePattern ) ;
+		else
+			pDoc -> T_LinePattern.Add ( 1 ) ;
 	}
 	// 역 삼각형을 그리는 경우
 	else if ( RT_IsDraw == 'o' ) {
@@ -2036,6 +2995,16 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 		// 두께 설정을 하지 않은 경우
 		else if ( m_IsThickness == 'x' )
 			pDoc -> RT_Thickness.Add (1) ;
+
+		if ( m_IsFillPattern == 'o' )
+			pDoc -> RT_FillPattern.Add ( m_FillPattern ) ;
+		else
+			pDoc -> RT_FillPattern.Add ( 1 ) ;
+
+		if ( m_IsLinePattern == 'o' )
+			pDoc -> RT_LinePattern.Add ( m_LinePattern ) ;
+		else
+			pDoc -> RT_LinePattern.Add ( 1 ) ;
 	}
 	// 직각 삼각형을 그리는 경우
 	else if ( RightT_IsDraw == 'o' ) {
@@ -2073,6 +3042,16 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 		// 두께 설정을 하지 않은 경우
 		else if ( m_IsThickness == 'x' )
 			pDoc -> RightT_Thickness.Add (1) ;
+
+		if ( m_IsFillPattern == 'o' )
+			pDoc -> RightT_FillPattern.Add ( m_FillPattern ) ;
+		else
+			pDoc -> RightT_FillPattern.Add ( 1 ) ;
+
+		if ( m_IsLinePattern == 'o' )
+			pDoc -> RightT_LinePattern.Add ( m_LinePattern ) ;
+		else
+			pDoc -> RightT_LinePattern.Add ( 1 ) ;
 	}
 	// 역 직각 삼각형을 그리는 경우
 	else if ( RRightT_IsDraw == 'o' ) {
@@ -2110,6 +3089,16 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 		// 두께 설정을 하지 않은 경우
 		else if ( m_IsThickness == 'x' )
 			pDoc -> RRightT_Thickness.Add (1) ;
+
+		if ( m_IsFillPattern == 'o' )
+			pDoc -> RRightT_FillPattern.Add ( m_FillPattern ) ;
+		else
+			pDoc -> RRightT_FillPattern.Add ( 1 ) ;
+
+		if ( m_IsLinePattern == 'o' )
+			pDoc -> RRightT_LinePattern.Add ( m_LinePattern ) ;
+		else
+			pDoc -> RRightT_LinePattern.Add ( 1 ) ;
 	}
 	// 왼쪽 -> 오른쪽 삼각형을 그리는 경우
 	else if ( LTRT_IsDraw == 'o' ) {
@@ -2147,6 +3136,16 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 		// 두께 설정을 하지 않은 경우
 		else if ( m_IsThickness == 'x' )
 			pDoc -> LTRT_Thickness.Add (1) ;
+
+		if ( m_IsFillPattern == 'o' )
+			pDoc -> LTRT_FillPattern.Add ( m_FillPattern ) ;
+		else
+			pDoc -> LTRT_FillPattern.Add ( 1 ) ;
+
+		if ( m_IsLinePattern == 'o' )
+			pDoc -> LTRT_LinePattern.Add ( m_LinePattern ) ;
+		else
+			pDoc -> LTRT_LinePattern.Add ( 1 ) ;
 	}
 	// 오른쪽 -> 왼쪽 삼각형을 그리는 경우
 	else if ( RTLT_IsDraw == 'o' ) {
@@ -2184,6 +3183,16 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 		// 두께 설정을 하지 않은 경우
 		else if ( m_IsThickness == 'x' )
 			pDoc -> RTLT_Thickness.Add (1) ;
+
+		if ( m_IsFillPattern == 'o' )
+			pDoc -> RTLT_FillPattern.Add ( m_FillPattern ) ;
+		else
+			pDoc -> RTLT_FillPattern.Add ( 1 ) ;
+
+		if ( m_IsLinePattern == 'o' )
+			pDoc -> RTLT_LinePattern.Add ( m_LinePattern ) ;
+		else
+			pDoc -> RTLT_LinePattern.Add ( 1 ) ;
 	}
 
 	if ( Text_IsText == 'o' && Text_IsKeyDown == 'o' ) {
@@ -2855,10 +3864,8 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 
 			}
 			if ( i == 0 ) {
-				M_IsDraw = 'x' ;
 				M_IsLineSelect = 'x' ;
-				M_IsSelect = 'x' ;
-				M_What = 'x' ;
+
 				Invalidate () ;
 			}
 		}
@@ -2889,6 +3896,11 @@ void CGraphicEditorView::OnMouseMove(UINT nFlags, CPoint point)
 			L_Insert.Thickness = m_Thickness ;
 		else
 			L_Insert.Thickness = 1 ;
+
+		if ( m_IsLinePattern == 'o' )
+			L_Insert.Pattern = m_LinePattern ;
+		else
+			L_Insert.Pattern = 1 ;
 
 		pDoc->L_Line.SetAt ( L_Current, L_Insert ) ;
 		Invalidate () ;
@@ -6455,10 +7467,90 @@ void CGraphicEditorView::OnFillpattern()
 {
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 
+	CGraphicEditorDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	if (!pDoc)
+		return;
+
 	CFillPattern dlg ;
 
-	if( dlg.DoModal() == IDOK )
-	{
+	if ( M_IsDraw != 'o' ) {
+		if( dlg.DoModal() == IDOK )
+		{
+			m_IsFillPattern = 'o' ;
+			m_FillPattern = dlg.GetPattern () ;
+		}
+	}
+	else {
+		if( dlg.DoModal() == IDOK )
+		{
+			m_IsFillPattern = 'o' ;
+			if ( M_What == _T("R") )
+				pDoc -> R_FillPattern.GetAt ( M_Number ) = dlg.GetPattern () ;
+			else if ( M_What == _T("E") )
+				pDoc -> E_FillPattern.GetAt ( M_Number ) = dlg.GetPattern () ;
+			else if ( M_What == _T("T") )
+				pDoc -> T_FillPattern.GetAt ( M_Number ) = dlg.GetPattern () ;
+			else if ( M_What == _T("RT") )
+				pDoc -> RT_FillPattern.GetAt ( M_Number ) = dlg.GetPattern () ;
+			else if ( M_What == _T("RightT") )
+				pDoc -> RightT_FillPattern.GetAt ( M_Number ) = dlg.GetPattern () ;
+			else if ( M_What == _T("RRightT") )
+				pDoc -> RRightT_FillPattern.GetAt ( M_Number ) = dlg.GetPattern () ;
+			else if ( M_What == _T("LTRT") )
+				pDoc -> LTRT_FillPattern.GetAt ( M_Number ) = dlg.GetPattern () ;
+			else if ( M_What == _T("RTLT") )
+				pDoc -> RTLT_FillPattern.GetAt ( M_Number ) = dlg.GetPattern () ;
 
+			Invalidate () ;
+		}
+	}
+}
+
+void CGraphicEditorView::OnLinepattern()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+
+	CGraphicEditorDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	if (!pDoc)
+		return;
+
+	LinePattern dlg ;
+
+	if ( M_IsDraw != 'o' ) {
+		if( dlg.DoModal() == IDOK )
+		{
+			m_IsLinePattern = 'o' ;
+			m_LinePattern = dlg.GetPattern () ;
+		}
+	}
+	else {
+		if( dlg.DoModal() == IDOK )
+		{
+			m_IsLinePattern = 'o' ;
+			if ( M_What == _T("R") )
+				pDoc -> R_LinePattern.GetAt ( M_Number ) = dlg.GetPattern () ;
+			else if ( M_What == _T("L") )
+				pDoc -> L_Line.GetAt ( M_Number ).Pattern = dlg.GetPattern () ;
+			else if ( M_What == _T("P") )
+				pDoc -> P_Poly.GetAt ( M_Number ).Pattern = dlg.GetPattern () ;
+			else if ( M_What == _T("E") )
+				pDoc -> E_LinePattern.GetAt ( M_Number ) = dlg.GetPattern () ;
+			else if ( M_What == _T("T") )
+				pDoc -> T_LinePattern.GetAt ( M_Number ) = dlg.GetPattern () ;
+			else if ( M_What == _T("RT") )
+				pDoc -> RT_LinePattern.GetAt ( M_Number ) = dlg.GetPattern () ;
+			else if ( M_What == _T("RightT") )
+				pDoc -> RightT_LinePattern.GetAt ( M_Number ) = dlg.GetPattern () ;
+			else if ( M_What == _T("RRightT") )
+				pDoc -> RRightT_LinePattern.GetAt ( M_Number ) = dlg.GetPattern () ;
+			else if ( M_What == _T("LTRT") )
+				pDoc -> LTRT_LinePattern.GetAt ( M_Number ) = dlg.GetPattern () ;
+			else if ( M_What == _T("RTLT") )
+				pDoc -> RTLT_LinePattern.GetAt ( M_Number ) = dlg.GetPattern () ;
+
+			Invalidate () ;
+		}
 	}
 }

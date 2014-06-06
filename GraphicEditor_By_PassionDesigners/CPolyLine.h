@@ -8,4 +8,5 @@ public:
 	CArray < CPoint, CPoint& > Poly_point ;
 	COLORREF P_Color ;
 	int thickness ;
+	int Pattern ;
 };

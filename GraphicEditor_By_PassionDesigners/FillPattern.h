@@ -43,4 +43,6 @@ public:
 	afx_msg void OnBnClickedRadiopattern5();
 	afx_msg void OnBnClickedRadiopattern6();
 	afx_msg void OnBnClickedRadiopattern7();
+	int Pattern ;
+	int GetPattern () ;
 };

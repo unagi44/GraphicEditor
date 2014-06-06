@@ -21,6 +21,7 @@ CFillPattern::CFillPattern(CWnd* pParent /*=NULL*/)
 	, IsPattern6(false)
 	, IsPattern7(false)
 {
+	Pattern = 1 ;
 }
 
 CFillPattern::~CFillPattern()
@@ -277,4 +278,23 @@ void CFillPattern::OnBnClickedRadiopattern7()
 	}
 	else
 		IsPattern7 = false ;
+}
+
+int CFillPattern::GetPattern () {
+	if ( IsPattern1 == true )
+		return 1 ;
+	else if ( IsPattern2 == true )
+		return 2 ;
+	else if ( IsPattern3 == true )
+		return 3 ;
+	else if ( IsPattern4 == true )
+		return 4 ;
+	else if ( IsPattern5 == true )
+		return 5 ;
+	else if ( IsPattern6 == true )
+		return 6 ;
+	else if ( IsPattern7 == true )
+		return 7 ;
+	else
+		return 1 ;
 }

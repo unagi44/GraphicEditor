@@ -32,7 +32,10 @@ public:
 	char m_IsFillColor ;
 	char m_IsThickness ;
 	char m_Thickness ;
-
+	char m_IsFillPattern ;
+	char m_IsLinePattern ;
+	int m_FillPattern ;
+	int m_LinePattern ;
 
 	// 이동 툴바에 필요한 변수들
 	CRect M_Rect ;
@@ -90,6 +93,7 @@ public:
 
 	// 상자 그리기에 필요한 변수들
 	CRect R_Rect ;
+	int R_FillPattern ;
 	int R_Current ;
 	char R_IsDraw ;
 	char R_CanMove ;
@@ -112,42 +116,49 @@ public:
 	// 원 그리기에 필요한 변수들
 	CRect E_Insert ;
 	int E_Current ;
+	int E_FillPattern ;
 	char E_IsDraw ;
 	char E_CanMove ;
 
 	// 세모 그리기에 필요한 변수들
 	CRect T_Insert ;
 	int T_Current ;
+	int T_FillPattern ;
 	char T_IsDraw ;
 	char T_CanMove ;
 
 	// 역 삼각형 그리기에 필요한 변수들
 	CRect RT_Insert ;
 	int RT_Current ;
+	int RT_FillPattern ;
 	char RT_IsDraw ;
 	char RT_CanMove ;
 
 	// 직각 삼각형 그리기에 필요한 변수들
 	CRect RightT_Insert ;
 	int RightT_Current ;
+	int RightT_FillPattern ;
 	char RightT_IsDraw ;
 	char RightT_CanMove ;
 
 	// 역 직각 삼각형 그리기에 필요한 변수들
 	CRect RRightT_Insert ;
 	int RRightT_Current ;
+	int RRightT_FillPattern ;
 	char RRightT_IsDraw ;
 	char RRightT_CanMove ;
 
 	// 오른쪽 -> 왼쪽 삼각형 그리기에 필요한 변수들
 	CRect RTLT_Insert ;
 	int RTLT_Current ;
+	int RTLT_FillPattern ;
 	char RTLT_IsDraw ;
 	char RTLT_CanMove ;
 
 	// 왼쪽 -> 오른쪽 삼각형 그리기에 필요한 변수들
 	CRect LTRT_Insert ;
 	int LTRT_Current ;
+	int LTRT_FillPattern ;
 	char LTRT_IsDraw ;
 	char LTRT_CanMove ;
 
@@ -205,6 +216,7 @@ public:
 	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnFillpattern();
+	afx_msg void OnLinepattern();
 };
 
 #ifndef _DEBUG  // GraphicEditorView.cpp의 디버그 버전

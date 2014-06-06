@@ -70,6 +70,7 @@ public:
 	CArray < int, int > LTRT_Location ;			// 그린 모든 객체 중 왼쪽 -> 오른쪽 삼각형 객체의 각 Index
 	CArray < int, int > RTLT_Location ;			// 그린 모든 객체 중 오른쪽 -> 왼쪽 삼각형 객체의 각 Index
 	CArray < int, int > Text_Location ;			// 그린 모든 객체 중 Text 객체의 각 Index
+
 	CArray < char, char > R_IsNoFill ;
 	CArray < char, char > E_IsNoFill ;
 	CArray < char, char > T_IsNoFill ;
@@ -78,6 +79,25 @@ public:
 	CArray < char, char > RRightT_IsNoFill ;
 	CArray < char, char > LTRT_IsNoFill ;
 	CArray < char, char > RTLT_IsNoFill ;
+
+	CArray < int, int > R_FillPattern ;
+	CArray < int, int > E_FillPattern ;
+	CArray < int, int > T_FillPattern ;
+	CArray < int, int > RT_FillPattern ;
+	CArray < int, int > RightT_FillPattern ;		// 채우기 패턴이 무엇인지 확인해주는 변수
+	CArray < int, int > RRightT_FillPattern ;
+	CArray < int, int > LTRT_FillPattern ;
+	CArray < int, int > RTLT_FillPattern ;
+
+	CArray < int, int > R_LinePattern ;
+	CArray < int, int > E_LinePattern ;
+	CArray < int, int > T_LinePattern ;
+	CArray < int, int > RT_LinePattern ;
+	CArray < int, int > RightT_LinePattern ;		// 선 패턴이 무엇인지 확인해주는 변수
+	CArray < int, int > RRightT_LinePattern ;
+	CArray < int, int > LTRT_LinePattern ;
+	CArray < int, int > RTLT_LinePattern ;
+
 public:
 	CArray < CString, CString > What ;
 	int L_Count ;			// 선 객체의 개수
