@@ -36,6 +36,7 @@ public:
 
 	// 이동 툴바에 필요한 변수들
 	CRect M_Rect ;
+	CRect M_ChangeRect ;
 	CPoint M_Start ;
 	int M_Number ;
 	int M_PMin_x ;
@@ -49,6 +50,28 @@ public:
 	char M_IsLineSelect ;
 	char M_ChangeLineOnePoint ;
 	char M_IsChangeLineStart ;
+	char M_IsRectSelect ;
+	char M_ChangeRectSize ;
+	char M_IsChangeRectSide ;
+	char M_IsChangeRectNW ;
+	char M_IsChangeRectNE ;
+	char M_IsChangeRectSW ;
+	char M_IsChangeRectSE ;
+	char M_IsChangeRectVerticalTop ;
+	char M_IsChangeRectVerticalBottom ;
+	char M_IsChangeRectWidthLeft ;
+	char M_IsChangeRectWidthRight ;
+	char M_IsEllipseSelect ;
+	char M_ChangeEllipseSize ;
+	char M_IsChangeEllipseSide ;
+	char M_IsChangeEllipseNW ;
+	char M_IsChangeEllipseNE ;
+	char M_IsChangeEllipseSW ;
+	char M_IsChangeEllipseSE ;
+	char M_IsChangeEllipseVerticalTop ;
+	char M_IsChangeEllipseVerticalBottom ;
+	char M_IsChangeEllipseWidthLeft ;
+	char M_IsChangeEllipseWidthRight ;
 
 	// 텍스트 삽입에 필요한 변수들
 	LOGFONT Text_lf ;

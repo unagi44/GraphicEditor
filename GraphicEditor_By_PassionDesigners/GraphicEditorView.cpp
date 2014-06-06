@@ -76,6 +76,28 @@ CGraphicEditorView::CGraphicEditorView()
 	M_IsSelect = 'x' ;
 	M_ChangeLineOnePoint = 'x' ;
 	M_IsLineSelect = 'x' ;
+	M_IsRectSelect = 'x' ;
+	M_ChangeRectSize = 'x' ;
+	M_IsChangeRectVerticalTop = 'x' ;
+	M_IsChangeRectVerticalBottom = 'x' ;
+	M_IsChangeRectSide = 'x' ;
+	M_IsChangeRectNW = 'x' ;
+	M_IsChangeRectNE = 'x' ;
+	M_IsChangeRectSW = 'x' ;
+	M_IsChangeRectSE = 'x' ;
+	M_IsChangeRectWidthLeft = 'x' ;
+	M_IsChangeRectWidthRight = 'x' ;
+	M_IsEllipseSelect = 'x' ;
+	M_ChangeEllipseSize = 'x' ;
+	M_IsChangeEllipseSide = 'x' ;
+	M_IsChangeEllipseNW = 'x' ;
+	M_IsChangeEllipseNE = 'x' ;
+	M_IsChangeEllipseSW = 'x' ;
+	M_IsChangeEllipseSE = 'x' ;
+	M_IsChangeEllipseVerticalTop = 'x' ;
+	M_IsChangeEllipseVerticalBottom = 'x' ;
+	M_IsChangeEllipseWidthLeft = 'x' ;
+	M_IsChangeEllipseWidthRight = 'x' ;
 
 	// 텍스트 삽입에 필요한 변수 초기화
 	Text_IsText = 'x' ;
@@ -217,6 +239,27 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 
 		// 상자 객체일 경우
 		else if ( pDoc -> What.GetAt (i) == _T ("R") ) {
+
+			// 만약 변경 시키는 중이라면
+			if ( M_Number == R_Number && M_IsDraw == 'o' && M_What == _T ("R") ) {
+				if ( M_ChangeRectSize == 'o' ) {
+					CPen pen;
+					pen.CreatePen( PS_DOT, 1.8, RGB (0,0,0) ) ;
+					CPen* oldPen = pDC->SelectObject( &pen ) ;
+					pDC -> SelectStockObject ( NULL_BRUSH ) ;
+					M_ChangeRect.left -= pDoc -> R_Thickness.GetAt ( M_Number ) / 2 ;
+					M_ChangeRect.right += pDoc -> R_Thickness.GetAt ( M_Number ) / 2 ;
+					M_ChangeRect.top -= pDoc -> R_Thickness.GetAt ( M_Number ) / 2 ;
+					M_ChangeRect.bottom += pDoc -> R_Thickness.GetAt ( M_Number ) / 2 ;
+					pDC -> Rectangle ( M_ChangeRect.left, M_ChangeRect.top, M_ChangeRect.right, M_ChangeRect.bottom ) ;
+					pDC -> SelectObject ( oldPen ) ;
+					M_ChangeRect.left += pDoc -> R_Thickness.GetAt ( M_Number ) / 2 ;
+					M_ChangeRect.right -= pDoc -> R_Thickness.GetAt ( M_Number ) / 2 ;
+					M_ChangeRect.top += pDoc -> R_Thickness.GetAt ( M_Number ) / 2 ;
+					M_ChangeRect.bottom -= pDoc -> R_Thickness.GetAt ( M_Number ) / 2 ;
+				}
+			}
+
 			// 선 색을 가지지 않았을 경우의 출력
 			if ( pDoc -> R_Color.GetAt (R_Number) == RGB (0,0,0) ) {
 
@@ -270,11 +313,65 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 
 			// 만약 이동시키고 있는 중이라면
 			if ( M_Number == R_Number && M_IsDraw == 'o' && M_What == _T ("R") ) {
-				CPen pen ( PS_DOT, 1.8, RGB (0, 0, 150) ) ;
-				CPen *Draw_Pen = pDC -> SelectObject(&pen);
-				pDC -> SelectStockObject ( NULL_BRUSH ) ;
-				pDC -> Rectangle ( M_Rect.left, M_Rect.top, M_Rect.right, M_Rect.bottom ) ;
-				pDC -> SelectObject ( Draw_Pen ) ;
+				if ( M_ChangeRectSize == 'x' ) {
+					CPen pen ( PS_DOT, 1.8, RGB (0, 0, 150) ) ;
+					CPen *Draw_Pen = pDC -> SelectObject(&pen);
+					pDC -> SelectStockObject ( NULL_BRUSH ) ;
+					pDC -> Rectangle ( M_Rect.left, M_Rect.top, M_Rect.right, M_Rect.bottom ) ;
+					pDC -> SelectObject ( Draw_Pen ) ;
+
+					CRect Rect, Rect2, Rect3, Rect4, Rect5, Rect6, Rect7, Rect8 ;
+					Rect.top = M_Rect.top - 4 ;
+					Rect.bottom = M_Rect.top + 4 ;
+					Rect.left = M_Rect.left - 4 ;
+					Rect.right = M_Rect.left + 4 ;
+
+					Rect2.top = M_Rect.bottom - 4 ;
+					Rect2.bottom = M_Rect.bottom + 4 ;
+					Rect2.left = M_Rect.right - 4 ;
+					Rect2.right = M_Rect.right + 4 ;
+
+					Rect3.top = M_Rect.top - 4 ;
+					Rect3.bottom = M_Rect.top + 4 ;
+					Rect3.left = M_Rect.right - 4 ;
+					Rect3.right = M_Rect.right + 4 ;
+
+					Rect4.top = M_Rect.bottom - 4 ;
+					Rect4.bottom = M_Rect.bottom + 4 ;
+					Rect4.left = M_Rect.left - 4 ;
+					Rect4.right = M_Rect.left + 4 ;
+
+					Rect5.left = M_Rect.left + (M_Rect.right - M_Rect.left) / 2 - 4 ;
+					Rect5.right = M_Rect.left + (M_Rect.right - M_Rect.left) / 2 + 4 ;
+					Rect5.top = M_Rect.bottom - 4 ;
+					Rect5.bottom = M_Rect.bottom + 4 ;
+
+					Rect6.left = M_Rect.left + (M_Rect.right - M_Rect.left) / 2 - 4 ;
+					Rect6.right = M_Rect.left + (M_Rect.right - M_Rect.left) / 2 + 4 ;
+					Rect6.top = M_Rect.top - 4 ;
+					Rect6.bottom = M_Rect.top + 4 ;
+
+					Rect7.left = M_Rect.left - 4 ;
+					Rect7.right = M_Rect.left + 4 ;
+					Rect7.top = M_Rect.top + (M_Rect.bottom - M_Rect.top) / 2 - 4 ;
+					Rect7.bottom = M_Rect.top + (M_Rect.bottom - M_Rect.top) / 2 + 4 ;
+
+					Rect8.left = M_Rect.right - 4 ;
+					Rect8.right = M_Rect.right + 4 ;
+					Rect8.top = M_Rect.top + (M_Rect.bottom - M_Rect.top) / 2 - 4 ;
+					Rect8.bottom = M_Rect.top + (M_Rect.bottom - M_Rect.top) / 2 + 4 ;
+
+					pDC -> SelectStockObject ( NULL ) ;
+
+					pDC -> Rectangle ( Rect.left, Rect.top, Rect.right, Rect.bottom ) ;
+					pDC -> Rectangle ( Rect2.left, Rect2.top, Rect2.right, Rect2.bottom ) ;
+					pDC -> Rectangle ( Rect3.left, Rect3.top, Rect3.right, Rect3.bottom ) ;
+					pDC -> Rectangle ( Rect4.left, Rect4.top, Rect4.right, Rect4.bottom ) ;
+					pDC -> Rectangle ( Rect5.left, Rect5.top, Rect5.right, Rect5.bottom ) ;
+					pDC -> Rectangle ( Rect6.left, Rect6.top, Rect6.right, Rect6.bottom ) ;
+					pDC -> Rectangle ( Rect7.left, Rect7.top, Rect7.right, Rect7.bottom ) ;
+					pDC -> Rectangle ( Rect8.left, Rect8.top, Rect8.right, Rect8.bottom ) ;
+				}
 			}
 			R_Number++ ;
 		}
@@ -346,6 +443,27 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 
 		// 원 객체일 경우
 		else if ( pDoc -> What.GetAt (i) == _T ("E") ) {
+
+			// 만약 변경 시키는 중이라면
+			if ( M_Number == E_Number && M_IsDraw == 'o' && M_What == _T ("E") ) {
+				if ( M_ChangeEllipseSize == 'o' ) {
+					CPen pen;
+					pen.CreatePen( PS_DOT, 1.8, RGB (0,0,0) ) ;
+					CPen* oldPen = pDC->SelectObject( &pen ) ;
+					pDC -> SelectStockObject ( NULL_BRUSH ) ;
+					M_ChangeRect.left -= pDoc -> E_Thickness.GetAt ( M_Number ) / 2 ;
+					M_ChangeRect.right += pDoc -> E_Thickness.GetAt ( M_Number ) / 2 ;
+					M_ChangeRect.top -= pDoc -> E_Thickness.GetAt ( M_Number ) / 2 ;
+					M_ChangeRect.bottom += pDoc -> E_Thickness.GetAt ( M_Number ) / 2 ;
+					pDC -> Ellipse ( M_ChangeRect.left, M_ChangeRect.top, M_ChangeRect.right, M_ChangeRect.bottom ) ;
+					pDC -> SelectObject ( oldPen ) ;
+					M_ChangeRect.left += pDoc -> E_Thickness.GetAt ( M_Number ) / 2 ;
+					M_ChangeRect.right -= pDoc -> E_Thickness.GetAt ( M_Number ) / 2 ;
+					M_ChangeRect.top += pDoc -> E_Thickness.GetAt ( M_Number ) / 2 ;
+					M_ChangeRect.bottom -= pDoc -> E_Thickness.GetAt ( M_Number ) / 2 ;
+				}
+			}
+
 			// 선 색을 가지지 않았을 경우의 출력
 			if ( pDoc -> E_Color.GetAt (E_Number) == RGB (0,0,0) ) {
 				// 채우기 색상을 가지지 않았을 경우의 출력
@@ -397,11 +515,65 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 
 			// 만약 이동시키고 있는 중이라면
 			if ( M_Number == E_Number && M_IsDraw == 'o' && M_What == _T ("E") ) {
-				CPen pen ( PS_DOT, 1.8, RGB (0, 0, 150) ) ;
-				CPen *Draw_Pen = pDC -> SelectObject(&pen);
-				pDC -> SelectStockObject ( NULL_BRUSH ) ;
-				pDC -> Rectangle ( M_Rect.left, M_Rect.top, M_Rect.right, M_Rect.bottom ) ;
-				pDC -> SelectObject ( Draw_Pen ) ;
+				if ( M_ChangeRectSize == 'x' ) {
+					CPen pen ( PS_DOT, 1.8, RGB (0, 0, 150) ) ;
+					CPen *Draw_Pen = pDC -> SelectObject(&pen);
+					pDC -> SelectStockObject ( NULL_BRUSH ) ;
+					pDC -> Rectangle ( M_Rect.left, M_Rect.top, M_Rect.right, M_Rect.bottom ) ;
+					pDC -> SelectObject ( Draw_Pen ) ;
+
+					CRect Rect, Rect2, Rect3, Rect4, Rect5, Rect6, Rect7, Rect8 ;
+					Rect.top = M_Rect.top - 4 ;
+					Rect.bottom = M_Rect.top + 4 ;
+					Rect.left = M_Rect.left - 4 ;
+					Rect.right = M_Rect.left + 4 ;
+
+					Rect2.top = M_Rect.bottom - 4 ;
+					Rect2.bottom = M_Rect.bottom + 4 ;
+					Rect2.left = M_Rect.right - 4 ;
+					Rect2.right = M_Rect.right + 4 ;
+
+					Rect3.top = M_Rect.top - 4 ;
+					Rect3.bottom = M_Rect.top + 4 ;
+					Rect3.left = M_Rect.right - 4 ;
+					Rect3.right = M_Rect.right + 4 ;
+
+					Rect4.top = M_Rect.bottom - 4 ;
+					Rect4.bottom = M_Rect.bottom + 4 ;
+					Rect4.left = M_Rect.left - 4 ;
+					Rect4.right = M_Rect.left + 4 ;
+
+					Rect5.left = M_Rect.left + (M_Rect.right - M_Rect.left) / 2 - 4 ;
+					Rect5.right = M_Rect.left + (M_Rect.right - M_Rect.left) / 2 + 4 ;
+					Rect5.top = M_Rect.bottom - 4 ;
+					Rect5.bottom = M_Rect.bottom + 4 ;
+
+					Rect6.left = M_Rect.left + (M_Rect.right - M_Rect.left) / 2 - 4 ;
+					Rect6.right = M_Rect.left + (M_Rect.right - M_Rect.left) / 2 + 4 ;
+					Rect6.top = M_Rect.top - 4 ;
+					Rect6.bottom = M_Rect.top + 4 ;
+
+					Rect7.left = M_Rect.left - 4 ;
+					Rect7.right = M_Rect.left + 4 ;
+					Rect7.top = M_Rect.top + (M_Rect.bottom - M_Rect.top) / 2 - 4 ;
+					Rect7.bottom = M_Rect.top + (M_Rect.bottom - M_Rect.top) / 2 + 4 ;
+
+					Rect8.left = M_Rect.right - 4 ;
+					Rect8.right = M_Rect.right + 4 ;
+					Rect8.top = M_Rect.top + (M_Rect.bottom - M_Rect.top) / 2 - 4 ;
+					Rect8.bottom = M_Rect.top + (M_Rect.bottom - M_Rect.top) / 2 + 4 ;
+
+					pDC -> SelectStockObject ( NULL ) ;
+
+					pDC -> Rectangle ( Rect.left, Rect.top, Rect.right, Rect.bottom ) ;
+					pDC -> Rectangle ( Rect2.left, Rect2.top, Rect2.right, Rect2.bottom ) ;
+					pDC -> Rectangle ( Rect3.left, Rect3.top, Rect3.right, Rect3.bottom ) ;
+					pDC -> Rectangle ( Rect4.left, Rect4.top, Rect4.right, Rect4.bottom ) ;
+					pDC -> Rectangle ( Rect5.left, Rect5.top, Rect5.right, Rect5.bottom ) ;
+					pDC -> Rectangle ( Rect6.left, Rect6.top, Rect6.right, Rect6.bottom ) ;
+					pDC -> Rectangle ( Rect7.left, Rect7.top, Rect7.right, Rect7.bottom ) ;
+					pDC -> Rectangle ( Rect8.left, Rect8.top, Rect8.right, Rect8.bottom ) ;
+				}
 			}
 
 			// 만약 원을 그리고 있는 상태라면 테두리 직사각형을 그려줍니다.
@@ -521,6 +693,34 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 				pDC -> SelectStockObject ( NULL_BRUSH ) ;
 				pDC -> Rectangle ( M_Rect.left, M_Rect.top, M_Rect.right, M_Rect.bottom ) ;
 				pDC -> SelectObject ( Draw_Pen ) ;
+
+				CRect Rect, Rect2, Rect3, Rect4 ;
+				Rect.top = M_Rect.top - 4 ;
+				Rect.bottom = M_Rect.top + 4 ;
+				Rect.left = M_Rect.left - 4 ;
+				Rect.right = M_Rect.left + 4 ;
+
+				Rect2.top = M_Rect.bottom - 4 ;
+				Rect2.bottom = M_Rect.bottom + 4 ;
+				Rect2.left = M_Rect.right - 4 ;
+				Rect2.right = M_Rect.right + 4 ;
+
+				Rect3.top = M_Rect.top - 4 ;
+				Rect3.bottom = M_Rect.top + 4 ;
+				Rect3.left = M_Rect.right - 4 ;
+				Rect3.right = M_Rect.right + 4 ;
+
+				Rect4.top = M_Rect.bottom - 4 ;
+				Rect4.bottom = M_Rect.bottom + 4 ;
+				Rect4.left = M_Rect.left - 4 ;
+				Rect4.right = M_Rect.left + 4 ;
+
+				pDC -> SelectStockObject ( NULL ) ;
+				
+				pDC -> Rectangle ( Rect.left, Rect.top, Rect.right, Rect.bottom ) ;
+				pDC -> Rectangle ( Rect2.left, Rect2.top, Rect2.right, Rect2.bottom ) ;
+				pDC -> Rectangle ( Rect3.left, Rect3.top, Rect3.right, Rect3.bottom ) ;
+				pDC -> Rectangle ( Rect4.left, Rect4.top, Rect4.right, Rect4.bottom ) ;
 			}
 
 			// 만약 세모를 그리고 있는 상태라면 테두리 직사각형을 그려줍니다.
@@ -661,6 +861,34 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 				pDC -> SelectStockObject ( NULL_BRUSH ) ;
 				pDC -> Rectangle ( M_Rect.left, M_Rect.top, M_Rect.right, M_Rect.bottom ) ;
 				pDC -> SelectObject ( Draw_Pen ) ;
+
+				CRect Rect, Rect2, Rect3, Rect4 ;
+				Rect.top = M_Rect.top - 4 ;
+				Rect.bottom = M_Rect.top + 4 ;
+				Rect.left = M_Rect.left - 4 ;
+				Rect.right = M_Rect.left + 4 ;
+
+				Rect2.top = M_Rect.bottom - 4 ;
+				Rect2.bottom = M_Rect.bottom + 4 ;
+				Rect2.left = M_Rect.right - 4 ;
+				Rect2.right = M_Rect.right + 4 ;
+
+				Rect3.top = M_Rect.top - 4 ;
+				Rect3.bottom = M_Rect.top + 4 ;
+				Rect3.left = M_Rect.right - 4 ;
+				Rect3.right = M_Rect.right + 4 ;
+
+				Rect4.top = M_Rect.bottom - 4 ;
+				Rect4.bottom = M_Rect.bottom + 4 ;
+				Rect4.left = M_Rect.left - 4 ;
+				Rect4.right = M_Rect.left + 4 ;
+
+				pDC -> SelectStockObject ( NULL ) ;
+				
+				pDC -> Rectangle ( Rect.left, Rect.top, Rect.right, Rect.bottom ) ;
+				pDC -> Rectangle ( Rect2.left, Rect2.top, Rect2.right, Rect2.bottom ) ;
+				pDC -> Rectangle ( Rect3.left, Rect3.top, Rect3.right, Rect3.bottom ) ;
+				pDC -> Rectangle ( Rect4.left, Rect4.top, Rect4.right, Rect4.bottom ) ;
 			}
 
 			// 만약 역 삼각형을 그리고 있는 상태, 변경하는 상태라면 테두리 직사각형을 그려줍니다.
@@ -807,6 +1035,34 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 				pDC -> SelectStockObject ( NULL_BRUSH ) ;
 				pDC -> Rectangle ( M_Rect.left, M_Rect.top, M_Rect.right, M_Rect.bottom ) ;
 				pDC -> SelectObject ( Draw_Pen ) ;
+
+				CRect Rect, Rect2, Rect3, Rect4 ;
+				Rect.top = M_Rect.top - 4 ;
+				Rect.bottom = M_Rect.top + 4 ;
+				Rect.left = M_Rect.left - 4 ;
+				Rect.right = M_Rect.left + 4 ;
+
+				Rect2.top = M_Rect.bottom - 4 ;
+				Rect2.bottom = M_Rect.bottom + 4 ;
+				Rect2.left = M_Rect.right - 4 ;
+				Rect2.right = M_Rect.right + 4 ;
+
+				Rect3.top = M_Rect.top - 4 ;
+				Rect3.bottom = M_Rect.top + 4 ;
+				Rect3.left = M_Rect.right - 4 ;
+				Rect3.right = M_Rect.right + 4 ;
+
+				Rect4.top = M_Rect.bottom - 4 ;
+				Rect4.bottom = M_Rect.bottom + 4 ;
+				Rect4.left = M_Rect.left - 4 ;
+				Rect4.right = M_Rect.left + 4 ;
+
+				pDC -> SelectStockObject ( NULL ) ;
+				
+				pDC -> Rectangle ( Rect.left, Rect.top, Rect.right, Rect.bottom ) ;
+				pDC -> Rectangle ( Rect2.left, Rect2.top, Rect2.right, Rect2.bottom ) ;
+				pDC -> Rectangle ( Rect3.left, Rect3.top, Rect3.right, Rect3.bottom ) ;
+				pDC -> Rectangle ( Rect4.left, Rect4.top, Rect4.right, Rect4.bottom ) ;
 			}
 
 			// 만약 직각 삼각형을 그리고 있는 상태라면 테두리 직사각형을 그려줍니다.
@@ -976,6 +1232,34 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 				pDC -> SelectStockObject ( NULL_BRUSH ) ;
 				pDC -> Rectangle ( M_Rect.left, M_Rect.top, M_Rect.right, M_Rect.bottom ) ;
 				pDC -> SelectObject ( Draw_Pen ) ;
+
+				CRect Rect, Rect2, Rect3, Rect4 ;
+				Rect.top = M_Rect.top - 4 ;
+				Rect.bottom = M_Rect.top + 4 ;
+				Rect.left = M_Rect.left - 4 ;
+				Rect.right = M_Rect.left + 4 ;
+
+				Rect2.top = M_Rect.bottom - 4 ;
+				Rect2.bottom = M_Rect.bottom + 4 ;
+				Rect2.left = M_Rect.right - 4 ;
+				Rect2.right = M_Rect.right + 4 ;
+
+				Rect3.top = M_Rect.top - 4 ;
+				Rect3.bottom = M_Rect.top + 4 ;
+				Rect3.left = M_Rect.right - 4 ;
+				Rect3.right = M_Rect.right + 4 ;
+
+				Rect4.top = M_Rect.bottom - 4 ;
+				Rect4.bottom = M_Rect.bottom + 4 ;
+				Rect4.left = M_Rect.left - 4 ;
+				Rect4.right = M_Rect.left + 4 ;
+
+				pDC -> SelectStockObject ( NULL ) ;
+				
+				pDC -> Rectangle ( Rect.left, Rect.top, Rect.right, Rect.bottom ) ;
+				pDC -> Rectangle ( Rect2.left, Rect2.top, Rect2.right, Rect2.bottom ) ;
+				pDC -> Rectangle ( Rect3.left, Rect3.top, Rect3.right, Rect3.bottom ) ;
+				pDC -> Rectangle ( Rect4.left, Rect4.top, Rect4.right, Rect4.bottom ) ;
 			}
 
 			// 만약 역 직각 삼각형을 그리고 있는 상태라면 테두리 직사각형을 그려줍니다.
@@ -1141,6 +1425,34 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 				pDC -> SelectStockObject ( NULL_BRUSH ) ;
 				pDC -> Rectangle ( M_Rect.left, M_Rect.top, M_Rect.right, M_Rect.bottom ) ;
 				pDC -> SelectObject ( Draw_Pen ) ;
+
+				CRect Rect, Rect2, Rect3, Rect4 ;
+				Rect.top = M_Rect.top - 4 ;
+				Rect.bottom = M_Rect.top + 4 ;
+				Rect.left = M_Rect.left - 4 ;
+				Rect.right = M_Rect.left + 4 ;
+
+				Rect2.top = M_Rect.bottom - 4 ;
+				Rect2.bottom = M_Rect.bottom + 4 ;
+				Rect2.left = M_Rect.right - 4 ;
+				Rect2.right = M_Rect.right + 4 ;
+
+				Rect3.top = M_Rect.top - 4 ;
+				Rect3.bottom = M_Rect.top + 4 ;
+				Rect3.left = M_Rect.right - 4 ;
+				Rect3.right = M_Rect.right + 4 ;
+
+				Rect4.top = M_Rect.bottom - 4 ;
+				Rect4.bottom = M_Rect.bottom + 4 ;
+				Rect4.left = M_Rect.left - 4 ;
+				Rect4.right = M_Rect.left + 4 ;
+
+				pDC -> SelectStockObject ( NULL ) ;
+				
+				pDC -> Rectangle ( Rect.left, Rect.top, Rect.right, Rect.bottom ) ;
+				pDC -> Rectangle ( Rect2.left, Rect2.top, Rect2.right, Rect2.bottom ) ;
+				pDC -> Rectangle ( Rect3.left, Rect3.top, Rect3.right, Rect3.bottom ) ;
+				pDC -> Rectangle ( Rect4.left, Rect4.top, Rect4.right, Rect4.bottom ) ;
 			}
 
 			// 만약 왼쪽 -> 오른쪽 삼각형을 그리고 있는 상태라면 테두리 직사각형을 그려줍니다.
@@ -1282,6 +1594,34 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 				pDC -> SelectStockObject ( NULL_BRUSH ) ;
 				pDC -> Rectangle ( M_Rect.left, M_Rect.top, M_Rect.right, M_Rect.bottom ) ;
 				pDC -> SelectObject ( Draw_Pen ) ;
+
+				CRect Rect, Rect2, Rect3, Rect4 ;
+				Rect.top = M_Rect.top - 4 ;
+				Rect.bottom = M_Rect.top + 4 ;
+				Rect.left = M_Rect.left - 4 ;
+				Rect.right = M_Rect.left + 4 ;
+
+				Rect2.top = M_Rect.bottom - 4 ;
+				Rect2.bottom = M_Rect.bottom + 4 ;
+				Rect2.left = M_Rect.right - 4 ;
+				Rect2.right = M_Rect.right + 4 ;
+
+				Rect3.top = M_Rect.top - 4 ;
+				Rect3.bottom = M_Rect.top + 4 ;
+				Rect3.left = M_Rect.right - 4 ;
+				Rect3.right = M_Rect.right + 4 ;
+
+				Rect4.top = M_Rect.bottom - 4 ;
+				Rect4.bottom = M_Rect.bottom + 4 ;
+				Rect4.left = M_Rect.left - 4 ;
+				Rect4.right = M_Rect.left + 4 ;
+
+				pDC -> SelectStockObject ( NULL ) ;
+				
+				pDC -> Rectangle ( Rect.left, Rect.top, Rect.right, Rect.bottom ) ;
+				pDC -> Rectangle ( Rect2.left, Rect2.top, Rect2.right, Rect2.bottom ) ;
+				pDC -> Rectangle ( Rect3.left, Rect3.top, Rect3.right, Rect3.bottom ) ;
+				pDC -> Rectangle ( Rect4.left, Rect4.top, Rect4.right, Rect4.bottom ) ;
 			}
 
 			// 만약 오른쪽 -> 왼쪽 삼각형을 그리고 있는 상태라면 테두리 직사각형을 그려줍니다.
@@ -1480,6 +1820,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 					else
 						P_CurrentPoint++ ;
 
+					P_ChangeSkeleton = 0 ;
 					P_CanMove = 'o' ;
 			}
 		}
@@ -1496,6 +1837,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 					P_ChangeSkeleton = i ;
 					P_CanMove = 'o' ;
 					P_Flag = 'o' ;
+					break ;
 				}
 			}
 
@@ -1507,6 +1849,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 					P_Insert.Poly_point.GetAt ( 0 ).y >= point.y - 15) ) {
 						P_IsStart = 'o' ;
 						P_CanMove = 'o' ;
+						P_ChangeSkeleton = 0 ;
 				}
 				// 마지막 Skeleton을 건드리면 그 Skeleton을 변경한다.
 				else if ( (P_Insert.Poly_point.GetAt ( P_CurrentPoint ).x <= point.x + 15 &&
@@ -1515,6 +1858,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 					P_Insert.Poly_point.GetAt ( P_CurrentPoint ).y >= point.y - 15) ) {
 						P_CanMove = 'o' ;
 						P_CurrentPoint++ ;
+						P_ChangeSkeleton = 0 ;
 				}
 			}
 		}
@@ -1823,10 +2167,234 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 					M_IsChangeLineStart = 'x' ;
 				}
 		}
+
+		// 상자 객체를 변경시키는 경우
+		else if ( M_IsRectSelect == 'o' &&
+				( ( M_Rect.top - 15 <= point.y && M_Rect.top + 15 >= point.y && M_Rect.left - 15 <= point.x && M_Rect.left + 15 >= point.x ) ||
+				  ( M_Rect.top - 15 <= point.y && M_Rect.top + 15 >= point.y && M_Rect.right - 15 <= point.x && M_Rect.right + 15 >= point.x ) ||
+				  ( M_Rect.bottom - 15 <= point.y && M_Rect.bottom + 15 >= point.y && M_Rect.left - 15 <= point.x && M_Rect.left + 15 >= point.x ) ||
+				  ( M_Rect.bottom - 15 <= point.y && M_Rect.bottom + 15 >= point.y && M_Rect.right - 15 <= point.x && M_Rect.right + 15 >= point.x ) ||
+				  ((M_Rect.right - M_Rect.left) / 2 + M_Rect.left + 15 >= point.x && (M_Rect.right - M_Rect.left) / 2 + M_Rect.left - 15 <= point.x &&
+				    M_Rect.top - 15 <= point.y && M_Rect.top + 15 >= point.y ) ||
+				  ((M_Rect.right - M_Rect.left) / 2 + M_Rect.left + 15 >= point.x && (M_Rect.right - M_Rect.left) / 2 + M_Rect.left - 15 <= point.x &&
+				    M_Rect.bottom - 15 <= point.y && M_Rect.bottom + 15 >= point.y) ||
+				  ((M_Rect.bottom - M_Rect.top) / 2 + M_Rect.top - 15 <= point.y && (M_Rect.bottom - M_Rect.top) / 2 + M_Rect.top + 15 >= point.y &&
+				    M_Rect.left - 15 <= point.x && M_Rect.left + 15 >= point.x) ||
+				  ((M_Rect.bottom - M_Rect.top) / 2 + M_Rect.top - 15 <= point.y && (M_Rect.bottom - M_Rect.top) / 2 + M_Rect.top + 15 >= point.y &&
+				    M_Rect.right - 15 <= point.x && M_Rect.right + 15 >= point.x) ) ) {
+
+			M_ChangeRectSize = 'o' ;
+			if ( M_Rect.top - 15 <= point.y && M_Rect.top + 15 >= point.y && M_Rect.left - 15 <= point.x && M_Rect.left + 15 >= point.x ) {
+				M_IsChangeRectSide = 'o' ;
+				M_IsChangeRectNW = 'o' ;
+				M_ChangeRect.top = point.y ;
+				M_ChangeRect.left = point.x ;
+				M_ChangeRect.bottom = pDoc -> R_Rec.GetAt ( M_Number ).bottom ;
+				M_ChangeRect.right = pDoc -> R_Rec.GetAt ( M_Number ).right ;
+
+				M_Start.x = point.x ;
+				M_Start.y = point.y ;
+			}
+			else if ( M_Rect.top - 15 <= point.y && M_Rect.top + 15 >= point.y && M_Rect.right - 15 <= point.x && M_Rect.right + 15 >= point.x ) {
+				M_IsChangeRectSide = 'o' ;
+				M_IsChangeRectNE = 'o' ;
+				M_ChangeRect.top = point.y ;
+				M_ChangeRect.right = point.x ;
+				M_ChangeRect.left = pDoc -> R_Rec.GetAt ( M_Number ).left ;
+				M_ChangeRect.bottom = pDoc -> R_Rec.GetAt ( M_Number ).bottom ;
+
+				M_Start.x = point.x ;
+				M_Start.y = point.y ;
+			}
+			else if ( M_Rect.bottom - 15 <= point.y && M_Rect.bottom + 15 >= point.y && M_Rect.left - 15 <= point.x && M_Rect.left + 15 >= point.x ) {
+				M_IsChangeRectSide = 'o' ;
+				M_IsChangeRectSW = 'o' ;
+				M_ChangeRect.bottom = point.y ;
+				M_ChangeRect.left = point.x ;
+				M_ChangeRect.top = pDoc -> R_Rec.GetAt ( M_Number ).top ;
+				M_ChangeRect.right = pDoc -> R_Rec.GetAt ( M_Number ).right ;
+
+				M_Start.x = point.x ;
+				M_Start.y = point.y ;
+			}
+			else if ( M_Rect.bottom - 15 <= point.y && M_Rect.bottom + 15 >= point.y && M_Rect.right - 15 <= point.x && M_Rect.right + 15 >= point.x ) {
+				M_IsChangeRectSide = 'o' ;
+				M_IsChangeRectNW ;
+				M_IsChangeRectSE = 'o' ;
+				M_ChangeRect.bottom = point.y ;
+				M_ChangeRect.right = point.x ;
+				M_ChangeRect.top = pDoc -> R_Rec.GetAt ( M_Number ).top ;
+				M_ChangeRect.left = pDoc -> R_Rec.GetAt ( M_Number ).left ;
+
+				M_Start.x = point.x ;
+				M_Start.y = point.y ;
+			}
+			else if ( (M_Rect.right - M_Rect.left) / 2 + M_Rect.left + 15 >= point.x && (M_Rect.right - M_Rect.left) / 2 + M_Rect.left - 15 <= point.x &&
+				    M_Rect.top - 15 <= point.y && M_Rect.top + 15 >= point.y ) {
+				M_IsChangeRectVerticalTop = 'o' ;
+				M_ChangeRect.left = pDoc -> R_Rec.GetAt ( M_Number ).left ;
+				M_ChangeRect.right = pDoc -> R_Rec.GetAt ( M_Number ).right ;
+				M_ChangeRect.top = point.y ;
+				M_ChangeRect.bottom = pDoc -> R_Rec.GetAt ( M_Number ).bottom ;
+
+				M_Start.y = point.y ;
+			}
+			else if ( (M_Rect.right - M_Rect.left) / 2 + M_Rect.left + 15 >= point.x && (M_Rect.right - M_Rect.left) / 2 + M_Rect.left - 15 <= point.x &&
+				    M_Rect.bottom - 15 <= point.y && M_Rect.bottom + 15 >= point.y ) {
+				M_IsChangeRectVerticalBottom = 'o' ;
+				M_ChangeRect.left = pDoc -> R_Rec.GetAt ( M_Number ).left ;
+				M_ChangeRect.right = pDoc -> R_Rec.GetAt ( M_Number ).right ;
+				M_ChangeRect.top = pDoc -> R_Rec.GetAt ( M_Number ).top ;
+				M_ChangeRect.bottom = point.y ;
+
+				M_Start.y = point.y ;
+			}
+			else if ( (M_Rect.bottom - M_Rect.top) / 2 + M_Rect.top - 15 <= point.y && (M_Rect.bottom - M_Rect.top) / 2 + M_Rect.top + 15 >= point.y &&
+				    M_Rect.left - 15 <= point.x && M_Rect.left + 15 >= point.x ) {
+				M_IsChangeRectWidthLeft = 'o' ;
+				M_ChangeRect.left = point.x ;
+				M_ChangeRect.right = pDoc -> R_Rec.GetAt ( M_Number ).right ;
+				M_ChangeRect.top = pDoc -> R_Rec.GetAt ( M_Number ).top ;
+				M_ChangeRect.bottom = pDoc -> R_Rec.GetAt ( M_Number ).bottom ;
+
+				M_Start.x = point.x ;
+			}
+			else {
+				M_IsChangeRectWidthRight = 'o' ;
+				M_ChangeRect.left = pDoc -> R_Rec.GetAt ( M_Number ).left ;
+				M_ChangeRect.right = point.x ;
+				M_ChangeRect.top = pDoc -> R_Rec.GetAt ( M_Number ).top ;
+				M_ChangeRect.bottom = pDoc -> R_Rec.GetAt ( M_Number ).bottom ;
+
+				M_Start.x = point.x ;
+			}
+		}
+		// 원 객체를 변경시키는 경우
+		else if ( M_IsEllipseSelect == 'o' &&
+				( ( M_Rect.top - 15 <= point.y && M_Rect.top + 15 >= point.y && M_Rect.left - 15 <= point.x && M_Rect.left + 15 >= point.x ) ||
+				  ( M_Rect.top - 15 <= point.y && M_Rect.top + 15 >= point.y && M_Rect.right - 15 <= point.x && M_Rect.right + 15 >= point.x ) ||
+				  ( M_Rect.bottom - 15 <= point.y && M_Rect.bottom + 15 >= point.y && M_Rect.left - 15 <= point.x && M_Rect.left + 15 >= point.x ) ||
+				  ( M_Rect.bottom - 15 <= point.y && M_Rect.bottom + 15 >= point.y && M_Rect.right - 15 <= point.x && M_Rect.right + 15 >= point.x ) ||
+				  ((M_Rect.right - M_Rect.left) / 2 + M_Rect.left + 15 >= point.x && (M_Rect.right - M_Rect.left) / 2 + M_Rect.left - 15 <= point.x &&
+				    M_Rect.top - 15 <= point.y && M_Rect.top + 15 >= point.y ) ||
+				  ((M_Rect.right - M_Rect.left) / 2 + M_Rect.left + 15 >= point.x && (M_Rect.right - M_Rect.left) / 2 + M_Rect.left - 15 <= point.x &&
+				    M_Rect.bottom - 15 <= point.y && M_Rect.bottom + 15 >= point.y) ||
+				  ((M_Rect.bottom - M_Rect.top) / 2 + M_Rect.top - 15 <= point.y && (M_Rect.bottom - M_Rect.top) / 2 + M_Rect.top + 15 >= point.y &&
+				    M_Rect.left - 15 <= point.x && M_Rect.left + 15 >= point.x) ||
+				  ((M_Rect.bottom - M_Rect.top) / 2 + M_Rect.top - 15 <= point.y && (M_Rect.bottom - M_Rect.top) / 2 + M_Rect.top + 15 >= point.y &&
+				    M_Rect.right - 15 <= point.x && M_Rect.right + 15 >= point.x) ) ) {
+
+			M_ChangeEllipseSize = 'o' ;
+			if ( M_Rect.top - 15 <= point.y && M_Rect.top + 15 >= point.y && M_Rect.left - 15 <= point.x && M_Rect.left + 15 >= point.x ) {
+				M_IsChangeEllipseSide = 'o' ;
+				M_IsChangeEllipseNW = 'o' ;
+				M_ChangeRect.top = point.y ;
+				M_ChangeRect.left = point.x ;
+				M_ChangeRect.bottom = pDoc -> E_Ellipse.GetAt ( M_Number ).bottom ;
+				M_ChangeRect.right = pDoc -> E_Ellipse.GetAt ( M_Number ).right ;
+
+				M_Start.x = point.x ;
+				M_Start.y = point.y ;
+			}
+			else if ( M_Rect.top - 15 <= point.y && M_Rect.top + 15 >= point.y && M_Rect.right - 15 <= point.x && M_Rect.right + 15 >= point.x ) {
+				M_IsChangeEllipseSide = 'o' ;
+				M_IsChangeEllipseNE = 'o' ;
+				M_ChangeRect.top = point.y ;
+				M_ChangeRect.right = point.x ;
+				M_ChangeRect.left = pDoc -> E_Ellipse.GetAt ( M_Number ).left ;
+				M_ChangeRect.bottom = pDoc -> E_Ellipse.GetAt ( M_Number ).bottom ;
+
+				M_Start.x = point.x ;
+				M_Start.y = point.y ;
+			}
+			else if ( M_Rect.bottom - 15 <= point.y && M_Rect.bottom + 15 >= point.y && M_Rect.left - 15 <= point.x && M_Rect.left + 15 >= point.x ) {
+				M_IsChangeEllipseSide = 'o' ;
+				M_IsChangeEllipseSW = 'o' ;
+				M_ChangeRect.bottom = point.y ;
+				M_ChangeRect.left = point.x ;
+				M_ChangeRect.top = pDoc -> E_Ellipse.GetAt ( M_Number ).top ;
+				M_ChangeRect.right = pDoc -> E_Ellipse.GetAt ( M_Number ).right ;
+
+				M_Start.x = point.x ;
+				M_Start.y = point.y ;
+			}
+			else if ( M_Rect.bottom - 15 <= point.y && M_Rect.bottom + 15 >= point.y && M_Rect.right - 15 <= point.x && M_Rect.right + 15 >= point.x ) {
+				M_IsChangeEllipseSide = 'o' ;
+				M_IsChangeRectSE = 'o' ;
+				M_ChangeRect.bottom = point.y ;
+				M_ChangeRect.right = point.x ;
+				M_ChangeRect.top = pDoc -> E_Ellipse.GetAt ( M_Number ).top ;
+				M_ChangeRect.left = pDoc -> E_Ellipse.GetAt ( M_Number ).left ;
+
+				M_Start.x = point.x ;
+				M_Start.y = point.y ;
+			}
+			else if ( (M_Rect.right - M_Rect.left) / 2 + M_Rect.left + 15 >= point.x && (M_Rect.right - M_Rect.left) / 2 + M_Rect.left - 15 <= point.x &&
+				    M_Rect.top - 15 <= point.y && M_Rect.top + 15 >= point.y ) {
+				M_IsChangeEllipseVerticalTop = 'o' ;
+				M_ChangeRect.left = pDoc -> E_Ellipse.GetAt ( M_Number ).left ;
+				M_ChangeRect.right = pDoc -> E_Ellipse.GetAt ( M_Number ).right ;
+				M_ChangeRect.top = point.y ;
+				M_ChangeRect.bottom = pDoc -> E_Ellipse.GetAt ( M_Number ).bottom ;
+
+				M_Start.y = point.y ;
+			}
+			else if ( (M_Rect.right - M_Rect.left) / 2 + M_Rect.left + 15 >= point.x && (M_Rect.right - M_Rect.left) / 2 + M_Rect.left - 15 <= point.x &&
+				    M_Rect.bottom - 15 <= point.y && M_Rect.bottom + 15 >= point.y ) {
+				M_IsChangeEllipseVerticalBottom = 'o' ;
+				M_ChangeRect.left = pDoc -> E_Ellipse.GetAt ( M_Number ).left ;
+				M_ChangeRect.right = pDoc -> E_Ellipse.GetAt ( M_Number ).right ;
+				M_ChangeRect.top = pDoc -> E_Ellipse.GetAt ( M_Number ).top ;
+				M_ChangeRect.bottom = point.y ;
+
+				M_Start.y = point.y ;
+			}
+			else if ( (M_Rect.bottom - M_Rect.top) / 2 + M_Rect.top - 15 <= point.y && (M_Rect.bottom - M_Rect.top) / 2 + M_Rect.top + 15 >= point.y &&
+				    M_Rect.left - 15 <= point.x && M_Rect.left + 15 >= point.x ) {
+				M_IsChangeEllipseWidthLeft = 'o' ;
+				M_ChangeRect.left = point.x ;
+				M_ChangeRect.right = pDoc -> E_Ellipse.GetAt ( M_Number ).right ;
+				M_ChangeRect.top = pDoc -> E_Ellipse.GetAt ( M_Number ).top ;
+				M_ChangeRect.bottom = pDoc -> E_Ellipse.GetAt ( M_Number ).bottom ;
+
+				M_Start.x = point.x ;
+			}
+			else {
+				M_IsChangeEllipseWidthRight = 'o' ;
+				M_ChangeRect.left = pDoc -> E_Ellipse.GetAt ( M_Number ).left ;
+				M_ChangeRect.right = point.x ;
+				M_ChangeRect.top = pDoc -> E_Ellipse.GetAt ( M_Number ).top ;
+				M_ChangeRect.bottom = pDoc -> E_Ellipse.GetAt ( M_Number ).bottom ;
+
+				M_Start.x = point.x ;
+			}
+		}
 		else {
 			M_IsLineSelect = 'x' ;
+			M_IsRectSelect = 'x' ;
 			M_ChangeLineOnePoint = 'x' ;
 			M_IsChangeLineStart = 'x' ;
+			M_ChangeRectSize = 'x' ;
+			M_IsChangeRectVerticalTop = 'x' ;
+			M_IsChangeRectVerticalBottom = 'x' ;
+			M_IsChangeRectSide = 'x' ;
+			M_IsChangeRectNW = 'x' ;
+			M_IsChangeRectNE = 'x' ;
+			M_IsChangeRectSW = 'x' ;
+			M_IsChangeRectSE = 'x' ;
+			M_IsChangeRectWidthLeft = 'x' ;
+			M_IsChangeRectWidthRight = 'x' ;
+			M_ChangeEllipseSize = 'x' ;
+			M_IsChangeEllipseVerticalTop = 'x' ;
+			M_IsChangeEllipseVerticalBottom = 'x' ;
+			M_IsChangeEllipseSide = 'x' ;
+			M_IsChangeEllipseNW = 'x' ;
+			M_IsChangeEllipseNE = 'x' ;
+			M_IsChangeEllipseSW = 'x' ;
+			M_IsChangeEllipseSE = 'x' ;
+			M_IsChangeEllipseWidthLeft = 'x' ;
+			M_IsChangeEllipseWidthRight = 'x' ;
+
 			int L_Number = pDoc -> L_Count - 1;
 			int R_Number = pDoc -> R_Count - 1;
 			int P_Number = pDoc -> P_Count - 1;
@@ -1840,7 +2408,8 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 
 			// 선택한 좌표에 객체가 있는지 전부 확인합니다.
 			// 늦게 그린 객체부터 확인합니다.
-			for ( int i = pDoc->What.GetCount () ; i > 0  ; i-- ) {
+			int i ;
+			for ( i = pDoc->What.GetCount () ; i > 0  ; i-- ) {
 
 				// 선 객체인 경우
 				if ( pDoc -> What.GetAt (i-1) == _T ("L") ) {
@@ -2040,7 +2609,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 							M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
 							M_What.Format ( _T ("R") ) ; M_Number = R_Number ;
 							M_IsDraw = 'o' ; P_IsContinue = 'x' ;
-							Invalidate () ; break ;
+							Invalidate () ; M_IsRectSelect = 'o' ; break ;
 					}
 					R_Number-- ;
 				}
@@ -2080,6 +2649,8 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 						P_Insert.P_Color = pDoc -> P_Poly.GetAt ( M_Number ).P_Color ;
 						P_Insert.thickness = pDoc -> P_Poly.GetAt ( M_Number ).thickness ;
 						P_CurrentPoint = pDoc -> P_Poly.GetAt ( M_Number ).Poly_point.GetCount () - 1 ;
+						if ( P_ChangeSkeleton == 0 && P_IsStart == 'x' && P_IsContinue == 'o' )
+							P_CurrentPoint++ ;
 						Invalidate () ; P_IsContinue = 'o' ; break ;
 					}
 					P_Number-- ;
@@ -2098,7 +2669,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 							M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
 							M_What.Format ( _T ("E") ) ; M_Number = E_Number ;
 							M_IsDraw = 'o' ; P_IsContinue = 'x' ;
-							Invalidate () ; break ;
+							Invalidate () ; M_IsEllipseSelect = 'o' ; break ;
 					}
 					E_Number-- ;
 
@@ -2212,6 +2783,13 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 					RTLT_Number-- ;
 				}
 
+			}
+			if ( i == 0 ) {
+				M_IsDraw = 'x' ;
+				M_IsLineSelect = 'x' ;
+				M_IsSelect = 'x' ;
+				M_What = 'x' ;
+				Invalidate () ;
 			}
 		}
 	}
@@ -2355,6 +2933,7 @@ void CGraphicEditorView::OnMouseMove(UINT nFlags, CPoint point)
 		pDoc->RTLT_Triangle.SetAt ( RTLT_Current, RTLT_Insert ) ;
 		Invalidate () ;
 	}
+	// PolyLine의 Skeleton 하나를 변경하는 경우
 	else if ( M_ChangeLineOnePoint == 'o' ) {
 		if ( M_IsChangeLineStart == 'o' ) {
 			pDoc -> L_Line.GetAt ( M_Number ).Start.x = point.x ;
@@ -2366,6 +2945,428 @@ void CGraphicEditorView::OnMouseMove(UINT nFlags, CPoint point)
 		}
 
 		Invalidate () ;
+	}
+	// 상자 객체를 변경시키는 경우
+	else if ( M_ChangeRectSize == 'o' ) {
+		// 상자의 각 4 꼭지점을 클릭하여 변경하는 경우
+		if ( M_IsChangeRectSide == 'o' ) {
+			// 북서쪽 Skeleton으로 변경하는 경우
+			if ( M_IsChangeRectNW == 'o' ) {
+				if ( M_Rect.bottom >= point.y && M_Rect.right >= point.x ) {
+					M_ChangeRect.top += point.y - M_Start.y ;
+					M_ChangeRect.left += point.x - M_Start.x ;
+					if ( M_ChangeRect.right != pDoc -> R_Rec.GetAt ( M_Number ).right )
+						M_ChangeRect.right = pDoc -> R_Rec.GetAt ( M_Number ).right ;
+					if ( M_ChangeRect.bottom != pDoc -> R_Rec.GetAt ( M_Number ).bottom )
+						M_ChangeRect.bottom = pDoc -> R_Rec.GetAt ( M_Number ).bottom ;
+				}
+				else if ( M_Rect.bottom <= point.y && M_Rect.right >= point.x ) {
+					M_ChangeRect.bottom += point.y - M_Start.y ;
+					M_ChangeRect.left += point.x - M_Start.x ;
+					if ( M_ChangeRect.top != pDoc -> R_Rec.GetAt ( M_Number ).bottom )
+						M_ChangeRect.top = pDoc -> R_Rec.GetAt ( M_Number ).bottom ;
+					if ( M_ChangeRect.right != pDoc -> R_Rec.GetAt ( M_Number ).right )
+						M_ChangeRect.right = pDoc -> R_Rec.GetAt ( M_Number ).right ;
+				}
+				else if ( M_Rect.bottom >= point.y && M_Rect.right <= point.x ) {
+					M_ChangeRect.top += point.y - M_Start.y ;
+					M_ChangeRect.right += point.x - M_Start.x ;
+					if ( M_ChangeRect.left != pDoc -> R_Rec.GetAt ( M_Number ).right )
+						M_ChangeRect.left = pDoc -> R_Rec.GetAt ( M_Number ).right ;
+					if ( M_ChangeRect.bottom != pDoc -> R_Rec.GetAt ( M_Number ).bottom )
+						M_ChangeRect.bottom = pDoc -> R_Rec.GetAt ( M_Number ).bottom ;
+				}
+				else {
+					M_ChangeRect.bottom += point.y - M_Start.y ;
+					M_ChangeRect.right += point.x - M_Start.x ;
+					if ( M_ChangeRect.top != pDoc -> R_Rec.GetAt ( M_Number ).bottom )
+						M_ChangeRect.top = pDoc -> R_Rec.GetAt ( M_Number ).bottom ;
+					if ( M_ChangeRect.left != pDoc -> R_Rec.GetAt ( M_Number ).right )
+						M_ChangeRect.left = pDoc -> R_Rec.GetAt ( M_Number ).right ;
+				}
+			}
+			// 북동쪽 Skeleton으로 변경하는 경우
+			else if ( M_IsChangeRectNE == 'o' ) {
+				if ( M_Rect.bottom >= point.y && M_Rect.left <= point.x ) {
+					M_ChangeRect.top += point.y - M_Start.y ;
+					M_ChangeRect.right += point.x - M_Start.x ;
+					if ( M_ChangeRect.left != pDoc -> R_Rec.GetAt ( M_Number ).left )
+						M_ChangeRect.left = pDoc -> R_Rec.GetAt ( M_Number ).left ;
+					if ( M_ChangeRect.bottom != pDoc -> R_Rec.GetAt ( M_Number ).bottom )
+						M_ChangeRect.bottom = pDoc -> R_Rec.GetAt ( M_Number ).bottom ;
+				}
+				else if ( M_Rect.bottom <= point.y && M_Rect.left <= point.x ) {
+					M_ChangeRect.bottom += point.y - M_Start.y ;
+					M_ChangeRect.right += point.x - M_Start.x ;
+					if ( M_ChangeRect.top != pDoc -> R_Rec.GetAt ( M_Number ).bottom )
+						M_ChangeRect.top = pDoc -> R_Rec.GetAt ( M_Number ).bottom ;
+					if ( M_ChangeRect.left != pDoc -> R_Rec.GetAt ( M_Number ).left )
+						M_ChangeRect.left = pDoc -> R_Rec.GetAt ( M_Number ).left ;
+				}
+				else if ( M_Rect.bottom >= point.y && M_Rect.left >= point.x ) {
+					M_ChangeRect.top += point.y - M_Start.y ;
+					M_ChangeRect.left += point.x - M_Start.x ;
+					if ( M_ChangeRect.right != pDoc -> R_Rec.GetAt ( M_Number ).left )
+						M_ChangeRect.right = pDoc -> R_Rec.GetAt ( M_Number ).left ;
+					if ( M_ChangeRect.bottom != pDoc -> R_Rec.GetAt ( M_Number ).bottom )
+						M_ChangeRect.bottom = pDoc -> R_Rec.GetAt ( M_Number ).bottom ;
+				}
+				else {
+					M_ChangeRect.bottom += point.y - M_Start.y ;
+					M_ChangeRect.left += point.x - M_Start.x ;
+					if ( M_ChangeRect.right != pDoc -> R_Rec.GetAt ( M_Number ).left )
+						M_ChangeRect.right = pDoc -> R_Rec.GetAt ( M_Number ).left ;
+					if ( M_ChangeRect.top != pDoc -> R_Rec.GetAt ( M_Number ).bottom )
+						M_ChangeRect.top = pDoc -> R_Rec.GetAt ( M_Number ).bottom ;
+				}
+			}
+			// 남서쪽 Skeleton으로 변경하는 경우
+			else if ( M_IsChangeRectSW == 'o' ) {
+				if ( M_Rect.top <= point.y && M_Rect.right >= point.x ) {
+					M_ChangeRect.bottom += point.y - M_Start.y ;
+					M_ChangeRect.left += point.x - M_Start.x ;
+					if ( M_ChangeRect.right != pDoc -> R_Rec.GetAt ( M_Number ).right )
+						M_ChangeRect.right = pDoc -> R_Rec.GetAt ( M_Number ).right ;
+					if ( M_ChangeRect.top != pDoc -> R_Rec.GetAt ( M_Number ).top )
+						M_ChangeRect.top = pDoc -> R_Rec.GetAt ( M_Number ).top ;
+				}
+				else if ( M_Rect.top <= point.y && M_Rect.right <= point.x ) {
+					M_ChangeRect.bottom += point.y - M_Start.y ;
+					M_ChangeRect.right += point.x - M_Start.x ;
+					if ( M_ChangeRect.left != pDoc -> R_Rec.GetAt ( M_Number ).right )
+						M_ChangeRect.left = pDoc -> R_Rec.GetAt ( M_Number ).right ;
+					if ( M_ChangeRect.top != pDoc -> R_Rec.GetAt ( M_Number ).top )
+						M_ChangeRect.top = pDoc -> R_Rec.GetAt ( M_Number ).top ;
+				}
+				else if ( M_Rect.top >= point.y && M_Rect.right >= point.x ) {
+					M_ChangeRect.top += point.y - M_Start.y ;
+					M_ChangeRect.left += point.x - M_Start.x ;
+					if ( M_ChangeRect.right != pDoc -> R_Rec.GetAt ( M_Number ).right )
+						M_ChangeRect.right = pDoc -> R_Rec.GetAt ( M_Number ).right ;
+					if ( M_ChangeRect.bottom != pDoc -> R_Rec.GetAt ( M_Number ).top )
+						M_ChangeRect.bottom = pDoc -> R_Rec.GetAt ( M_Number ).top ;
+				}
+				else {
+					M_ChangeRect.top += point.y - M_Start.y ;
+					M_ChangeRect.right += point.x - M_Start.x ;
+					if ( M_ChangeRect.left != pDoc -> R_Rec.GetAt ( M_Number ).right )
+						M_ChangeRect.left = pDoc -> R_Rec.GetAt ( M_Number ).right ;
+					if ( M_ChangeRect.bottom != pDoc -> R_Rec.GetAt ( M_Number ).top )
+						M_ChangeRect.bottom = pDoc -> R_Rec.GetAt ( M_Number ).top ;
+				}
+			}
+			// 남동쪽 Skeleton으로 변경하는 경우
+			else {
+				if ( M_Rect.top <= point.y && M_Rect.left <= point.x ) {
+					M_ChangeRect.bottom += point.y - M_Start.y ;
+					M_ChangeRect.right += point.x - M_Start.x ;
+					if ( M_ChangeRect.left != pDoc -> R_Rec.GetAt ( M_Number ).left )
+						M_ChangeRect.left = pDoc -> R_Rec.GetAt ( M_Number ).left ;
+					if ( M_ChangeRect.top != pDoc -> R_Rec.GetAt ( M_Number ).top )
+						M_ChangeRect.top = pDoc -> R_Rec.GetAt ( M_Number ).top ;
+				}
+				else if ( M_Rect.top <= point.y && M_Rect.left >= point.x ) {
+					M_ChangeRect.bottom += point.y - M_Start.y ;
+					M_ChangeRect.left += point.x - M_Start.x ;
+					if ( M_ChangeRect.right != pDoc -> R_Rec.GetAt ( M_Number ).left )
+						M_ChangeRect.right = pDoc -> R_Rec.GetAt ( M_Number ).left ;
+					if ( M_ChangeRect.top != pDoc -> R_Rec.GetAt ( M_Number ).top )
+						M_ChangeRect.top = pDoc -> R_Rec.GetAt ( M_Number ).top ;
+				}
+				else if ( M_Rect.top >= point.y && M_Rect.left <= point.x ) {
+					M_ChangeRect.top += point.y - M_Start.y ;
+					M_ChangeRect.right += point.x - M_Start.x ;
+					if ( M_ChangeRect.left != pDoc -> R_Rec.GetAt ( M_Number ).left )
+						M_ChangeRect.left = pDoc -> R_Rec.GetAt ( M_Number ).left ;
+					if ( M_ChangeRect.bottom != pDoc -> R_Rec.GetAt ( M_Number ).top )
+						M_ChangeRect.bottom = pDoc -> R_Rec.GetAt ( M_Number ).top ;
+				}
+				else {
+					M_ChangeRect.top += point.y - M_Start.y ;
+					M_ChangeRect.left += point.x - M_Start.x ;
+					if ( M_ChangeRect.right != pDoc -> R_Rec.GetAt ( M_Number ).left )
+						M_ChangeRect.right = pDoc -> R_Rec.GetAt ( M_Number ).left ;
+					if ( M_ChangeRect.bottom != pDoc -> R_Rec.GetAt ( M_Number ).top )
+						M_ChangeRect.bottom = pDoc -> R_Rec.GetAt ( M_Number ).top ;
+				}
+			}
+		}
+		// 상자의 4 꼭지점이 아닌 경우
+		else {
+			// 위쪽 방향으로만 변경하는 경우
+			if ( M_IsChangeRectVerticalTop == 'o' ) {
+				
+				if ( point.y <= M_Rect.bottom ) {
+					M_ChangeRect.top += point.y - M_Start.y ;
+					if ( M_ChangeRect.bottom != pDoc -> R_Rec.GetAt ( M_Number ).bottom )
+						M_ChangeRect.bottom = pDoc -> R_Rec.GetAt ( M_Number ).bottom ;
+				}
+				else {
+					M_ChangeRect.bottom += point.y - M_Start.y ;
+					if ( M_ChangeRect.top != pDoc -> R_Rec.GetAt ( M_Number ).bottom )
+						M_ChangeRect.top = pDoc -> R_Rec.GetAt ( M_Number ).bottom ;
+				}
+			}
+			// 아래쪽 방향으로만 변경하는 경우
+			else if ( M_IsChangeRectVerticalBottom == 'o' ) {
+				
+				if ( point.y >= M_Rect.top ) {
+					M_ChangeRect.bottom += point.y - M_Start.y ;
+					if ( M_ChangeRect.top != pDoc -> R_Rec.GetAt ( M_Number ).top )
+						M_ChangeRect.top = pDoc -> R_Rec.GetAt ( M_Number ).top ;
+				}
+				else {
+					M_ChangeRect.top += point.y - M_Start.y ;
+					if ( M_ChangeRect.bottom != pDoc -> R_Rec.GetAt ( M_Number ).top )
+						M_ChangeRect.bottom = pDoc -> R_Rec.GetAt ( M_Number ).top ;
+				}
+			}
+			// 왼쪽 방향으로만 변경하는 경우
+			else if ( M_IsChangeRectWidthLeft == 'o' ) {
+				
+				if ( point.x <= M_Rect.right ) {
+					M_ChangeRect.left += point.x - M_Start.x ;
+					if ( M_ChangeRect.right != pDoc -> R_Rec.GetAt ( M_Number ).right )
+						M_ChangeRect.right = pDoc -> R_Rec.GetAt ( M_Number ).right ;
+				}
+				else {
+					M_ChangeRect.right += point.x - M_Start.x ;
+					if ( M_ChangeRect.left != pDoc -> R_Rec.GetAt ( M_Number ).right )
+						M_ChangeRect.left = pDoc -> R_Rec.GetAt ( M_Number ).right ;
+				}
+			}
+			// 오른쪽 방향으로만 변경하는 경우
+			else {
+
+				if ( point.x >= M_Rect.left ) {
+					M_ChangeRect.right += point.x - M_Start.x ;
+					if ( M_ChangeRect.left != pDoc -> R_Rec.GetAt ( M_Number ).left )
+						M_ChangeRect.left = pDoc -> R_Rec.GetAt ( M_Number ).left ;
+				}
+				else {
+					M_ChangeRect.left += point.x - M_Start.x ;
+					if ( M_ChangeRect.right != pDoc -> R_Rec.GetAt ( M_Number ).left )
+						M_ChangeRect.right = pDoc -> R_Rec.GetAt ( M_Number ).left ;
+				}
+			}
+		}
+
+		M_Start.x = point.x ;
+		M_Start.y = point.y ;
+
+		Invalidate () ;
+
+	}
+	// 원의 크기를 변경시키는 경우
+	else if ( M_ChangeEllipseSize == 'o' ) {
+		// 원을 둘러싼 상자의 각 4 꼭지점을 클릭하여 변경하는 경우
+		if ( M_IsChangeEllipseSide == 'o' ) {
+			// 북서쪽 Skeleton으로 변경하는 경우
+			if ( M_IsChangeEllipseNW == 'o' ) {
+				if ( M_Rect.bottom >= point.y && M_Rect.right >= point.x ) {
+					M_ChangeRect.top += point.y - M_Start.y ;
+					M_ChangeRect.left += point.x - M_Start.x ;
+					if ( M_ChangeRect.right != pDoc -> E_Ellipse.GetAt ( M_Number ).right )
+						M_ChangeRect.right = pDoc -> E_Ellipse.GetAt ( M_Number ).right ;
+					if ( M_ChangeRect.bottom != pDoc -> E_Ellipse.GetAt ( M_Number ).bottom )
+						M_ChangeRect.bottom = pDoc -> E_Ellipse.GetAt ( M_Number ).bottom ;
+				}
+				else if ( M_Rect.bottom <= point.y && M_Rect.right >= point.x ) {
+					M_ChangeRect.bottom += point.y - M_Start.y ;
+					M_ChangeRect.left += point.x - M_Start.x ;
+					if ( M_ChangeRect.top != pDoc -> E_Ellipse.GetAt ( M_Number ).bottom )
+						M_ChangeRect.top = pDoc -> E_Ellipse.GetAt ( M_Number ).bottom ;
+					if ( M_ChangeRect.right != pDoc -> E_Ellipse.GetAt ( M_Number ).right )
+						M_ChangeRect.right = pDoc -> E_Ellipse.GetAt ( M_Number ).right ;
+				}
+				else if ( M_Rect.bottom >= point.y && M_Rect.right <= point.x ) {
+					M_ChangeRect.top += point.y - M_Start.y ;
+					M_ChangeRect.right += point.x - M_Start.x ;
+					if ( M_ChangeRect.left != pDoc -> E_Ellipse.GetAt ( M_Number ).right )
+						M_ChangeRect.left = pDoc -> E_Ellipse.GetAt ( M_Number ).right ;
+					if ( M_ChangeRect.bottom != pDoc -> E_Ellipse.GetAt ( M_Number ).bottom )
+						M_ChangeRect.bottom = pDoc -> E_Ellipse.GetAt ( M_Number ).bottom ;
+				}
+				else {
+					M_ChangeRect.bottom += point.y - M_Start.y ;
+					M_ChangeRect.right += point.x - M_Start.x ;
+					if ( M_ChangeRect.top != pDoc -> E_Ellipse.GetAt ( M_Number ).bottom )
+						M_ChangeRect.top = pDoc -> E_Ellipse.GetAt ( M_Number ).bottom ;
+					if ( M_ChangeRect.left != pDoc -> E_Ellipse.GetAt ( M_Number ).right )
+						M_ChangeRect.left = pDoc -> E_Ellipse.GetAt ( M_Number ).right ;
+				}
+			}
+			// 북동쪽 Skeleton으로 변경하는 경우
+			else if ( M_IsChangeEllipseNE == 'o' ) {
+				if ( M_Rect.bottom >= point.y && M_Rect.left <= point.x ) {
+					M_ChangeRect.top += point.y - M_Start.y ;
+					M_ChangeRect.right += point.x - M_Start.x ;
+					if ( M_ChangeRect.left != pDoc -> E_Ellipse.GetAt ( M_Number ).left )
+						M_ChangeRect.left = pDoc -> E_Ellipse.GetAt ( M_Number ).left ;
+					if ( M_ChangeRect.bottom != pDoc -> E_Ellipse.GetAt ( M_Number ).bottom )
+						M_ChangeRect.bottom = pDoc -> E_Ellipse.GetAt ( M_Number ).bottom ;
+				}
+				else if ( M_Rect.bottom <= point.y && M_Rect.left <= point.x ) {
+					M_ChangeRect.bottom += point.y - M_Start.y ;
+					M_ChangeRect.right += point.x - M_Start.x ;
+					if ( M_ChangeRect.top != pDoc -> E_Ellipse.GetAt ( M_Number ).bottom )
+						M_ChangeRect.top = pDoc -> E_Ellipse.GetAt ( M_Number ).bottom ;
+					if ( M_ChangeRect.left != pDoc -> E_Ellipse.GetAt ( M_Number ).left )
+						M_ChangeRect.left = pDoc -> E_Ellipse.GetAt ( M_Number ).left ;
+				}
+				else if ( M_Rect.bottom >= point.y && M_Rect.left >= point.x ) {
+					M_ChangeRect.top += point.y - M_Start.y ;
+					M_ChangeRect.left += point.x - M_Start.x ;
+					if ( M_ChangeRect.right != pDoc -> E_Ellipse.GetAt ( M_Number ).left )
+						M_ChangeRect.right = pDoc -> E_Ellipse.GetAt ( M_Number ).left ;
+					if ( M_ChangeRect.bottom != pDoc -> E_Ellipse.GetAt ( M_Number ).bottom )
+						M_ChangeRect.bottom = pDoc -> E_Ellipse.GetAt ( M_Number ).bottom ;
+				}
+				else {
+					M_ChangeRect.bottom += point.y - M_Start.y ;
+					M_ChangeRect.left += point.x - M_Start.x ;
+					if ( M_ChangeRect.right != pDoc -> E_Ellipse.GetAt ( M_Number ).left )
+						M_ChangeRect.right = pDoc -> E_Ellipse.GetAt ( M_Number ).left ;
+					if ( M_ChangeRect.top != pDoc -> E_Ellipse.GetAt ( M_Number ).bottom )
+						M_ChangeRect.top = pDoc -> E_Ellipse.GetAt ( M_Number ).bottom ;
+				}
+			}
+			// 남서쪽 Skeleton으로 변경하는 경우
+			else if ( M_IsChangeEllipseSW == 'o' ) {
+				if ( M_Rect.top <= point.y && M_Rect.right >= point.x ) {
+					M_ChangeRect.bottom += point.y - M_Start.y ;
+					M_ChangeRect.left += point.x - M_Start.x ;
+					if ( M_ChangeRect.right != pDoc -> E_Ellipse.GetAt ( M_Number ).right )
+						M_ChangeRect.right = pDoc -> E_Ellipse.GetAt ( M_Number ).right ;
+					if ( M_ChangeRect.top != pDoc -> E_Ellipse.GetAt ( M_Number ).top )
+						M_ChangeRect.top = pDoc -> E_Ellipse.GetAt ( M_Number ).top ;
+				}
+				else if ( M_Rect.top <= point.y && M_Rect.right <= point.x ) {
+					M_ChangeRect.bottom += point.y - M_Start.y ;
+					M_ChangeRect.right += point.x - M_Start.x ;
+					if ( M_ChangeRect.left != pDoc -> E_Ellipse.GetAt ( M_Number ).right )
+						M_ChangeRect.left = pDoc -> E_Ellipse.GetAt ( M_Number ).right ;
+					if ( M_ChangeRect.top != pDoc -> E_Ellipse.GetAt ( M_Number ).top )
+						M_ChangeRect.top = pDoc -> E_Ellipse.GetAt ( M_Number ).top ;
+				}
+				else if ( M_Rect.top >= point.y && M_Rect.right >= point.x ) {
+					M_ChangeRect.top += point.y - M_Start.y ;
+					M_ChangeRect.left += point.x - M_Start.x ;
+					if ( M_ChangeRect.right != pDoc -> E_Ellipse.GetAt ( M_Number ).right )
+						M_ChangeRect.right = pDoc -> E_Ellipse.GetAt ( M_Number ).right ;
+					if ( M_ChangeRect.bottom != pDoc -> E_Ellipse.GetAt ( M_Number ).top )
+						M_ChangeRect.bottom = pDoc -> E_Ellipse.GetAt ( M_Number ).top ;
+				}
+				else {
+					M_ChangeRect.top += point.y - M_Start.y ;
+					M_ChangeRect.right += point.x - M_Start.x ;
+					if ( M_ChangeRect.left != pDoc -> E_Ellipse.GetAt ( M_Number ).right )
+						M_ChangeRect.left = pDoc -> E_Ellipse.GetAt ( M_Number ).right ;
+					if ( M_ChangeRect.bottom != pDoc -> E_Ellipse.GetAt ( M_Number ).top )
+						M_ChangeRect.bottom = pDoc -> E_Ellipse.GetAt ( M_Number ).top ;
+				}
+			}
+			// 남동쪽 Skeleton으로 변경하는 경우
+			else {
+				if ( M_Rect.top <= point.y && M_Rect.left <= point.x ) {
+					M_ChangeRect.bottom += point.y - M_Start.y ;
+					M_ChangeRect.right += point.x - M_Start.x ;
+					if ( M_ChangeRect.left != pDoc -> E_Ellipse.GetAt ( M_Number ).left )
+						M_ChangeRect.left = pDoc -> E_Ellipse.GetAt ( M_Number ).left ;
+					if ( M_ChangeRect.top != pDoc -> E_Ellipse.GetAt ( M_Number ).top )
+						M_ChangeRect.top = pDoc -> E_Ellipse.GetAt ( M_Number ).top ;
+				}
+				else if ( M_Rect.top <= point.y && M_Rect.left >= point.x ) {
+					M_ChangeRect.bottom += point.y - M_Start.y ;
+					M_ChangeRect.left += point.x - M_Start.x ;
+					if ( M_ChangeRect.right != pDoc -> E_Ellipse.GetAt ( M_Number ).left )
+						M_ChangeRect.right = pDoc -> E_Ellipse.GetAt ( M_Number ).left ;
+					if ( M_ChangeRect.top != pDoc -> E_Ellipse.GetAt ( M_Number ).top )
+						M_ChangeRect.top = pDoc -> E_Ellipse.GetAt ( M_Number ).top ;
+				}
+				else if ( M_Rect.top >= point.y && M_Rect.left <= point.x ) {
+					M_ChangeRect.top += point.y - M_Start.y ;
+					M_ChangeRect.right += point.x - M_Start.x ;
+					if ( M_ChangeRect.left != pDoc -> E_Ellipse.GetAt ( M_Number ).left )
+						M_ChangeRect.left = pDoc -> E_Ellipse.GetAt ( M_Number ).left ;
+					if ( M_ChangeRect.bottom != pDoc -> E_Ellipse.GetAt ( M_Number ).top )
+						M_ChangeRect.bottom = pDoc -> E_Ellipse.GetAt ( M_Number ).top ;
+				}
+				else {
+					M_ChangeRect.top += point.y - M_Start.y ;
+					M_ChangeRect.left += point.x - M_Start.x ;
+					if ( M_ChangeRect.right != pDoc -> E_Ellipse.GetAt ( M_Number ).left )
+						M_ChangeRect.right = pDoc -> E_Ellipse.GetAt ( M_Number ).left ;
+					if ( M_ChangeRect.bottom != pDoc -> E_Ellipse.GetAt ( M_Number ).top )
+						M_ChangeRect.bottom = pDoc -> E_Ellipse.GetAt ( M_Number ).top ;
+				}
+			}
+		}
+		// 원을 둘러싼 상자의 4 꼭지점이 아닌 경우
+		else {
+			// 위쪽 방향으로만 변경하는 경우
+			if ( M_IsChangeEllipseVerticalTop == 'o' ) {
+				
+				if ( point.y <= M_Rect.bottom ) {
+					M_ChangeRect.top += point.y - M_Start.y ;
+					if ( M_ChangeRect.bottom != pDoc -> E_Ellipse.GetAt ( M_Number ).bottom )
+						M_ChangeRect.bottom = pDoc -> E_Ellipse.GetAt ( M_Number ).bottom ;
+				}
+				else {
+					M_ChangeRect.bottom += point.y - M_Start.y ;
+					if ( M_ChangeRect.top != pDoc -> E_Ellipse.GetAt ( M_Number ).bottom )
+						M_ChangeRect.top = pDoc -> E_Ellipse.GetAt ( M_Number ).bottom ;
+				}
+			}
+			// 아래쪽 방향으로만 변경하는 경우
+			else if ( M_IsChangeEllipseVerticalBottom == 'o' ) {
+				
+				if ( point.y >= M_Rect.top ) {
+					M_ChangeRect.bottom += point.y - M_Start.y ;
+					if ( M_ChangeRect.top != pDoc -> E_Ellipse.GetAt ( M_Number ).top )
+						M_ChangeRect.top = pDoc -> E_Ellipse.GetAt ( M_Number ).top ;
+				}
+				else {
+					M_ChangeRect.top += point.y - M_Start.y ;
+					if ( M_ChangeRect.bottom != pDoc -> E_Ellipse.GetAt ( M_Number ).top )
+						M_ChangeRect.bottom = pDoc -> E_Ellipse.GetAt ( M_Number ).top ;
+				}
+			}
+			// 왼쪽 방향으로만 변경하는 경우
+			else if ( M_IsChangeEllipseWidthLeft == 'o' ) {
+				
+				if ( point.x <= M_Rect.right ) {
+					M_ChangeRect.left += point.x - M_Start.x ;
+					if ( M_ChangeRect.right != pDoc -> E_Ellipse.GetAt ( M_Number ).right )
+						M_ChangeRect.right = pDoc -> E_Ellipse.GetAt ( M_Number ).right ;
+				}
+				else {
+					M_ChangeRect.right += point.x - M_Start.x ;
+					if ( M_ChangeRect.left != pDoc -> E_Ellipse.GetAt ( M_Number ).right )
+						M_ChangeRect.left = pDoc -> E_Ellipse.GetAt ( M_Number ).right ;
+				}
+			}
+			// 오른쪽 방향으로만 변경하는 경우
+			else {
+
+				if ( point.x >= M_Rect.left ) {
+					M_ChangeRect.right += point.x - M_Start.x ;
+					if ( M_ChangeRect.left != pDoc -> E_Ellipse.GetAt ( M_Number ).left )
+						M_ChangeRect.left = pDoc -> E_Ellipse.GetAt ( M_Number ).left ;
+				}
+				else {
+					M_ChangeRect.left += point.x - M_Start.x ;
+					if ( M_ChangeRect.right != pDoc -> E_Ellipse.GetAt ( M_Number ).left )
+						M_ChangeRect.right = pDoc -> E_Ellipse.GetAt ( M_Number ).left ;
+				}
+			}
+		}
+
+		M_Start.x = point.x ;
+		M_Start.y = point.y ;
+
+		Invalidate () ;
+
 	}
 	// 객체를 이동시키는 경우
 	else if ( M_IsSelect == 'o' ) {
@@ -2586,18 +3587,18 @@ void CGraphicEditorView::OnLButtonUp(UINT nFlags, CPoint point)
 					M_Rect.bottom = pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt ( P_CurrentPoint ).y + pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 ;
 				else if ( pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt ( P_CurrentPoint ).y - pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 <= M_Rect.top )
 					M_Rect.top = pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt ( P_CurrentPoint ).y - pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 ;
+
 				Invalidate () ;
 			}
 			// 만약 첫번째 Skeleton을 변경한 경우
 			else if ( P_IsStart == 'o' ) {
 				P_Insert.Poly_point.SetAt ( 0, point ) ;
 				pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.SetAt ( 0, point ) ;
-				Invalidate () ;
 				P_IsStart = 'x' ;
 				P_IsSkeletonStart = 'x' ;
 
 				if ( pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt ( 0 ).x + pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 >= M_Rect.right )
-					M_Rect.right = pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt ( P_CurrentPoint).x + pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 ;
+					M_Rect.right = pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt ( 0 ).x + pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 ;
 				else if ( pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt ( 0 ).x - pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 <= M_Rect.left )
 					M_Rect.left = pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt ( 0 ).x - pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 ;
 
@@ -2606,23 +3607,37 @@ void CGraphicEditorView::OnLButtonUp(UINT nFlags, CPoint point)
 				else if ( pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt ( 0 ).y - pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 <= M_Rect.top )
 					M_Rect.top = pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt ( 0 ).y - pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 ;
 
+				Invalidate () ;
+
 			}
 			// 만약 첫번째, 마지막 Skeleton외 다른 Skeleton을 변경한 경우
 			else if ( P_ChangeSkeleton > 0 ) {
 				P_Insert.Poly_point.SetAt ( P_ChangeSkeleton, point ) ;
 				pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.SetAt ( P_ChangeSkeleton, point ) ;
+
+				int Max_x = pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt (0).x ;
+				int Min_x = Max_x ;
+				int Max_y = pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt (0).y ;
+				int Min_y = Max_y ;
+
+				for ( int i = 1 ; i < pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetCount () ; i++ ) {
+					if ( pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt (i).x > Max_x )
+						Max_x = pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt (i).x ;
+					else if ( pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt (i).x < Min_x )
+						Min_x = pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt (i).x ;
+
+					if ( pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt (i).y > Max_y )
+						Max_y = pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt (i).y ;
+					else if ( pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt (i).y < Min_y )
+						Min_y = pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt (i).y ;
+				}
+
+				M_Rect.top = Min_y - pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 ;
+				M_Rect.left = Min_x - pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 ;
+				M_Rect.bottom = Max_y + pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 ;
+				M_Rect.right = Max_x + pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 ;
+				
 				Invalidate () ;
-
-				if ( pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt ( P_ChangeSkeleton ).x + pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 >= M_Rect.right )
-					M_Rect.right = pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt ( P_ChangeSkeleton).x + pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 ;
-				else if ( pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt ( P_ChangeSkeleton ).x - pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 <= M_Rect.left )
-					M_Rect.left = pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt ( P_ChangeSkeleton ).x - pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 ;
-
-				if ( pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt ( P_ChangeSkeleton ).y + pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 >= M_Rect.bottom )
-					M_Rect.bottom = pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt ( P_ChangeSkeleton ).y + pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 ;
-				else if ( pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt ( P_ChangeSkeleton ).y - pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 <= M_Rect.top )
-					M_Rect.top = pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt ( P_ChangeSkeleton ).y - pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 ;
-
 				P_ChangeSkeleton = 0 ;
 			}
 			P_CanMove = 'x' ;
@@ -2630,11 +3645,63 @@ void CGraphicEditorView::OnLButtonUp(UINT nFlags, CPoint point)
 			M_IsSelect = 'x' ;
 		}
 	}
+	// 상자를 변경하다 클릭을 땐 경우
+	else if ( M_IsDraw == 'o' && M_IsRectSelect == 'o' && M_ChangeRectSize == 'o' ) {
+		M_Rect.top = pDoc -> R_Rec.GetAt ( M_Number ).top = M_ChangeRect.top ;
+		M_Rect.bottom = pDoc -> R_Rec.GetAt ( M_Number ).bottom = M_ChangeRect.bottom ;
+		M_Rect.left = pDoc -> R_Rec.GetAt ( M_Number ).left = M_ChangeRect.left ;
+		M_Rect.right = pDoc -> R_Rec.GetAt ( M_Number ).right = M_ChangeRect.right ;
+
+		M_Rect.top -= pDoc -> R_Thickness.GetAt ( M_Number ) / 2 + 2 ;
+		M_Rect.bottom += pDoc -> R_Thickness.GetAt ( M_Number ) / 2 + 2 ;
+		M_Rect.left -= pDoc -> R_Thickness.GetAt ( M_Number ) / 2 + 2 ;
+		M_Rect.right += pDoc -> R_Thickness.GetAt ( M_Number ) / 2 + 2 ;
+
+		M_ChangeRectSize = 'x' ;
+		M_IsChangeRectSide = 'x' ;
+		M_IsChangeRectVerticalTop = 'x' ;
+		M_IsChangeRectVerticalBottom = 'x' ;
+		M_IsChangeRectNW = 'x' ;
+		M_IsChangeRectNE = 'x' ;
+		M_IsChangeRectSW = 'x' ;
+		M_IsChangeRectSE = 'x' ;
+		M_IsChangeRectWidthLeft = 'x' ;
+		M_IsChangeRectWidthRight = 'x' ;
+
+		Invalidate () ;
+	}
+	// 원을 변경하다 클릭을 땐 경우
+	else if ( M_IsDraw == 'o' && M_IsEllipseSelect == 'o' && M_ChangeEllipseSize == 'o' ) {
+		M_Rect.top = pDoc -> E_Ellipse.GetAt ( M_Number ).top = M_ChangeRect.top ;
+		M_Rect.bottom = pDoc -> E_Ellipse.GetAt ( M_Number ).bottom = M_ChangeRect.bottom ;
+		M_Rect.left = pDoc -> E_Ellipse.GetAt ( M_Number ).left = M_ChangeRect.left ;
+		M_Rect.right = pDoc -> E_Ellipse.GetAt ( M_Number ).right = M_ChangeRect.right ;
+
+		M_Rect.top -= pDoc -> E_Thickness.GetAt ( M_Number ) / 2 + 2 ;
+		M_Rect.bottom += pDoc -> E_Thickness.GetAt ( M_Number ) / 2 + 2 ;
+		M_Rect.left -= pDoc -> E_Thickness.GetAt ( M_Number ) / 2 + 2 ;
+		M_Rect.right += pDoc -> E_Thickness.GetAt ( M_Number ) / 2 + 2 ;
+
+		M_ChangeEllipseSize = 'x' ;
+		M_IsChangeEllipseSide = 'x' ;
+		M_IsChangeEllipseVerticalTop = 'x' ;
+		M_IsChangeEllipseVerticalBottom = 'x' ;
+		M_IsChangeEllipseNW = 'x' ;
+		M_IsChangeEllipseNE = 'x' ;
+		M_IsChangeEllipseSW = 'x' ;
+		M_IsChangeEllipseSE = 'x' ;
+		M_IsChangeEllipseWidthLeft = 'x' ;
+		M_IsChangeEllipseWidthRight = 'x' ;
+
+		Invalidate () ;
+	}
 	// 객체를 이동시키다 클릭을 땐 경우
 	else if ( M_IsMove == 'o' ) {
 		if ( M_What == 'P' ) {
-			for ( int i = 0 ; i < pDoc -> P_Poly.GetAt ( M_Number ).Poly_point.GetCount () ; i++ )
-				P_Insert.Poly_point.SetAt ( i, pDoc -> P_Poly.GetAt ( M_Number ).Poly_point.GetAt (i) ) ;
+			if ( P_Insert.Poly_point.GetSize () > 0 ) {
+				for ( int i = 0 ; i < pDoc -> P_Poly.GetAt ( M_Number ).Poly_point.GetCount () ; i++ )
+					P_Insert.Poly_point.SetAt ( i, pDoc -> P_Poly.GetAt ( M_Number ).Poly_point.GetAt (i) ) ;
+			}
 		}
 		Invalidate () ;
 		M_IsSelect = 'x' ;
@@ -2908,7 +3975,17 @@ BOOL CGraphicEditorView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 		// 평상시엔 기본 커서로 변환 합니다.
 		if ( IsNormal == 'o' )
 			::SetCursor(AfxGetApp()->LoadStandardCursor (IDC_ARROW)) ;
-		
+		// 선택한 PolyLine의 특정 Skeleton에 근접할 경우 커서를 변환합니다.
+		else if ( M_IsDraw == 'o' && P_IsContinue == 'o' ) {
+			for ( int i = 0 ; i < P_Insert.Poly_point.GetCount () ; i++ ) {
+				if ( P_Insert.Poly_point.GetAt (i).x - 15 <= point.x && P_Insert.Poly_point.GetAt (i).x + 15 >= point.x &&
+					 P_Insert.Poly_point.GetAt (i).y - 15 <= point.y && P_Insert.Poly_point.GetAt (i).y + 15 >= point.y ) {
+					::SetCursor(AfxGetApp()->LoadStandardCursor (IDC_SIZEALL)) ;
+					Flag = 'o' ; break ;
+				}
+			}
+		}
+
 		if ( M_IsDraw == 'o' && M_IsLineSelect == 'o' &&
 			  ((pDoc -> L_Line.GetAt ( M_Number ).Start.x - 15 <= point.x && pDoc -> L_Line.GetAt ( M_Number ).Start.x + 15 >= point.x
 			  && pDoc -> L_Line.GetAt ( M_Number ).Start.y - 15 <= point.y && pDoc -> L_Line.GetAt ( M_Number ).Start.y + 15 >= point.y) ||
@@ -2917,9 +3994,91 @@ BOOL CGraphicEditorView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 
 			::SetCursor(AfxGetApp()->LoadStandardCursor (IDC_SIZEALL)) ;
 		}
+		else if ( M_IsDraw == 'o' && M_IsEllipseSelect == 'o' && M_IsChangeEllipseSide == 'o' ) {
+			if ( M_IsChangeEllipseNW == 'o' || M_IsChangeEllipseSE == 'o' )
+				::SetCursor(AfxGetApp()->LoadStandardCursor (IDC_SIZENWSE)) ;
+			else if ( M_IsChangeEllipseNE == 'o' || M_IsChangeEllipseSW == 'o' )
+				::SetCursor(AfxGetApp()->LoadStandardCursor (IDC_SIZENESW)) ;
+		}
+		else if ( M_IsDraw == 'o' && M_IsEllipseSelect == 'o' && (M_IsChangeEllipseVerticalTop == 'o' || M_IsChangeEllipseVerticalBottom == 'o' ||
+				  M_IsChangeEllipseWidthLeft == 'o' || M_IsChangeEllipseWidthRight == 'o') ) {
+			if ( M_IsChangeEllipseVerticalTop == 'o' || M_IsChangeEllipseVerticalBottom == 'o' )
+				::SetCursor(AfxGetApp()->LoadStandardCursor (IDC_SIZENS)) ;
+			else {
+				::SetCursor(AfxGetApp()->LoadStandardCursor (IDC_SIZEWE)) ;
+			}
+		}
+		else if ( M_IsDraw == 'o' && M_IsEllipseSelect == 'o' &&
+				(( M_Rect.top - 15 <= point.y && M_Rect.top + 15 >= point.y && M_Rect.left - 15 <= point.x && M_Rect.left + 15 >= point.x ) ||
+				  ( M_Rect.top - 15 <= point.y && M_Rect.top + 15 >= point.y && M_Rect.right - 15 <= point.x && M_Rect.right + 15 >= point.x ) ||
+				  ( M_Rect.bottom - 15 <= point.y && M_Rect.bottom + 15 >= point.y && M_Rect.left - 15 <= point.x && M_Rect.left + 15 >= point.x ) ||
+				  ( M_Rect.bottom - 15 <= point.y && M_Rect.bottom + 15 >= point.y && M_Rect.right - 15 <= point.x && M_Rect.right + 15 >= point.x ) ||
+				  ((M_Rect.bottom - M_Rect.top) / 2 + M_Rect.top - 15 <= point.y && (M_Rect.bottom - M_Rect.top) / 2 + M_Rect.top + 15 >= point.y &&
+				    M_Rect.left - 15 <= point.x && M_Rect.left + 15 >= point.x) ||
+				  ((M_Rect.bottom - M_Rect.top) / 2 + M_Rect.top - 15 <= point.y && (M_Rect.bottom - M_Rect.top) / 2 + M_Rect.top + 15 >= point.y &&
+				    M_Rect.right - 15 <= point.x && M_Rect.right + 15 >= point.x)) ) {
+
+			if ( ( M_Rect.top - 15 <= point.y && M_Rect.top + 15 >= point.y && M_Rect.left - 15 <= point.x && M_Rect.left + 15 >= point.x ) ||
+				 ( M_Rect.bottom - 15 <= point.y && M_Rect.bottom + 15 >= point.y && M_Rect.right - 15 <= point.x && M_Rect.right + 15 >= point.x ) )
+				::SetCursor(AfxGetApp()->LoadStandardCursor (IDC_SIZENWSE)) ;
+			else if ( ( M_Rect.top - 15 <= point.y && M_Rect.top + 15 >= point.y && M_Rect.right - 15 <= point.x && M_Rect.right + 15 >= point.x ) ||
+					  ( M_Rect.bottom - 15 <= point.y && M_Rect.bottom + 15 >= point.y && M_Rect.left - 15 <= point.x && M_Rect.left + 15 >= point.x ) )
+				::SetCursor(AfxGetApp()->LoadStandardCursor (IDC_SIZENESW)) ;
+			else
+				::SetCursor(AfxGetApp()->LoadStandardCursor (IDC_SIZEWE)) ;
+		}
+		else if ( M_IsDraw == 'o' && M_IsEllipseSelect == 'o' &&
+				(((M_Rect.right - M_Rect.left) / 2 + M_Rect.left + 15 >= point.x && (M_Rect.right - M_Rect.left) / 2 + M_Rect.left - 15 <= point.x &&
+				  M_Rect.top - 15 <= point.y && M_Rect.top + 15 >= point.y ) ||
+				((M_Rect.right - M_Rect.left) / 2 + M_Rect.left + 15 >= point.x && (M_Rect.right - M_Rect.left) / 2 + M_Rect.left - 15 <= point.x &&
+				  M_Rect.bottom - 15 <= point.y && M_Rect.bottom + 15 >= point.y)) ) {
+			::SetCursor(AfxGetApp()->LoadStandardCursor (IDC_SIZENS)) ;
+		}
+		else if ( M_IsDraw == 'o' && M_IsRectSelect == 'o' && M_IsChangeRectSide == 'o' ) {
+			if ( M_IsChangeRectNW == 'o' || M_IsChangeRectSE == 'o' )
+				::SetCursor(AfxGetApp()->LoadStandardCursor (IDC_SIZENWSE)) ;
+			else if ( M_IsChangeRectNE == 'o' || M_IsChangeRectSW == 'o' )
+				::SetCursor(AfxGetApp()->LoadStandardCursor (IDC_SIZENESW)) ;
+		}
+		else if ( M_IsDraw == 'o' && M_IsRectSelect == 'o' && (M_IsChangeRectVerticalTop == 'o' || M_IsChangeRectVerticalBottom == 'o' ||
+				  M_IsChangeRectWidthLeft == 'o' || M_IsChangeRectWidthRight == 'o') ) {
+			if ( M_IsChangeRectVerticalTop == 'o' || M_IsChangeRectVerticalBottom == 'o' )
+				::SetCursor(AfxGetApp()->LoadStandardCursor (IDC_SIZENS)) ;
+			else {
+				::SetCursor(AfxGetApp()->LoadStandardCursor (IDC_SIZEWE)) ;
+			}
+		}
+		else if ( M_IsDraw == 'o' && M_IsRectSelect == 'o' &&
+				(( M_Rect.top - 15 <= point.y && M_Rect.top + 15 >= point.y && M_Rect.left - 15 <= point.x && M_Rect.left + 15 >= point.x ) ||
+				  ( M_Rect.top - 15 <= point.y && M_Rect.top + 15 >= point.y && M_Rect.right - 15 <= point.x && M_Rect.right + 15 >= point.x ) ||
+				  ( M_Rect.bottom - 15 <= point.y && M_Rect.bottom + 15 >= point.y && M_Rect.left - 15 <= point.x && M_Rect.left + 15 >= point.x ) ||
+				  ( M_Rect.bottom - 15 <= point.y && M_Rect.bottom + 15 >= point.y && M_Rect.right - 15 <= point.x && M_Rect.right + 15 >= point.x ) ||
+				  ((M_Rect.bottom - M_Rect.top) / 2 + M_Rect.top - 15 <= point.y && (M_Rect.bottom - M_Rect.top) / 2 + M_Rect.top + 15 >= point.y &&
+				    M_Rect.left - 15 <= point.x && M_Rect.left + 15 >= point.x) ||
+				  ((M_Rect.bottom - M_Rect.top) / 2 + M_Rect.top - 15 <= point.y && (M_Rect.bottom - M_Rect.top) / 2 + M_Rect.top + 15 >= point.y &&
+				    M_Rect.right - 15 <= point.x && M_Rect.right + 15 >= point.x)) ) {
+
+			if ( ( M_Rect.top - 15 <= point.y && M_Rect.top + 15 >= point.y && M_Rect.left - 15 <= point.x && M_Rect.left + 15 >= point.x ) ||
+				 ( M_Rect.bottom - 15 <= point.y && M_Rect.bottom + 15 >= point.y && M_Rect.right - 15 <= point.x && M_Rect.right + 15 >= point.x ) )
+				::SetCursor(AfxGetApp()->LoadStandardCursor (IDC_SIZENWSE)) ;
+			else if ( ( M_Rect.top - 15 <= point.y && M_Rect.top + 15 >= point.y && M_Rect.right - 15 <= point.x && M_Rect.right + 15 >= point.x ) ||
+					  ( M_Rect.bottom - 15 <= point.y && M_Rect.bottom + 15 >= point.y && M_Rect.left - 15 <= point.x && M_Rect.left + 15 >= point.x ) )
+				::SetCursor(AfxGetApp()->LoadStandardCursor (IDC_SIZENESW)) ;
+			else
+				::SetCursor(AfxGetApp()->LoadStandardCursor (IDC_SIZEWE)) ;
+		}
+		else if ( M_IsDraw == 'o' && M_IsRectSelect == 'o' &&
+				(((M_Rect.right - M_Rect.left) / 2 + M_Rect.left + 15 >= point.x && (M_Rect.right - M_Rect.left) / 2 + M_Rect.left - 15 <= point.x &&
+				  M_Rect.top - 15 <= point.y && M_Rect.top + 15 >= point.y ) ||
+				((M_Rect.right - M_Rect.left) / 2 + M_Rect.left + 15 >= point.x && (M_Rect.right - M_Rect.left) / 2 + M_Rect.left - 15 <= point.x &&
+				  M_Rect.bottom - 15 <= point.y && M_Rect.bottom + 15 >= point.y)) ) {
+			::SetCursor(AfxGetApp()->LoadStandardCursor (IDC_SIZENS)) ;
+		}
 		else if ( M_IsMove == 'o' && Flag == 'x' ) {
-			if ( M_IsDraw == 'x' ) 
+			if ( M_IsDraw == 'x' )  {
 				M_IsLineSelect = 'x' ;
+				M_IsRectSelect = 'x' ;
+			}
 
 			int L_Number = pDoc -> L_Count - 1;
 			int R_Number = pDoc -> R_Count - 1;
@@ -3471,20 +4630,27 @@ void CGraphicEditorView::OnLButtonDblClk(UINT nFlags, CPoint point)
 {
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
 
-	// 더블 클릭할 경우 PolyLine을 끝낸다.
-	if ( P_IsDraw == 'o' ) {
-		P_CanMove = 'x' ;
-		IsNormal = 'o' ;
-		P_Insert.Poly_point.RemoveAll () ;
-		P_ChangeSkeleton = 0 ;
-		P_IsContinue = 'x' ;
-		P_DrawContinue = 'x' ;
-		P_IsStart = 'x' ;
-		P_IsMove = 'x' ;
-	}
-
+	P_CanMove = 'x' ;
+	IsNormal = 'o' ;
+	P_Insert.Poly_point.RemoveAll () ;
+	P_ChangeSkeleton = 0 ;
+	P_IsContinue = 'x' ;
+	P_DrawContinue = 'x' ;
+	P_IsStart = 'x' ;
+	P_IsMove = 'x' ;
 	M_IsChangeLineStart = 'x' ;
 	M_ChangeLineOnePoint = 'x' ;
+	M_IsRectSelect = 'x' ;
+	M_ChangeRectSize = 'x' ;
+	M_IsChangeRectVerticalTop = 'x' ;
+	M_IsChangeRectVerticalBottom = 'x' ;
+	M_IsChangeRectSide = 'x' ;
+	M_IsChangeRectNW = 'x' ;
+	M_IsChangeRectNE = 'x' ;
+	M_IsChangeRectSW = 'x' ;
+	M_IsChangeRectSE = 'x' ;
+	M_IsChangeRectWidthLeft = 'x' ;
+	M_IsChangeRectWidthRight = 'x' ;
 	M_IsLineSelect = 'x' ;
 	M_IsSelect = 'x' ;
 	M_IsDraw = 'x' ;
@@ -3557,7 +4723,34 @@ void CGraphicEditorView::OnChangefillcolor()
 void CGraphicEditorView::OnNofillcolor()
 {
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
-	m_IsFillColor = 'x' ;
+
+	CGraphicEditorDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	if (!pDoc)
+		return;
+
+	if ( M_IsDraw != 'o' )
+		m_IsFillColor = 'x' ;
+	else {
+		if ( M_What == _T ("R") )
+			pDoc -> R_FillColor.GetAt ( M_Number ) = RGB (0,0,0) ;
+		else if ( M_What == _T("E") )
+			pDoc -> E_FillColor.GetAt ( M_Number ) = RGB (0,0,0) ;
+		else if ( M_What == _T("T") )
+			pDoc -> T_FillColor.GetAt ( M_Number ) = RGB (0,0,0) ;
+		else if ( M_What == _T("RT") )
+			pDoc -> RT_FillColor.GetAt ( M_Number ) = RGB (0,0,0) ;
+		else if ( M_What == _T("RightT") )
+			pDoc -> RightT_FillColor.GetAt ( M_Number ) = RGB (0,0,0) ;
+		else if ( M_What == _T("RRightT") )
+			pDoc -> RRightT_FillColor.GetAt ( M_Number ) = RGB (0,0,0) ;
+		else if ( M_What == _T("LTRT") )
+			pDoc -> LTRT_FillColor.GetAt ( M_Number ) = RGB (0,0,0) ;
+		else if ( M_What == _T("RTLT") )
+			pDoc -> RTLT_FillColor.GetAt ( M_Number ) = RGB (0,0,0) ;
+
+		Invalidate () ;
+	}
 }
 
 // 세모 그리기 모드
@@ -3905,7 +5098,6 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 		// Delete 키나 백 스페이스 키를 누르면 해당 객체를 삭제합니다.
 		if ( nChar == VK_DELETE || nChar == VK_BACK ) {
 			if ( M_What == _T ("L") ) {
-				M_IsLineSelect == 'x' ;
 				M_ChangeLineOnePoint = 'x' ;
 				M_IsChangeLineStart = 'x' ;
 				M_IsSelect = 'x' ;
@@ -4013,7 +5205,6 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 				M_Number = 0 ;
 			}
 			else if ( M_What == _T ("R") ) {
-				M_IsLineSelect == 'x' ;
 				M_ChangeLineOnePoint = 'x' ;
 				M_IsChangeLineStart = 'x' ;
 				M_IsSelect = 'x' ;
