@@ -17,6 +17,7 @@
 #include "GraphicEditorDoc.h"
 #include "GraphicEditorView.h"
 #include "Thickness.h"
+#include "FillPattern.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -49,14 +50,14 @@ BEGIN_MESSAGE_MAP(CGraphicEditorView, CScrollView)
 	ON_COMMAND(ID_DrawReverseTri, &CGraphicEditorView::OnDrawreversetri)
 	ON_COMMAND(ID_Thickness, &CGraphicEditorView::OnThickness)
 	ON_COMMAND(ID_RightAngledTri, &CGraphicEditorView::OnRightangledtri)
-//	ON_COMMAND(ID_RRightAngledTri, &CGraphicEditorView::OnRrightangledtri)
 ON_COMMAND(ID_RRightAngledTri, &CGraphicEditorView::OnRRrightangledtri)
 ON_COMMAND(ID_RightToLeftTri, &CGraphicEditorView::OnRighttolefttri)
 ON_COMMAND(ID_LeftToRightTri, &CGraphicEditorView::OnLefttorighttri)
 ON_COMMAND(ID_Font, &CGraphicEditorView::OnFont)
-//ON_UPDATE_COMMAND_UI(ID_Font, &CGraphicEditorView::OnUpdateFont)
 ON_COMMAND(ID_Text, &CGraphicEditorView::OnText)
 ON_WM_KEYDOWN()
+ON_WM_CHAR()
+ON_COMMAND(ID_FillPattern, &CGraphicEditorView::OnFillpattern)
 END_MESSAGE_MAP()
 
 // CGraphicEditorView 생성/소멸
@@ -102,6 +103,7 @@ CGraphicEditorView::CGraphicEditorView()
 	// 텍스트 삽입에 필요한 변수 초기화
 	Text_IsText = 'x' ;
 	Text_IsFont = 'x' ;
+	Text_IsKeyDown = 'x' ;
 
 	// 선 그리기에 필요한 변수들 초기화
 	L_IsDraw = 'x' ;
@@ -264,7 +266,7 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 			if ( pDoc -> R_Color.GetAt (R_Number) == RGB (0,0,0) ) {
 
 				// 채우기 색상을 가지지 않았을 경우의 출력
-				if ( pDoc -> R_FillColor.GetAt (R_Number) == RGB (0,0,0) ) {
+				if ( pDoc -> R_IsNoFill.GetAt (R_Number) == 'o' ) {
 					CPen pen;
 					pen.CreatePen( PS_SOLID, pDoc -> R_Thickness.GetAt (R_Number), RGB (0,0,0) ) ;
 					CPen* oldPen = pDC->SelectObject( &pen ) ;
@@ -289,7 +291,7 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 			else {
 
 				// 채우기 색상을 가지지 않았을 경우의 출력
-				if ( pDoc -> R_FillColor.GetAt (R_Number) == RGB (0,0,0) ) {
+				if ( pDoc -> R_IsNoFill.GetAt (R_Number) == 'o' ) {
 					CPen pen;
 					pen.CreatePen( PS_SOLID, pDoc -> R_Thickness.GetAt (R_Number), pDoc -> R_Color.GetAt (R_Number) ) ;
 					CPen* oldPen = pDC->SelectObject( &pen ) ;
@@ -467,7 +469,7 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 			// 선 색을 가지지 않았을 경우의 출력
 			if ( pDoc -> E_Color.GetAt (E_Number) == RGB (0,0,0) ) {
 				// 채우기 색상을 가지지 않았을 경우의 출력
-				if ( pDoc -> E_FillColor.GetAt (E_Number) == RGB (0,0,0) ) {
+				if ( pDoc -> E_IsNoFill.GetAt (E_Number) == 'o' ) {
 					CPen pen;
 					pen.CreatePen( PS_SOLID, pDoc -> E_Thickness.GetAt (E_Number), RGB (0,0,0) ) ;
 					CPen* oldPen = pDC->SelectObject( &pen ) ;
@@ -491,7 +493,7 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 			// 특정 선 색상을 가졌을 경우의 출력
 			else {
 				// 채우기 색상을 가지지 않았을 경우의 출력
-				if ( pDoc -> E_FillColor.GetAt (E_Number) == RGB (0,0,0) ) {
+				if ( pDoc -> E_IsNoFill.GetAt (E_Number) == 'o' ) {
 					CPen pen;
 					pen.CreatePen( PS_SOLID, pDoc -> E_Thickness.GetAt (E_Number), pDoc -> E_Color.GetAt (E_Number) ) ;
 					CPen* oldPen = pDC->SelectObject( &pen ) ;
@@ -636,7 +638,7 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 			if ( pDoc -> T_Color.GetAt (T_Number) == RGB (0,0,0) ) {
 
 				// 채우기 색상을 가지지 않았을 경우의 출력
-				if ( pDoc -> T_FillColor.GetAt (T_Number) == RGB (0,0,0) ) {
+				if ( pDoc -> T_IsNoFill.GetAt (T_Number) == 'o' ) {
 					CPen pen;
 					pen.CreatePen( PS_SOLID, pDoc -> T_Thickness.GetAt (T_Number), RGB (0,0,0) ) ;
 					CPen* oldPen = pDC->SelectObject( &pen ) ;
@@ -662,7 +664,7 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 			else {
 
 				// 채우기 색상을 가지지 않았을 경우의 출력
-				if ( pDoc -> T_FillColor.GetAt (T_Number) == RGB (0,0,0) ) {
+				if ( pDoc -> T_IsNoFill.GetAt (T_Number) == 'o' ) {
 					CPen pen ( PS_SOLID, pDoc -> T_Thickness.GetAt (T_Number), pDoc -> T_Color.GetAt (T_Number) );
 					CPen *Draw_Pen = pDC -> SelectObject(&pen);
 					pDC -> SelectStockObject ( NULL_BRUSH ) ;
@@ -804,7 +806,7 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 			if ( pDoc -> RT_Color.GetAt (RT_Number) == RGB (0,0,0) ) {
 
 				// 채우기 색상을 가지지 않았을 경우의 출력
-				if ( pDoc -> RT_FillColor.GetAt (RT_Number) == RGB (0,0,0) ) {
+				if ( pDoc -> RT_IsNoFill.GetAt (RT_Number) == 'o' ) {
 					CPen pen;
 					pen.CreatePen( PS_SOLID, pDoc -> RT_Thickness.GetAt (RT_Number), RGB (0,0,0) ) ;
 					CPen* oldPen = pDC->SelectObject( &pen ) ;
@@ -830,7 +832,7 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 			else {
 
 				// 채우기 색상을 가지지 않았을 경우의 출력
-				if ( pDoc -> RT_FillColor.GetAt (RT_Number) == RGB (0,0,0) ) {
+				if ( pDoc -> RT_IsNoFill.GetAt (RT_Number) == 'o' ) {
 					CPen pen ( PS_SOLID, pDoc -> RT_Thickness.GetAt (RT_Number), pDoc -> RT_Color.GetAt (RT_Number) );
 					CPen *Draw_Pen = pDC -> SelectObject(&pen);
 					pDC -> SelectStockObject ( NULL_BRUSH ) ;
@@ -978,7 +980,7 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 			if ( pDoc -> RightT_Color.GetAt (RightT_Number) == RGB (0,0,0) ) {
 
 				// 채우기 색상을 가지지 않았을 경우의 출력
-				if ( pDoc -> RightT_FillColor.GetAt (RightT_Number) == RGB (0,0,0) ) {
+				if ( pDoc -> RightT_IsNoFill.GetAt (RightT_Number) == 'o' ) {
 					CPen pen;
 					pen.CreatePen( PS_SOLID, pDoc -> RightT_Thickness.GetAt (RightT_Number), RGB (0,0,0) ) ;
 					CPen* oldPen = pDC->SelectObject( &pen ) ;
@@ -1004,7 +1006,7 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 			else {
 
 				// 채우기 색상을 가지지 않았을 경우의 출력
-				if ( pDoc -> RightT_FillColor.GetAt (RightT_Number) == RGB (0,0,0) ) {
+				if ( pDoc -> RightT_IsNoFill.GetAt (RightT_Number) == 'o' ) {
 					CPen pen ( PS_SOLID, pDoc -> RightT_Thickness.GetAt (RightT_Number), pDoc -> RightT_Color.GetAt (RightT_Number) );
 					CPen *Draw_Pen = pDC -> SelectObject(&pen);
 					pDC -> SelectStockObject ( NULL_BRUSH ) ;
@@ -1175,7 +1177,7 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 			if ( pDoc -> RRightT_Color.GetAt (RRightT_Number) == RGB (0,0,0) ) {
 
 				// 채우기 색상을 가지지 않았을 경우의 출력
-				if ( pDoc -> RRightT_FillColor.GetAt (RRightT_Number) == RGB (0,0,0) ) {
+				if ( pDoc -> RRightT_IsNoFill.GetAt (RRightT_Number) == 'o' ) {
 					CPen pen;
 					pen.CreatePen( PS_SOLID, pDoc -> RRightT_Thickness.GetAt (RRightT_Number), RGB (0,0,0) ) ;
 					CPen* oldPen = pDC->SelectObject( &pen ) ;
@@ -1201,7 +1203,7 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 			else {
 
 				// 채우기 색상을 가지지 않았을 경우의 출력
-				if ( pDoc -> RRightT_FillColor.GetAt (RRightT_Number) == RGB (0,0,0) ) {
+				if ( pDoc -> RRightT_IsNoFill.GetAt (RRightT_Number) == 'o' ) {
 					CPen pen ( PS_SOLID, pDoc -> RRightT_Thickness.GetAt (RRightT_Number), pDoc -> RRightT_Color.GetAt (RRightT_Number) );
 					CPen *Draw_Pen = pDC -> SelectObject(&pen);
 					pDC -> SelectStockObject ( NULL_BRUSH ) ;
@@ -1368,7 +1370,7 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 			if ( pDoc -> LTRT_Color.GetAt (LTRT_Number) == RGB (0,0,0) ) {
 
 				// 채우기 색상을 가지지 않았을 경우의 출력
-				if ( pDoc -> LTRT_FillColor.GetAt (LTRT_Number) == RGB (0,0,0) ) {
+				if ( pDoc -> LTRT_IsNoFill.GetAt (LTRT_Number) == 'o' ) {
 					CPen pen;
 					pen.CreatePen( PS_SOLID, pDoc -> LTRT_Thickness.GetAt (LTRT_Number), RGB (0,0,0) ) ;
 					CPen* oldPen = pDC->SelectObject( &pen ) ;
@@ -1394,7 +1396,7 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 			else {
 
 				// 채우기 색상을 가지지 않았을 경우의 출력
-				if ( pDoc -> LTRT_FillColor.GetAt (LTRT_Number) == RGB (0,0,0) ) {
+				if ( pDoc -> LTRT_IsNoFill.GetAt (LTRT_Number) == 'o' ) {
 					CPen pen ( PS_SOLID, pDoc -> LTRT_Thickness.GetAt (LTRT_Number), pDoc -> LTRT_Color.GetAt (LTRT_Number) );
 					CPen *Draw_Pen = pDC -> SelectObject(&pen);
 					pDC -> SelectStockObject ( NULL_BRUSH ) ;
@@ -1537,7 +1539,7 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 			if ( pDoc -> RTLT_Color.GetAt (RTLT_Number) == RGB (0,0,0) ) {
 
 				// 채우기 색상을 가지지 않았을 경우의 출력
-				if ( pDoc -> RTLT_FillColor.GetAt (RTLT_Number) == RGB (0,0,0) ) {
+				if ( pDoc -> RTLT_IsNoFill.GetAt (RTLT_Number) == 'o' ) {
 					CPen pen;
 					pen.CreatePen( PS_SOLID, pDoc -> RTLT_Thickness.GetAt (RTLT_Number), RGB (0,0,0) ) ;
 					CPen* oldPen = pDC->SelectObject( &pen ) ;
@@ -1563,7 +1565,7 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 			else {
 
 				// 채우기 색상을 가지지 않았을 경우의 출력
-				if ( pDoc -> RTLT_FillColor.GetAt (RTLT_Number) == RGB (0,0,0) ) {
+				if ( pDoc -> RTLT_IsNoFill.GetAt (RTLT_Number) == 'o' ) {
 					CPen pen ( PS_SOLID, pDoc -> RTLT_Thickness.GetAt (RTLT_Number), pDoc -> RTLT_Color.GetAt (RTLT_Number) );
 					CPen *Draw_Pen = pDC -> SelectObject(&pen);
 					pDC -> SelectStockObject ( NULL_BRUSH ) ;
@@ -1690,6 +1692,38 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 
 		// 텍스트 객체일 경우
 		else if ( pDoc -> What.GetAt (i) == _T ("Text") ) {
+
+			if ( pDoc -> Text_Text.GetAt ( Text_Number ).IsFont == 'o' ) {
+				CFont* def_font = pDC -> SelectObject ( &(pDoc -> Text_Text.GetAt ( Text_Number ).Font) ) ;
+				pDC -> TextOut ( pDoc -> Text_Text.GetAt ( Text_Number ).Location.x, pDoc -> Text_Text.GetAt ( Text_Number ).Location.y,
+								 pDoc -> Text_Text.GetAt ( Text_Number ).Text ) ;
+
+				CSize strSize ;
+
+				if ( Text_IsKeyDown == 'o' ) {
+					strSize = pDC -> GetTextExtent ( pDoc -> Text_Text.GetAt ( Text_Number ).Text ) ;
+					Text_CurPoint.x = pDoc -> Text_Text.GetAt ( Text_Number ).Location.x + strSize.cx ;
+					Text_CurPoint.y = pDoc -> Text_Text.GetAt ( Text_Number ).Location.y ;
+					SetCaretPos ( Text_CurPoint ) ;
+					ShowCaret () ;
+				}
+				pDC -> SelectObject ( def_font ) ;
+			}
+			else {
+				pDC -> TextOut ( pDoc -> Text_Text.GetAt ( Text_Number ).Location.x, pDoc -> Text_Text.GetAt ( Text_Number ).Location.y,
+								 pDoc -> Text_Text.GetAt ( Text_Number ).Text ) ;
+
+				CSize strSize ;
+
+				if ( Text_IsKeyDown == 'o' ) {
+					strSize = pDC -> GetTextExtent ( pDoc -> Text_Text.GetAt ( Text_Number ).Text ) ;
+					Text_CurPoint.x = pDoc -> Text_Text.GetAt ( Text_Number ).Location.x + strSize.cx ;
+					Text_CurPoint.y = pDoc -> Text_Text.GetAt ( Text_Number ).Location.y ;
+					SetCaretPos ( Text_CurPoint ) ;
+					ShowCaret () ;
+				}
+			}
+			Text_Number++ ;
 		}
 	}
 
@@ -1786,10 +1820,14 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 		else if ( m_IsColor == 'x' )
 			pDoc -> R_Color.Add ( RGB(0,0,0) ) ;
 
-		if ( m_IsFillColor == 'o' )
+		if ( m_IsFillColor == 'o' ) {
 			pDoc -> R_FillColor.Add ( m_FillColor ) ;
-		else if ( m_IsFillColor == 'x' )
+			pDoc -> R_IsNoFill.Add ( 'x' ) ;
+		}
+		else if ( m_IsFillColor == 'x' ) {
 			pDoc -> R_FillColor.Add ( RGB(0,0,0) ) ;
+			pDoc -> R_IsNoFill.Add ( 'o' ) ;
+		}
 
 		// 두께 설정을 한 경우
 		if ( m_IsThickness == 'o' )
@@ -1909,10 +1947,14 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 		else if ( m_IsColor == 'x' )
 			pDoc -> E_Color.Add (RGB(0,0,0)) ;
 
-		if ( m_IsFillColor == 'o' )
+		if ( m_IsFillColor == 'o' ) {
 			pDoc -> E_FillColor.Add ( m_FillColor ) ;
-		else if ( m_IsFillColor == 'x' )
+			pDoc -> E_IsNoFill.Add ( 'x' ) ;
+		}
+		else if ( m_IsFillColor == 'x' ) {
 			pDoc -> E_FillColor.Add ( RGB(0,0,0) ) ;
+			pDoc -> E_IsNoFill.Add ( 'o' ) ;
+		}
 
 		// 두께 설정을 한 경우
 		if ( m_IsThickness == 'o' )
@@ -1942,10 +1984,14 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 		else if ( m_IsColor == 'x' )
 			pDoc -> T_Color.Add (RGB(0,0,0)) ;
 
-		if ( m_IsFillColor == 'o' )
+		if ( m_IsFillColor == 'o' ) {
 			pDoc -> T_FillColor.Add ( m_FillColor ) ;
-		else if ( m_IsFillColor == 'x' )
+			pDoc -> T_IsNoFill.Add ( 'x' ) ;
+		}
+		else if ( m_IsFillColor == 'x' ) {
 			pDoc -> T_FillColor.Add ( RGB(0,0,0) ) ;
+			pDoc -> T_IsNoFill.Add ( 'o' ) ;
+		}
 
 		// 두께 설정을 한 경우
 		if ( m_IsThickness == 'o' )
@@ -1975,10 +2021,14 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 		else if ( m_IsColor == 'x' )
 			pDoc -> RT_Color.Add (RGB(0,0,0)) ;
 
-		if ( m_IsFillColor == 'o' )
+		if ( m_IsFillColor == 'o' ) {
 			pDoc -> RT_FillColor.Add ( m_FillColor ) ;
-		else if ( m_IsFillColor == 'x' )
+			pDoc -> RT_IsNoFill.Add ( 'x' ) ;
+		}
+		else if ( m_IsFillColor == 'x' ) {
 			pDoc -> RT_FillColor.Add ( RGB(0,0,0) ) ;
+			pDoc -> RT_IsNoFill.Add ( 'o' ) ;
+		}
 
 		// 두께 설정을 한 경우
 		if ( m_IsThickness == 'o' )
@@ -2008,10 +2058,14 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 		else if ( m_IsColor == 'x' )
 			pDoc -> RightT_Color.Add (RGB(0,0,0)) ;
 
-		if ( m_IsFillColor == 'o' )
+		if ( m_IsFillColor == 'o' ) {
 			pDoc -> RightT_FillColor.Add ( m_FillColor ) ;
-		else if ( m_IsFillColor == 'x' )
+			pDoc -> RightT_IsNoFill.Add ( 'x' ) ;
+		}
+		else if ( m_IsFillColor == 'x' ) {
 			pDoc -> RightT_FillColor.Add ( RGB(0,0,0) ) ;
+			pDoc -> RightT_IsNoFill.Add ( 'o' ) ;
+		}
 
 		// 두께 설정을 한 경우
 		if ( m_IsThickness == 'o' )
@@ -2041,10 +2095,14 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 		else if ( m_IsColor == 'x' )
 			pDoc -> RRightT_Color.Add (RGB(0,0,0)) ;
 
-		if ( m_IsFillColor == 'o' )
+		if ( m_IsFillColor == 'o' ) {
 			pDoc -> RRightT_FillColor.Add ( m_FillColor ) ;
-		else if ( m_IsFillColor == 'x' )
+			pDoc -> RRightT_IsNoFill.Add ( 'x' ) ;
+		}
+		else if ( m_IsFillColor == 'x' ) {
 			pDoc -> RRightT_FillColor.Add ( RGB(0,0,0) ) ;
+			pDoc -> RRightT_IsNoFill.Add ( 'o' ) ;
+		}
 
 		// 두께 설정을 한 경우
 		if ( m_IsThickness == 'o' )
@@ -2074,10 +2132,14 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 		else if ( m_IsColor == 'x' )
 			pDoc -> LTRT_Color.Add (RGB(0,0,0)) ;
 
-		if ( m_IsFillColor == 'o' )
+		if ( m_IsFillColor == 'o' ) {
 			pDoc -> LTRT_FillColor.Add ( m_FillColor ) ;
-		else if ( m_IsFillColor == 'x' )
+			pDoc -> LTRT_IsNoFill.Add ( 'x' ) ;
+		}
+		else if ( m_IsFillColor == 'x' ) {
 			pDoc -> LTRT_FillColor.Add ( RGB(0,0,0) ) ;
+			pDoc -> LTRT_IsNoFill.Add ( 'o' ) ;
+		}
 
 		// 두께 설정을 한 경우
 		if ( m_IsThickness == 'o' )
@@ -2107,10 +2169,14 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 		else if ( m_IsColor == 'x' )
 			pDoc -> RTLT_Color.Add (RGB(0,0,0)) ;
 
-		if ( m_IsFillColor == 'o' )
+		if ( m_IsFillColor == 'o' ) {
 			pDoc -> RTLT_FillColor.Add ( m_FillColor ) ;
-		else if ( m_IsFillColor == 'x' )
+			pDoc -> RTLT_IsNoFill.Add ( 'x' ) ;
+		}
+		else if ( m_IsFillColor == 'x' ) {
 			pDoc -> RTLT_FillColor.Add ( RGB(0,0,0) ) ;
+			pDoc -> RTLT_IsNoFill.Add ( 'o' ) ;
+		}
 
 		// 두께 설정을 한 경우
 		if ( m_IsThickness == 'o' )
@@ -2119,33 +2185,36 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 		else if ( m_IsThickness == 'x' )
 			pDoc -> RTLT_Thickness.Add (1) ;
 	}
-	// 텍스트를 그만 입력 할 경우
-	if ( Text_IsContinue == 'o' ) {
-		if ( pDoc -> Text_Text.GetAt ( pDoc -> Text_Count - 1 ).Rect.top <= point.y && pDoc -> Text_Text.GetAt ( pDoc -> Text_Count - 1 ).Rect.bottom >= point.y
-			 && pDoc -> Text_Text.GetAt ( pDoc -> Text_Count - 1 ).Rect.left <= point.x && pDoc -> Text_Text.GetAt ( pDoc -> Text_Count - 1 ).Rect.right >= point.x )
-		{}
-		else {
-			Text_IsText = 'x' ;
-			Text_IsContinue = 'x' ;
-		}
+
+	if ( Text_IsText == 'o' && Text_IsKeyDown == 'o' ) {
+		HideCaret () ;
+		Text_IsKeyDown = 'x' ;
 	}
 	// 텍스트를 입력 하는 경우
-	else if ( Text_IsText == 'o' ) {
+	else if ( Text_IsText == 'o' && Text_IsKeyDown == 'x' ) {
+		Text_Current = pDoc -> Text_Text.GetSize () ;
+		pDoc -> Text_Text.SetSize ( pDoc -> Text_Text.GetSize () + 1 ) ;
 		pDoc -> What.Add ( _T("Text") ) ;
+		pDoc -> Text_Location.Add ( pDoc->What.GetSize () - 1 ) ;
 		pDoc -> Text_Count++ ;
-		pDoc -> Text_Text.SetSize ( pDoc -> Text_Count ) ;
-		if ( Text_IsFont == 'o' )
-			pDoc -> Text_Text.GetAt ( pDoc -> Text_Count - 1 ).Font.CreateFontIndirect ( &Text_lf ) ;
-		else if ( Text_IsFont == 'x' ) {
-			pDoc -> Text_Text.GetAt ( pDoc -> Text_Count - 1 ).Rect.top = point.y - 13 ;
-			pDoc -> Text_Text.GetAt ( pDoc -> Text_Count - 1 ).Rect.right = point.x + 100 ;
-			pDoc -> Text_Text.GetAt ( pDoc -> Text_Count - 1 ).Rect.bottom = point.y + 13 ;
-			pDoc -> Text_Text.GetAt ( pDoc -> Text_Count - 1 ).Rect.left = point.x - 4 ;
-		}
-		pDoc -> Text_Text.GetAt ( pDoc -> Text_Count - 1 ).Text.Format ( _T("") ) ;
+		pDoc -> Text_Text.GetAt ( Text_Current ).Location = point ;
 
-		if ( Text_IsContinue != 'o' )
-			Text_IsContinue = 'o' ;
+		if ( Text_IsFont == 'o' ) {
+			pDoc -> Text_Text.GetAt ( Text_Current ).Font.CreateFontIndirect ( &Text_lf ) ;
+			pDoc -> Text_Text.GetAt ( Text_Current ).IsFont = 'o' ;
+			pDoc -> Text_Text.GetAt ( Text_Current ).Font.GetLogFont ( &Text_Each ) ;
+			CreateSolidCaret ( 1, Text_Each.lfHeight ) ;
+		}
+		else {
+			pDoc -> Text_Text.GetAt ( Text_Current ).IsFont = 'x' ;
+			CreateSolidCaret ( 1, 16 ) ;
+		}
+
+		SetCaretPos ( point ) ;
+		
+		ShowCaret () ;
+		Invalidate () ;
+		Text_IsKeyDown = 'o' ;
 	}
 	// 객체를 이동, 선택하는 경우
 	else if ( M_IsMove == 'o' ) {
@@ -2372,6 +2441,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 		else {
 			M_IsLineSelect = 'x' ;
 			M_IsRectSelect = 'x' ;
+			M_IsEllipseSelect = 'x' ;
 			M_ChangeLineOnePoint = 'x' ;
 			M_IsChangeLineStart = 'x' ;
 			M_ChangeRectSize = 'x' ;
@@ -2806,7 +2876,7 @@ void CGraphicEditorView::OnMouseMove(UINT nFlags, CPoint point)
 	ASSERT_VALID(pDoc);
 	if (!pDoc)
 		return;
-
+	
 	// 선 그리기 선택후 드래그 하는 경우
 	if ( L_CanMove == 'o' ) {
 		L_Insert.Last = point ;
@@ -3925,7 +3995,7 @@ void CGraphicEditorView::OnLButtonUp(UINT nFlags, CPoint point)
 		Invalidate () ;
 		RTLT_CanMove = 'x' ;
 	}
-
+	
 	CScrollView::OnLButtonUp(nFlags, point);
 }
 
@@ -3938,6 +4008,7 @@ void CGraphicEditorView::OnDrawline()
 	M_IsDraw = 'x' ;
 	M_IsMove = 'x' ;
 	Text_IsText = 'x' ;
+	Text_IsKeyDown = 'x' ;
 	LTRT_IsDraw = 'x' ;
 	RTLT_IsDraw = 'x' ;
 	RRightT_IsDraw = 'x' ;
@@ -3964,7 +4035,7 @@ BOOL CGraphicEditorView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 	ASSERT_VALID(pDoc);
 	if (!pDoc)
 		return CScrollView::OnSetCursor(pWnd, nHitTest, message);
-
+	
 	char Flag = 'x' ;
 
 	if (nHitTest == HTCLIENT) {
@@ -4078,6 +4149,7 @@ BOOL CGraphicEditorView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 			if ( M_IsDraw == 'x' )  {
 				M_IsLineSelect = 'x' ;
 				M_IsRectSelect = 'x' ;
+				M_IsEllipseSelect = 'x' ;
 			}
 
 			int L_Number = pDoc -> L_Count - 1;
@@ -4456,13 +4528,21 @@ BOOL CGraphicEditorView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 				}
 			}
 		}
+		// Text 모드 + 입력 중이라면 기본 커서로 변합니다.
+		else if ( Text_IsText == 'o' && Text_IsKeyDown == 'o' ) {
+			::SetCursor(AfxGetApp()->LoadStandardCursor (IDC_ARROW)) ;
+		}
+		// Text 모드에선 커서가 글자 입력 모양으로 변합니다.
+		else if ( Text_IsText == 'o' ) {
+			::SetCursor(AfxGetApp()->LoadStandardCursor (IDC_IBEAM)) ;
+		}
 		// 그리기 모드에선 커서가 십자형으로 변합니다.
 		else if ( IsNormal == 'x' ) {
 			::SetCursor(AfxGetApp()->LoadStandardCursor (IDC_CROSS)) ;
 		}
 		return TRUE ;
 	}
-
+	
 	return CScrollView::OnSetCursor(pWnd, nHitTest, message);
 }
 
@@ -4475,6 +4555,7 @@ void CGraphicEditorView::OnDrawrec()
 	M_IsDraw = 'x' ;
 	M_IsMove = 'x' ;
 	Text_IsText = 'x' ;
+	Text_IsKeyDown = 'x' ;
 	LTRT_IsDraw = 'x' ;
 	RTLT_IsDraw = 'x' ;
 	RRightT_IsDraw = 'x' ;
@@ -4502,6 +4583,7 @@ void CGraphicEditorView::OnDrawpoly()
 	M_IsDraw = 'x' ;
 	M_IsMove = 'x' ;
 	Text_IsText = 'x' ;
+	Text_IsKeyDown = 'x' ;
 	LTRT_IsDraw = 'x' ;
 	RTLT_IsDraw = 'x' ;
 	RRightT_IsDraw = 'x' ;
@@ -4530,6 +4612,7 @@ void CGraphicEditorView::OnDrawellipse()
 	M_IsDraw = 'x' ;
 	M_IsMove = 'x' ;
 	Text_IsText = 'x' ;
+	Text_IsKeyDown = 'x' ;
 	LTRT_IsDraw = 'x' ;
 	RTLT_IsDraw = 'x' ;
 	RRightT_IsDraw = 'x' ;
@@ -4555,6 +4638,7 @@ void CGraphicEditorView::OnSelectobject()
 	M_IsSelect = 'x' ;
 	M_IsDraw = 'x' ;
 	Text_IsText = 'x' ;
+	Text_IsKeyDown = 'x' ;
 	LTRT_IsDraw = 'x' ;
 	RTLT_IsDraw = 'x' ;
 	RRightT_IsDraw = 'x' ;
@@ -4651,11 +4735,23 @@ void CGraphicEditorView::OnLButtonDblClk(UINT nFlags, CPoint point)
 	M_IsChangeRectSE = 'x' ;
 	M_IsChangeRectWidthLeft = 'x' ;
 	M_IsChangeRectWidthRight = 'x' ;
+	M_IsEllipseSelect = 'x' ;
+	M_ChangeEllipseSize = 'x' ;
+	M_IsChangeEllipseSide = 'x' ;
+	M_IsChangeEllipseNW = 'x' ;
+	M_IsChangeEllipseNE = 'x' ;
+	M_IsChangeEllipseSW = 'x' ;
+	M_IsChangeEllipseSE = 'x' ;
+	M_IsChangeEllipseVerticalTop = 'x' ;
+	M_IsChangeEllipseVerticalBottom = 'x' ;
+	M_IsChangeEllipseWidthLeft = 'x' ;
+	M_IsChangeEllipseWidthRight = 'x' ;
 	M_IsLineSelect = 'x' ;
 	M_IsSelect = 'x' ;
 	M_IsDraw = 'x' ;
 	M_IsMove = 'x' ;
 	Text_IsText = 'x' ;
+	Text_IsKeyDown = 'x' ;
 	LTRT_IsDraw = 'x' ;
 	RTLT_IsDraw = 'x' ;
 	RRightT_IsDraw = 'x' ;
@@ -4697,22 +4793,38 @@ void CGraphicEditorView::OnChangefillcolor()
 		if ( dlgColor.DoModal () == IDOK ) {
 			m_FillColor = dlgColor.GetColor () ;
 
-			if ( M_What == _T ("R") )
+			if ( M_What == _T ("R") ) {
 				pDoc -> R_FillColor.GetAt ( M_Number ) = m_FillColor ;
-			else if ( M_What == _T("E") )
+				pDoc -> R_IsNoFill.GetAt ( M_Number ) = 'x' ;
+			}
+			else if ( M_What == _T("E") ) {
 				pDoc -> E_FillColor.GetAt ( M_Number ) = m_FillColor ;
-			else if ( M_What == _T("T") )
+				pDoc -> E_IsNoFill.GetAt ( M_Number ) = 'x' ;
+			}
+			else if ( M_What == _T("T") ) {
 				pDoc -> T_FillColor.GetAt ( M_Number ) = m_FillColor ;
-			else if ( M_What == _T("RT") )
+				pDoc -> T_IsNoFill.GetAt ( M_Number ) = 'x' ;
+			}
+			else if ( M_What == _T("RT") ) {
 				pDoc -> RT_FillColor.GetAt ( M_Number ) = m_FillColor ;
-			else if ( M_What == _T("RightT") )
+				pDoc -> RT_IsNoFill.GetAt ( M_Number ) = 'x' ;
+			}
+			else if ( M_What == _T("RightT") ) {
 				pDoc -> RightT_FillColor.GetAt ( M_Number ) = m_FillColor ;
-			else if ( M_What == _T("RRightT") )
+				pDoc -> RightT_IsNoFill.GetAt ( M_Number ) = 'x' ;
+			}
+			else if ( M_What == _T("RRightT") ) {
 				pDoc -> RRightT_FillColor.GetAt ( M_Number ) = m_FillColor ;
-			else if ( M_What == _T("LTRT") )
+				pDoc -> RRightT_IsNoFill.GetAt ( M_Number ) = 'x' ;
+			}
+			else if ( M_What == _T("LTRT") ) {
 				pDoc -> LTRT_FillColor.GetAt ( M_Number ) = m_FillColor ;
-			else if ( M_What == _T("RTLT") )
+				pDoc -> LTRT_IsNoFill.GetAt ( M_Number ) = 'x' ;
+			}
+			else if ( M_What == _T("RTLT") ) {
 				pDoc -> RTLT_FillColor.GetAt ( M_Number ) = m_FillColor ;
+				pDoc -> RTLT_IsNoFill.GetAt ( M_Number ) = 'x' ;
+			}
 		}
 
 		Invalidate () ;
@@ -4729,25 +4841,43 @@ void CGraphicEditorView::OnNofillcolor()
 	if (!pDoc)
 		return;
 
-	if ( M_IsDraw != 'o' )
+	if ( M_IsDraw != 'o' ) {
 		m_IsFillColor = 'x' ;
-	else {
 		if ( M_What == _T ("R") )
-			pDoc -> R_FillColor.GetAt ( M_Number ) = RGB (0,0,0) ;
+			pDoc -> R_IsNoFill.GetAt ( M_Number ) = 'o' ;
 		else if ( M_What == _T("E") )
-			pDoc -> E_FillColor.GetAt ( M_Number ) = RGB (0,0,0) ;
+			pDoc -> E_IsNoFill.GetAt ( M_Number ) = 'o' ;
 		else if ( M_What == _T("T") )
-			pDoc -> T_FillColor.GetAt ( M_Number ) = RGB (0,0,0) ;
+			pDoc -> T_IsNoFill.GetAt ( M_Number ) = 'o' ;
 		else if ( M_What == _T("RT") )
-			pDoc -> RT_FillColor.GetAt ( M_Number ) = RGB (0,0,0) ;
+			pDoc -> RT_IsNoFill.GetAt ( M_Number ) = 'o' ;
 		else if ( M_What == _T("RightT") )
-			pDoc -> RightT_FillColor.GetAt ( M_Number ) = RGB (0,0,0) ;
+			pDoc -> RightT_IsNoFill.GetAt ( M_Number ) = 'o' ;
 		else if ( M_What == _T("RRightT") )
-			pDoc -> RRightT_FillColor.GetAt ( M_Number ) = RGB (0,0,0) ;
+			pDoc -> RRightT_IsNoFill.GetAt ( M_Number ) = 'o' ;
 		else if ( M_What == _T("LTRT") )
-			pDoc -> LTRT_FillColor.GetAt ( M_Number ) = RGB (0,0,0) ;
+			pDoc -> LTRT_IsNoFill.GetAt ( M_Number ) = 'o' ;
 		else if ( M_What == _T("RTLT") )
-			pDoc -> RTLT_FillColor.GetAt ( M_Number ) = RGB (0,0,0) ;
+			pDoc -> RTLT_IsNoFill.GetAt ( M_Number ) = 'o' ;
+	}
+	else {
+		m_IsFillColor = 'x' ;
+		if ( M_What == _T ("R") )
+			pDoc -> R_IsNoFill.GetAt ( M_Number ) = 'o' ;
+		else if ( M_What == _T("E") )
+			pDoc -> E_IsNoFill.GetAt ( M_Number ) = 'o' ;
+		else if ( M_What == _T("T") )
+			pDoc -> T_IsNoFill.GetAt ( M_Number ) = 'o' ;
+		else if ( M_What == _T("RT") )
+			pDoc -> RT_IsNoFill.GetAt ( M_Number ) = 'o' ;
+		else if ( M_What == _T("RightT") )
+			pDoc -> RightT_IsNoFill.GetAt ( M_Number ) = 'o' ;
+		else if ( M_What == _T("RRightT") )
+			pDoc -> RRightT_IsNoFill.GetAt ( M_Number ) = 'o' ;
+		else if ( M_What == _T("LTRT") )
+			pDoc -> LTRT_IsNoFill.GetAt ( M_Number ) = 'o' ;
+		else if ( M_What == _T("RTLT") )
+			pDoc -> RTLT_IsNoFill.GetAt ( M_Number ) = 'o' ;
 
 		Invalidate () ;
 	}
@@ -4762,6 +4892,7 @@ void CGraphicEditorView::OnDrawtriangle()
 	M_IsDraw = 'x' ;
 	M_IsMove = 'x' ;
 	Text_IsText = 'x' ;
+	Text_IsKeyDown = 'x' ;
 	LTRT_IsDraw = 'x' ;
 	RTLT_IsDraw = 'x' ;
 	RRightT_IsDraw = 'x' ;
@@ -4789,6 +4920,7 @@ void CGraphicEditorView::OnDrawreversetri()
 	M_IsDraw = 'x' ;
 	M_IsMove = 'x' ;
 	Text_IsText = 'x' ;
+	Text_IsKeyDown = 'x' ;
 	LTRT_IsDraw = 'x' ;
 	RTLT_IsDraw = 'x' ;
 	RRightT_IsDraw = 'x' ;
@@ -4943,6 +5075,7 @@ void CGraphicEditorView::OnRightangledtri()
 	M_IsDraw = 'x' ;
 	M_IsMove = 'x' ;
 	Text_IsText = 'x' ;
+	Text_IsKeyDown = 'x' ;
 	LTRT_IsDraw = 'x' ;
 	RTLT_IsDraw = 'x' ;
 	RRightT_IsDraw = 'x' ;
@@ -4970,6 +5103,7 @@ void CGraphicEditorView::OnRRrightangledtri()
 	M_IsDraw = 'x' ;
 	M_IsMove = 'x' ;
 	Text_IsText = 'x' ;
+	Text_IsKeyDown = 'x' ;
 	LTRT_IsDraw = 'x' ;
 	RTLT_IsDraw = 'x' ;
 	RRightT_IsDraw = 'o' ;
@@ -4997,6 +5131,7 @@ void CGraphicEditorView::OnRighttolefttri()
 	M_IsDraw = 'x' ;
 	M_IsMove = 'x' ;
 	Text_IsText = 'x' ;
+	Text_IsKeyDown = 'x' ;
 	LTRT_IsDraw = 'x' ;
 	RTLT_IsDraw = 'o' ;
 	RRightT_IsDraw = 'x' ;
@@ -5024,6 +5159,7 @@ void CGraphicEditorView::OnLefttorighttri()
 	M_IsDraw = 'x' ;
 	M_IsMove = 'x' ;
 	Text_IsText = 'x' ;
+	Text_IsKeyDown = 'x' ;
 	LTRT_IsDraw = 'o' ;
 	RTLT_IsDraw = 'x' ;
 	RRightT_IsDraw = 'x' ;
@@ -5050,8 +5186,6 @@ void CGraphicEditorView::OnFont()
 	if( dlg.DoModal() == IDOK )
 	{
 		dlg.GetCurrentFont (&Text_lf) ;
-		Text_Rect.top = Text_lf.lfHeight / 2 ;
-		Text_Rect.bottom = Text_lf.lfHeight / 2 ;
 		Text_IsFont = 'o' ;
 	}
 }
@@ -5065,6 +5199,7 @@ void CGraphicEditorView::OnText()
 	M_IsDraw = 'x' ;
 	M_IsMove = 'x' ;
 	Text_IsText = 'o' ;
+	Text_IsKeyDown = 'x' ;
 	LTRT_IsDraw = 'x' ;
 	RTLT_IsDraw = 'x' ;
 	RRightT_IsDraw = 'x' ;
@@ -5119,6 +5254,8 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 				int RRightT_For = 0 ;
 				int LTRT_For = 0 ;
 				int RTLT_For = 0 ;
+				int Text_For = 0 ;
+
 				for ( int i = location ; i < pDoc -> What.GetCount () ; i++ ) {
 					if ( pDoc -> What.GetAt (i) == _T ("R") ) {
 						for ( int j = R_For ; j < pDoc -> R_Location.GetCount () ; j++ ) {
@@ -5201,6 +5338,15 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 							}
 						}
 					}
+					else if ( pDoc -> What.GetAt (i) == _T("Text") ) {
+						for ( int j = Text_For ; j < pDoc -> Text_Location.GetCount () ; j++ ) {
+							if ( pDoc -> Text_Location.GetAt (j) == i+1 ) {
+								pDoc -> Text_Location.SetAt (j, i) ;
+								Text_For = j ;
+								break ;
+							}
+						}
+					}
 				}
 				M_Number = 0 ;
 			}
@@ -5227,6 +5373,7 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 				int RRightT_For = 0 ;
 				int LTRT_For = 0 ;
 				int RTLT_For = 0 ;
+				int Text_For = 0 ;
 				for ( int i = location ; i < pDoc -> What.GetCount () ; i++ ) {
 					if ( pDoc -> What.GetAt (i) == _T ("L") ) {
 						for ( int j = L_For ; j < pDoc -> L_Location.GetCount () ; j++ ) {
@@ -5309,6 +5456,15 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 							}
 						}
 					}
+					else if ( pDoc -> What.GetAt (i) == _T("Text") ) {
+						for ( int j = Text_For ; j < pDoc -> Text_Location.GetCount () ; j++ ) {
+							if ( pDoc -> Text_Location.GetAt (j) == i+1 ) {
+								pDoc -> Text_Location.SetAt (j, i) ;
+								Text_For = j ;
+								break ;
+							}
+						}
+					}
 				}
 				M_Number = 0 ;
 			}
@@ -5333,6 +5489,7 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 				int RRightT_For = 0 ;
 				int LTRT_For = 0 ;
 				int RTLT_For = 0 ;
+				int Text_For = 0 ;
 				for ( int i = location ; i < pDoc -> What.GetCount () ; i++ ) {
 					if ( pDoc -> What.GetAt (i) == _T ("R") ) {
 						for ( int j = R_For ; j < pDoc -> R_Location.GetCount () ; j++ ) {
@@ -5411,6 +5568,15 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 							if ( pDoc -> RTLT_Location.GetAt (j) == i+1 ) {
 								pDoc -> RTLT_Location.SetAt (j, i) ;
 								RTLT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("Text") ) {
+						for ( int j = Text_For ; j < pDoc -> Text_Location.GetCount () ; j++ ) {
+							if ( pDoc -> Text_Location.GetAt (j) == i+1 ) {
+								pDoc -> Text_Location.SetAt (j, i) ;
+								Text_For = j ;
 								break ;
 							}
 						}
@@ -5439,6 +5605,7 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 				int RRightT_For = 0 ;
 				int LTRT_For = 0 ;
 				int RTLT_For = 0 ;
+				int Text_For = 0 ;
 				for ( int i = location ; i < pDoc -> What.GetCount () ; i++ ) {
 					if ( pDoc -> What.GetAt (i) == _T ("R") ) {
 						for ( int j = R_For ; j < pDoc -> R_Location.GetCount () ; j++ ) {
@@ -5517,6 +5684,15 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 							if ( pDoc -> RTLT_Location.GetAt (j) == i+1 ) {
 								pDoc -> RTLT_Location.SetAt (j, i) ;
 								RTLT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("Text") ) {
+						for ( int j = Text_For ; j < pDoc -> Text_Location.GetCount () ; j++ ) {
+							if ( pDoc -> Text_Location.GetAt (j) == i+1 ) {
+								pDoc -> Text_Location.SetAt (j, i) ;
+								Text_For = j ;
 								break ;
 							}
 						}
@@ -5545,6 +5721,7 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 				int RRightT_For = 0 ;
 				int LTRT_For = 0 ;
 				int RTLT_For = 0 ;
+				int Text_For = 0 ;
 				for ( int i = location ; i < pDoc -> What.GetCount () ; i++ ) {
 					if ( pDoc -> What.GetAt (i) == _T ("R") ) {
 						for ( int j = R_For ; j < pDoc -> R_Location.GetCount () ; j++ ) {
@@ -5623,6 +5800,15 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 							if ( pDoc -> RTLT_Location.GetAt (j) == i+1 ) {
 								pDoc -> RTLT_Location.SetAt (j, i) ;
 								RTLT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("Text") ) {
+						for ( int j = Text_For ; j < pDoc -> Text_Location.GetCount () ; j++ ) {
+							if ( pDoc -> Text_Location.GetAt (j) == i+1 ) {
+								pDoc -> Text_Location.SetAt (j, i) ;
+								Text_For = j ;
 								break ;
 							}
 						}
@@ -5651,6 +5837,7 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 				int RRightT_For = 0 ;
 				int LTRT_For = 0 ;
 				int RTLT_For = 0 ;
+				int Text_For = 0 ;
 				for ( int i = location ; i < pDoc -> What.GetCount () ; i++ ) {
 					if ( pDoc -> What.GetAt (i) == _T ("R") ) {
 						for ( int j = R_For ; j < pDoc -> R_Location.GetCount () ; j++ ) {
@@ -5729,6 +5916,15 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 							if ( pDoc -> RTLT_Location.GetAt (j) == i+1 ) {
 								pDoc -> RTLT_Location.SetAt (j, i) ;
 								RTLT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("Text") ) {
+						for ( int j = Text_For ; j < pDoc -> Text_Location.GetCount () ; j++ ) {
+							if ( pDoc -> Text_Location.GetAt (j) == i+1 ) {
+								pDoc -> Text_Location.SetAt (j, i) ;
+								Text_For = j ;
 								break ;
 							}
 						}
@@ -5757,6 +5953,7 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 				int RRightT_For = 0 ;
 				int LTRT_For = 0 ;
 				int RTLT_For = 0 ;
+				int Text_For = 0 ;
 				for ( int i = location ; i < pDoc -> What.GetCount () ; i++ ) {
 					if ( pDoc -> What.GetAt (i) == _T ("R") ) {
 						for ( int j = R_For ; j < pDoc -> R_Location.GetCount () ; j++ ) {
@@ -5835,6 +6032,15 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 							if ( pDoc -> RTLT_Location.GetAt (j) == i+1 ) {
 								pDoc -> RTLT_Location.SetAt (j, i) ;
 								RTLT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("Text") ) {
+						for ( int j = Text_For ; j < pDoc -> Text_Location.GetCount () ; j++ ) {
+							if ( pDoc -> Text_Location.GetAt (j) == i+1 ) {
+								pDoc -> Text_Location.SetAt (j, i) ;
+								Text_For = j ;
 								break ;
 							}
 						}
@@ -5863,6 +6069,7 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 				int L_For = 0 ;
 				int LTRT_For = 0 ;
 				int RTLT_For = 0 ;
+				int Text_For = 0 ;
 				for ( int i = location ; i < pDoc -> What.GetCount () ; i++ ) {
 					if ( pDoc -> What.GetAt (i) == _T ("R") ) {
 						for ( int j = R_For ; j < pDoc -> R_Location.GetCount () ; j++ ) {
@@ -5941,6 +6148,15 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 							if ( pDoc -> RTLT_Location.GetAt (j) == i+1 ) {
 								pDoc -> RTLT_Location.SetAt (j, i) ;
 								RTLT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("Text") ) {
+						for ( int j = Text_For ; j < pDoc -> Text_Location.GetCount () ; j++ ) {
+							if ( pDoc -> Text_Location.GetAt (j) == i+1 ) {
+								pDoc -> Text_Location.SetAt (j, i) ;
+								Text_For = j ;
 								break ;
 							}
 						}
@@ -5969,6 +6185,7 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 				int RRightT_For = 0 ;
 				int L_For = 0 ;
 				int RTLT_For = 0 ;
+				int Text_For = 0 ;
 				for ( int i = location ; i < pDoc -> What.GetCount () ; i++ ) {
 					if ( pDoc -> What.GetAt (i) == _T ("R") ) {
 						for ( int j = R_For ; j < pDoc -> R_Location.GetCount () ; j++ ) {
@@ -6051,6 +6268,15 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 							}
 						}
 					}
+					else if ( pDoc -> What.GetAt (i) == _T("Text") ) {
+						for ( int j = Text_For ; j < pDoc -> Text_Location.GetCount () ; j++ ) {
+							if ( pDoc -> Text_Location.GetAt (j) == i+1 ) {
+								pDoc -> Text_Location.SetAt (j, i) ;
+								Text_For = j ;
+								break ;
+							}
+						}
+					}
 				}
 				M_Number = 0 ;
 			}
@@ -6075,6 +6301,7 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 				int RRightT_For = 0 ;
 				int LTRT_For = 0 ;
 				int L_For = 0 ;
+				int Text_For = 0 ;
 				for ( int i = location ; i < pDoc -> What.GetCount () ; i++ ) {
 					if ( pDoc -> What.GetAt (i) == _T ("R") ) {
 						for ( int j = R_For ; j < pDoc -> R_Location.GetCount () ; j++ ) {
@@ -6157,6 +6384,15 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 							}
 						}
 					}
+					else if ( pDoc -> What.GetAt (i) == _T("Text") ) {
+						for ( int j = Text_For ; j < pDoc -> Text_Location.GetCount () ; j++ ) {
+							if ( pDoc -> Text_Location.GetAt (j) == i+1 ) {
+								pDoc -> Text_Location.SetAt (j, i) ;
+								Text_For = j ;
+								break ;
+							}
+						}
+					}
 				}
 				M_Number = 0 ;
 			}
@@ -6166,4 +6402,63 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	}
 
 	CScrollView::OnKeyDown(nChar, nRepCnt, nFlags);
+}
+
+void CGraphicEditorView::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	
+	CGraphicEditorDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	if (!pDoc)
+		return;
+
+	// Text를 입력 중인 경우
+	if ( Text_IsText == 'o' && Text_IsKeyDown == 'o' ) {
+
+		// 백 스페이스를 누르는 경우
+		if ( nChar == VK_BACK )
+			pDoc -> Text_Text.GetAt ( Text_Current ).Text.Delete ( pDoc -> Text_Text.GetAt ( Text_Current ).Text.GetLength () - 1 ) ;
+		// esc나 엔터를 누르는 경우
+		else if ( nChar == VK_ESCAPE || nChar == VK_RETURN ) {
+			Text_IsKeyDown = 'x' ;
+			HideCaret () ;
+		}
+		// TAB을 누르면 8번 띄어쓰기 효과를 가집니다.
+		else if ( nChar == VK_TAB ) {
+			pDoc -> Text_Text.GetAt ( Text_Current ).Text.AppendChar ( VK_SPACE ) ;
+			pDoc -> Text_Text.GetAt ( Text_Current ).Text.AppendChar ( VK_SPACE ) ;
+			pDoc -> Text_Text.GetAt ( Text_Current ).Text.AppendChar ( VK_SPACE ) ;
+			pDoc -> Text_Text.GetAt ( Text_Current ).Text.AppendChar ( VK_SPACE ) ;
+			pDoc -> Text_Text.GetAt ( Text_Current ).Text.AppendChar ( VK_SPACE ) ;
+			pDoc -> Text_Text.GetAt ( Text_Current ).Text.AppendChar ( VK_SPACE ) ;
+			pDoc -> Text_Text.GetAt ( Text_Current ).Text.AppendChar ( VK_SPACE ) ;
+			pDoc -> Text_Text.GetAt ( Text_Current ).Text.AppendChar ( VK_SPACE ) ;
+		}
+		// 일반적인 경우는 해당 키를 그대로 출력합니다.
+		else
+			pDoc -> Text_Text.GetAt ( Text_Current ).Text.AppendChar ( nChar ) ;
+
+		Invalidate () ;
+	}
+	else if ( Text_IsText == 'o' && Text_IsKeyDown == 'x' && nChar == VK_ESCAPE ) {
+		HideCaret () ;
+		Text_IsKeyDown = 'x' ;
+		Text_IsText = 'x' ;
+		IsNormal = 'o' ;
+	}
+	
+	CScrollView::OnChar(nChar, nRepCnt, nFlags);
+}
+
+void CGraphicEditorView::OnFillpattern()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+
+	CFillPattern dlg ;
+
+	if( dlg.DoModal() == IDOK )
+	{
+
+	}
 }

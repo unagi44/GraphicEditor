@@ -69,6 +69,15 @@ public:
 	CArray < int, int > RRightT_Location ;		// 그린 모든 객체 중 역 직각 삼각형 객체의 각 Index
 	CArray < int, int > LTRT_Location ;			// 그린 모든 객체 중 왼쪽 -> 오른쪽 삼각형 객체의 각 Index
 	CArray < int, int > RTLT_Location ;			// 그린 모든 객체 중 오른쪽 -> 왼쪽 삼각형 객체의 각 Index
+	CArray < int, int > Text_Location ;			// 그린 모든 객체 중 Text 객체의 각 Index
+	CArray < char, char > R_IsNoFill ;
+	CArray < char, char > E_IsNoFill ;
+	CArray < char, char > T_IsNoFill ;
+	CArray < char, char > RT_IsNoFill ;
+	CArray < char, char > RightT_IsNoFill ;		// 채우기 색상이 없는지 확인해주는 변수
+	CArray < char, char > RRightT_IsNoFill ;
+	CArray < char, char > LTRT_IsNoFill ;
+	CArray < char, char > RTLT_IsNoFill ;
 public:
 	CArray < CString, CString > What ;
 	int L_Count ;			// 선 객체의 개수

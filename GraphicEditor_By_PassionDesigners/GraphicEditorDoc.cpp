@@ -143,6 +143,15 @@ void CGraphicEditorDoc::Serialize(CArchive& ar)
 		RRightT_Location.Serialize (ar) ;		// 그린 모든 객체 중 역 직각 삼각형 객체의 각 Index 저장
 		LTRT_Location.Serialize (ar) ;			// 그린 모든 객체 중 왼쪽 -> 오른쪽 삼각형 객체의 각 Index 저장
 		RTLT_Location.Serialize (ar) ;			// 그린 모든 객체 중 오른쪽 -> 왼쪽 객체의 각 Index 저장
+		Text_Location.Serialize (ar) ;			// 그린 모든 객체 중 Text 객체의 각 Index 저장
+		R_IsNoFill.Serialize (ar) ;
+		E_IsNoFill.Serialize (ar) ;
+		T_IsNoFill.Serialize (ar) ;
+		RT_IsNoFill.Serialize (ar) ;
+		RightT_IsNoFill.Serialize (ar) ;		// 채우기 색상이 없는지 확인해주는 변수
+		RRightT_IsNoFill.Serialize (ar) ;
+		LTRT_IsNoFill.Serialize (ar) ;
+		RTLT_IsNoFill.Serialize (ar) ;
 	}
 	else
 	{
@@ -216,6 +225,7 @@ void CGraphicEditorDoc::Serialize(CArchive& ar)
 		RRightT_Location.Serialize (ar) ;		// 그린 모든 객체 중 역 직각 삼각형 객체의 각 Index 불러오기
 		LTRT_Location.Serialize (ar) ;			// 그린 모든 객체 중 왼쪽 -> 오른쪽 삼각형 객체의 각 Index 불러오기
 		RTLT_Location.Serialize (ar) ;			// 그린 모든 객체 중 오른쪽 -> 왼쪽 객체의 각 Index 불러오기
+		Text_Location.Serialize (ar) ;			// 그린 모든 객체 중 Text 객체의 각 Index 불러오기
 	}
 }
 

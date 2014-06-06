@@ -75,10 +75,12 @@ public:
 
 	// 텍스트 삽입에 필요한 변수들
 	LOGFONT Text_lf ;
-	CRect Text_Rect ;
+	LOGFONT Text_Each ;
+	CPoint Text_CurPoint ;
+	int Text_Current ;
 	char Text_IsText ;
+	char Text_IsKeyDown ;
 	char Text_IsFont ;
-	char Text_IsContinue ;
 
 	// 선 그리기에 필요한 변수들
 	CLine L_Insert ;
@@ -201,6 +203,8 @@ public:
 //	afx_msg void OnUpdateFont(CCmdUI *pCmdUI);
 	afx_msg void OnText();
 	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
+	afx_msg void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
+	afx_msg void OnFillpattern();
 };
 
 #ifndef _DEBUG  // GraphicEditorView.cpp의 디버그 버전

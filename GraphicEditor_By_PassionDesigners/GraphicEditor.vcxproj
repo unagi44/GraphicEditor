@@ -99,7 +99,16 @@
     <None Include="res\GraphicEditor.ico" />
     <None Include="res\GraphicEditor.rc2" />
     <None Include="res\GraphicEditorDoc.ico" />
+    <None Include="res\IDB_BRUSHPTN.bmp" />
+    <None Include="res\IDB_LINEPTN.bmp" />
     <None Include="res\images.bmp" />
+    <None Include="res\Pattern1.bmp" />
+    <None Include="res\Pattern2.bmp" />
+    <None Include="res\Pattern3.bmp" />
+    <None Include="res\Pattern4.bmp" />
+    <None Include="res\Pattern5.bmp" />
+    <None Include="res\Pattern6.bmp" />
+    <None Include="res\Pattern7.bmp" />
     <None Include="res\Toolbar.bmp" />
     <None Include="res\toolbar1.bmp" />
   </ItemGroup>
@@ -108,6 +117,7 @@
     <ClInclude Include="ChildFrm.h" />
     <ClInclude Include="CLine.h" />
     <ClInclude Include="CPolyLine.h" />
+    <ClInclude Include="FillPattern.h" />
     <ClInclude Include="GraphicEditor.h" />
     <ClInclude Include="GraphicEditorDoc.h" />
     <ClInclude Include="GraphicEditorView.h" />
@@ -122,6 +132,7 @@
     <ClCompile Include="ChildFrm.cpp" />
     <ClCompile Include="CLine.cpp" />
     <ClCompile Include="CPolyLine.cpp" />
+    <ClCompile Include="FillPattern.cpp" />
     <ClCompile Include="GraphicEditor.cpp" />
     <ClCompile Include="GraphicEditorDoc.cpp" />
     <ClCompile Include="GraphicEditorView.cpp" />
