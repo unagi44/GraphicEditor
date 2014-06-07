@@ -87,6 +87,7 @@ public:
 	char Text_IsKeyDown ;
 	char Text_IsFont ;
 	char Text_IsBGColor ;
+	char Text_IsChange ;
 	COLORREF Text_BGColor ;
 	COLORREF Text_Color ;
 

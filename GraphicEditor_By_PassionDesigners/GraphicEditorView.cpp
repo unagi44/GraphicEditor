@@ -108,6 +108,7 @@ CGraphicEditorView::CGraphicEditorView()
 	Text_IsText = 'x' ;
 	Text_IsFont = 'x' ;
 	Text_IsKeyDown = 'x' ;
+	Text_IsChange = 'x' ;
 
 	// 선 그리기에 필요한 변수들 초기화
 	L_IsDraw = 'x' ;
@@ -2652,7 +2653,7 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 
 				CSize strSize ;
 
-				if ( Text_IsKeyDown == 'o' ) {
+				if ( Text_IsKeyDown == 'o' || Text_IsChange == 'o' ) {
 					strSize = pDC -> GetTextExtent ( pDoc -> Text_Text.GetAt ( Text_Number ).Text ) ;
 					Text_CurPoint.x = pDoc -> Text_Text.GetAt ( Text_Number ).Location.x + strSize.cx ;
 					Text_CurPoint.y = pDoc -> Text_Text.GetAt ( Text_Number ).Location.y ;
@@ -2660,7 +2661,7 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 					ShowCaret () ;
 				}
 
-				if ( M_IsDraw != 'o' ) {
+				if ( M_IsDraw != 'o' || (M_IsDraw == 'o' && Text_IsChange == 'o') ) {
 					pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.top = pDoc -> Text_Text.GetAt ( Text_Number ).Location.y + pDoc -> Text_Text.GetAt ( Text_Number ).Font.lfHeight - 10 ;
 					pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.left = pDoc -> Text_Text.GetAt ( Text_Number ).Location.x - 10 ;
 					pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.bottom = pDoc -> Text_Text.GetAt ( Text_Number ).Location.y + 10 ;
@@ -2700,7 +2701,7 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 
 				CSize strSize ;
 
-				if ( Text_IsKeyDown == 'o' ) {
+				if ( Text_IsKeyDown == 'o' || Text_IsChange == 'o' ) {
 					strSize = pDC -> GetTextExtent ( pDoc -> Text_Text.GetAt ( Text_Number ).Text ) ;
 					Text_CurPoint.x = pDoc -> Text_Text.GetAt ( Text_Number ).Location.x + strSize.cx ;
 					Text_CurPoint.y = pDoc -> Text_Text.GetAt ( Text_Number ).Location.y ;
@@ -2708,7 +2709,7 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 					ShowCaret () ;
 				}
 
-				if ( M_IsDraw != 'o' ) {
+				if ( M_IsDraw != 'o' || (M_IsDraw == 'o' && Text_IsChange == 'o') ) {
 					pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.top = pDoc -> Text_Text.GetAt ( Text_Number ).Location.y - 10 ;
 					pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.left = pDoc -> Text_Text.GetAt ( Text_Number ).Location.x - 10 ;
 					pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.bottom = pDoc -> Text_Text.GetAt ( Text_Number ).Location.y + 26 ;
@@ -3662,7 +3663,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 											M_Rect.right = temp ;
 										}
 									}
-									Invalidate () ; M_IsLineSelect = 'o' ; break ;
+									Invalidate () ; M_IsLineSelect = 'o' ; Text_IsChange = 'x' ; break ;
 							}
 						}
 						else if ( pDoc -> L_Line.GetAt ( L_Number ).Start.y < pDoc -> L_Line.GetAt ( L_Number ).Last.y ) {
@@ -3712,7 +3713,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 											M_Rect.right = temp ;
 										}
 									}
-									Invalidate () ; M_IsLineSelect = 'o' ; break ;
+									Invalidate () ; M_IsLineSelect = 'o' ; Text_IsChange = 'x' ; break ;
 							}
 						}
 					}
@@ -3752,7 +3753,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 											M_Rect.bottom -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
 										}
 									}
-									Invalidate () ; M_IsLineSelect = 'o' ; break ;
+									Invalidate () ; M_IsLineSelect = 'o' ; Text_IsChange = 'x' ; break ;
 							}
 						}
 						else if ( pDoc -> L_Line.GetAt ( L_Number ).Start.y < pDoc -> L_Line.GetAt ( L_Number ).Last.y ) {
@@ -3790,7 +3791,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 											M_Rect.bottom -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
 										}
 									}
-									Invalidate () ; M_IsLineSelect = 'o' ; break ;
+									Invalidate () ; M_IsLineSelect = 'o' ; Text_IsChange = 'x' ; break ;
 							}
 						}
 					}
@@ -3809,7 +3810,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 
 							M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
 							M_What.Format ( _T ("R") ) ; M_Number = R_Number ;
-							M_IsDraw = 'o' ; P_IsContinue = 'x' ;
+							M_IsDraw = 'o' ; P_IsContinue = 'x' ; Text_IsChange = 'x' ;
 							Invalidate () ; M_IsRectSelect = 'o' ; break ;
 					}
 					R_Number-- ;
@@ -3850,7 +3851,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 						P_Insert.P_Color = pDoc -> P_Poly.GetAt ( M_Number ).P_Color ;
 						P_Insert.thickness = pDoc -> P_Poly.GetAt ( M_Number ).thickness ;
 						P_CurrentPoint = pDoc -> P_Poly.GetAt ( M_Number ).Poly_point.GetCount () - 1 ;
-						Invalidate () ; P_IsContinue = 'o' ; m_PSkeleton = 'x' ; break ;
+						Invalidate () ; P_IsContinue = 'o' ; m_PSkeleton = 'x' ; Text_IsChange = 'x' ; break ;
 					}
 					P_Number-- ;
 				}
@@ -3867,7 +3868,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 
 							M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
 							M_What.Format ( _T ("E") ) ; M_Number = E_Number ;
-							M_IsDraw = 'o' ; P_IsContinue = 'x' ;
+							M_IsDraw = 'o' ; P_IsContinue = 'x' ; Text_IsChange = 'x' ;
 							Invalidate () ; M_IsEllipseSelect = 'o' ; break ;
 					}
 					E_Number-- ;
@@ -3886,7 +3887,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 
 							M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
 							M_What.Format ( _T ("T") ) ; M_Number = T_Number ;
-							M_IsDraw = 'o' ; P_IsContinue = 'x' ;
+							M_IsDraw = 'o' ; P_IsContinue = 'x' ; Text_IsChange = 'x' ;
 							Invalidate () ; break ;
 					}
 					T_Number-- ;
@@ -3904,7 +3905,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 
 							M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
 							M_What.Format ( _T ("RT") ) ; M_Number = RT_Number ;
-							M_IsDraw = 'o' ; P_IsContinue = 'x' ;
+							M_IsDraw = 'o' ; P_IsContinue = 'x' ; Text_IsChange = 'x' ;
 							Invalidate () ; break ;
 					}
 					RT_Number-- ;
@@ -3922,7 +3923,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 
 							M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
 							M_What.Format ( _T ("RightT") ) ; M_Number = RightT_Number ;
-							M_IsDraw = 'o' ; P_IsContinue = 'x' ;
+							M_IsDraw = 'o' ; P_IsContinue = 'x' ; Text_IsChange = 'x' ;
 							Invalidate () ; break ;
 					}
 					RightT_Number-- ;
@@ -3940,7 +3941,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 
 							M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
 							M_What.Format ( _T ("RRightT") ) ; M_Number = RRightT_Number ;
-							M_IsDraw = 'o' ; P_IsContinue = 'x' ;
+							M_IsDraw = 'o' ; P_IsContinue = 'x' ; Text_IsChange = 'x' ;
 							Invalidate () ; break ;
 					}
 					RRightT_Number-- ;
@@ -3958,7 +3959,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 
 							M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
 							M_What.Format ( _T ("LTRT") ) ; M_Number = LTRT_Number ;
-							M_IsDraw = 'o' ; P_IsContinue = 'x' ;
+							M_IsDraw = 'o' ; P_IsContinue = 'x' ; Text_IsChange = 'x' ;
 							Invalidate () ; break ;
 					}
 					LTRT_Number-- ;
@@ -3976,7 +3977,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 
 							M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
 							M_What.Format ( _T ("RTLT") ) ; M_Number = RTLT_Number ;
-							M_IsDraw = 'o' ; P_IsContinue = 'x' ;
+							M_IsDraw = 'o' ; P_IsContinue = 'x' ; Text_IsChange = 'x' ;
 							Invalidate () ; break ;
 					}
 					RTLT_Number-- ;
@@ -3988,7 +3989,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 							M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
 							M_What.Format ( _T ("Text") ) ; M_Number = Text_Number ;
 							M_IsDraw = 'o' ; P_IsContinue = 'x' ;
-							Invalidate () ; break ;
+							Invalidate () ; Text_IsChange = 'o' ; break ;
 					}
 					Text_Number-- ;
 				}
@@ -5168,6 +5169,7 @@ void CGraphicEditorView::OnDrawline()
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 	
 	HideCaret () ;
+	Text_IsChange = 'x' ;
 	M_IsSelect = 'x' ;
 	M_IsDraw = 'x' ;
 	M_IsMove = 'x' ;
@@ -5717,6 +5719,7 @@ void CGraphicEditorView::OnDrawrec()
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 
 	HideCaret () ;
+	Text_IsChange = 'x' ;
 	M_IsSelect = 'x' ;
 	M_IsDraw = 'x' ;
 	M_IsMove = 'x' ;
@@ -5747,6 +5750,7 @@ void CGraphicEditorView::OnDrawpoly()
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 
 	HideCaret () ;
+	Text_IsChange = 'x' ;
 	M_IsSelect = 'x' ;
 	M_IsDraw = 'x' ;
 	M_IsMove = 'x' ;
@@ -5778,6 +5782,7 @@ void CGraphicEditorView::OnDrawellipse()
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 	
 	HideCaret () ;
+	Text_IsChange = 'x' ;
 	M_IsSelect = 'x' ;
 	M_IsDraw = 'x' ;
 	M_IsMove = 'x' ;
@@ -5807,6 +5812,7 @@ void CGraphicEditorView::OnSelectobject()
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 
 	HideCaret () ;
+	Text_IsChange = 'x' ;
 	M_IsSelect = 'x' ;
 	M_IsDraw = 'x' ;
 	Text_IsText = 'x' ;
@@ -5888,6 +5894,7 @@ void CGraphicEditorView::OnLButtonDblClk(UINT nFlags, CPoint point)
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
 
 	HideCaret () ;
+	Text_IsChange = 'x' ;
 	P_CanMove = 'x' ;
 	IsNormal = 'o' ;
 	P_Insert.Poly_point.RemoveAll () ;
@@ -6064,6 +6071,7 @@ void CGraphicEditorView::OnDrawtriangle()
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 	
 	HideCaret () ;
+	Text_IsChange = 'x' ;
 	M_IsSelect = 'x' ;
 	M_IsDraw = 'x' ;
 	M_IsMove = 'x' ;
@@ -6094,6 +6102,7 @@ void CGraphicEditorView::OnDrawreversetri()
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 
 	HideCaret () ;
+	Text_IsChange = 'x' ;
 	M_IsSelect = 'x' ;
 	M_IsDraw = 'x' ;
 	M_IsMove = 'x' ;
@@ -6252,6 +6261,7 @@ void CGraphicEditorView::OnRightangledtri()
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 
 	HideCaret () ;
+	Text_IsChange = 'x' ;
 	M_IsSelect = 'x' ;
 	M_IsDraw = 'x' ;
 	M_IsMove = 'x' ;
@@ -6282,6 +6292,7 @@ void CGraphicEditorView::OnRRrightangledtri()
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 
 	HideCaret () ;
+	Text_IsChange = 'x' ;
 	M_IsSelect = 'x' ;
 	M_IsDraw = 'x' ;
 	M_IsMove = 'x' ;
@@ -6312,6 +6323,7 @@ void CGraphicEditorView::OnRighttolefttri()
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 
 	HideCaret () ;
+	Text_IsChange = 'x' ;
 	M_IsSelect = 'x' ;
 	M_IsDraw = 'x' ;
 	M_IsMove = 'x' ;
@@ -6342,6 +6354,7 @@ void CGraphicEditorView::OnLefttorighttri()
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 
 	HideCaret () ;
+	Text_IsChange = 'x' ;
 	M_IsSelect = 'x' ;
 	M_IsDraw = 'x' ;
 	M_IsMove = 'x' ;
@@ -6408,6 +6421,7 @@ void CGraphicEditorView::OnText()
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 
 	M_IsSelect = 'x' ;
+	Text_IsChange = 'x' ;
 	M_IsDraw = 'x' ;
 	M_IsMove = 'x' ;
 	Text_IsText = 'o' ;
@@ -6442,7 +6456,7 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 		return;
 	
 	// 특정 객체를 클릭한 상태입니다.
-	if ( M_IsDraw == 'o' ) {
+	if ( M_IsDraw == 'o' && Text_IsChange == 'x' ) {
 		// Delete 키나 백 스페이스 키를 누르면 해당 객체를 삭제합니다.
 		if ( nChar == VK_DELETE || nChar == VK_BACK ) {
 			if ( M_What == _T ("L") ) {
@@ -7779,30 +7793,57 @@ void CGraphicEditorView::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 		return;
 
 	// Text를 입력 중인 경우
-	if ( Text_IsText == 'o' && Text_IsKeyDown == 'o' ) {
+	if ( (Text_IsText == 'o' && Text_IsKeyDown == 'o') || Text_IsChange == 'o' ) {
 
-		// 백 스페이스를 누르는 경우
-		if ( nChar == VK_BACK )
-			pDoc -> Text_Text.GetAt ( Text_Current ).Text.Delete ( pDoc -> Text_Text.GetAt ( Text_Current ).Text.GetLength () - 1 ) ;
-		// esc나 엔터를 누르는 경우
-		else if ( nChar == VK_ESCAPE || nChar == VK_RETURN ) {
-			Text_IsKeyDown = 'x' ;
-			HideCaret () ;
+		if ( Text_IsChange == 'o' ) {
+			// 백 스페이스를 누르는 경우
+			if ( nChar == VK_BACK )
+				pDoc -> Text_Text.GetAt ( M_Number ).Text.Delete ( pDoc -> Text_Text.GetAt ( M_Number ).Text.GetLength () - 1 ) ;
+			// esc나 엔터를 누르는 경우
+			else if ( nChar == VK_ESCAPE || nChar == VK_RETURN ) {
+				Text_IsKeyDown = 'x' ;
+				Text_IsChange = 'x' ;
+				HideCaret () ;
+			}
+			// TAB을 누르면 8번 띄어쓰기 효과를 가집니다.
+			else if ( nChar == VK_TAB ) {
+				pDoc -> Text_Text.GetAt ( M_Number ).Text.AppendChar ( VK_SPACE ) ;
+				pDoc -> Text_Text.GetAt ( M_Number ).Text.AppendChar ( VK_SPACE ) ;
+				pDoc -> Text_Text.GetAt ( M_Number ).Text.AppendChar ( VK_SPACE ) ;
+				pDoc -> Text_Text.GetAt ( M_Number ).Text.AppendChar ( VK_SPACE ) ;
+				pDoc -> Text_Text.GetAt ( M_Number ).Text.AppendChar ( VK_SPACE ) ;
+				pDoc -> Text_Text.GetAt ( M_Number ).Text.AppendChar ( VK_SPACE ) ;
+				pDoc -> Text_Text.GetAt ( M_Number ).Text.AppendChar ( VK_SPACE ) ;
+				pDoc -> Text_Text.GetAt ( M_Number ).Text.AppendChar ( VK_SPACE ) ;
+			}
+			// 일반적인 경우는 해당 키를 그대로 출력합니다.
+			else
+				pDoc -> Text_Text.GetAt ( M_Number ).Text.AppendChar ( nChar ) ;
 		}
-		// TAB을 누르면 8번 띄어쓰기 효과를 가집니다.
-		else if ( nChar == VK_TAB ) {
-			pDoc -> Text_Text.GetAt ( Text_Current ).Text.AppendChar ( VK_SPACE ) ;
-			pDoc -> Text_Text.GetAt ( Text_Current ).Text.AppendChar ( VK_SPACE ) ;
-			pDoc -> Text_Text.GetAt ( Text_Current ).Text.AppendChar ( VK_SPACE ) ;
-			pDoc -> Text_Text.GetAt ( Text_Current ).Text.AppendChar ( VK_SPACE ) ;
-			pDoc -> Text_Text.GetAt ( Text_Current ).Text.AppendChar ( VK_SPACE ) ;
-			pDoc -> Text_Text.GetAt ( Text_Current ).Text.AppendChar ( VK_SPACE ) ;
-			pDoc -> Text_Text.GetAt ( Text_Current ).Text.AppendChar ( VK_SPACE ) ;
-			pDoc -> Text_Text.GetAt ( Text_Current ).Text.AppendChar ( VK_SPACE ) ;
+		else {
+			// 백 스페이스를 누르는 경우
+			if ( nChar == VK_BACK )
+				pDoc -> Text_Text.GetAt ( Text_Current ).Text.Delete ( pDoc -> Text_Text.GetAt ( Text_Current ).Text.GetLength () - 1 ) ;
+			// esc나 엔터를 누르는 경우
+			else if ( nChar == VK_ESCAPE || nChar == VK_RETURN ) {
+				Text_IsKeyDown = 'x' ;
+				HideCaret () ;
+			}
+			// TAB을 누르면 8번 띄어쓰기 효과를 가집니다.
+			else if ( nChar == VK_TAB ) {
+				pDoc -> Text_Text.GetAt ( Text_Current ).Text.AppendChar ( VK_SPACE ) ;
+				pDoc -> Text_Text.GetAt ( Text_Current ).Text.AppendChar ( VK_SPACE ) ;
+				pDoc -> Text_Text.GetAt ( Text_Current ).Text.AppendChar ( VK_SPACE ) ;
+				pDoc -> Text_Text.GetAt ( Text_Current ).Text.AppendChar ( VK_SPACE ) ;
+				pDoc -> Text_Text.GetAt ( Text_Current ).Text.AppendChar ( VK_SPACE ) ;
+				pDoc -> Text_Text.GetAt ( Text_Current ).Text.AppendChar ( VK_SPACE ) ;
+				pDoc -> Text_Text.GetAt ( Text_Current ).Text.AppendChar ( VK_SPACE ) ;
+				pDoc -> Text_Text.GetAt ( Text_Current ).Text.AppendChar ( VK_SPACE ) ;
+			}
+			// 일반적인 경우는 해당 키를 그대로 출력합니다.
+			else
+				pDoc -> Text_Text.GetAt ( Text_Current ).Text.AppendChar ( nChar ) ;
 		}
-		// 일반적인 경우는 해당 키를 그대로 출력합니다.
-		else
-			pDoc -> Text_Text.GetAt ( Text_Current ).Text.AppendChar ( nChar ) ;
 
 		Invalidate () ;
 	}
