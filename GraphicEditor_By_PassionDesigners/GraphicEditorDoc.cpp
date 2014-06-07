@@ -46,6 +46,7 @@ CGraphicEditorDoc::CGraphicEditorDoc()
 	LTRT_Count = 0 ;
 	RTLT_Count = 0 ;
 	Text_Count = 0 ;
+	G_Count = 0 ;
 }
 
 CGraphicEditorDoc::~CGraphicEditorDoc()
@@ -132,6 +133,7 @@ void CGraphicEditorDoc::Serialize(CArchive& ar)
 		ar << LTRT_Count ;
 		ar << RTLT_Count ;
 		ar << Text_Count ;
+		ar << G_Count ;
 
 		L_Location.Serialize (ar) ;				// 그린 모든 객체 중 선 객체의 각 Index 저장
 		R_Location.Serialize (ar) ;				// 그린 모든 객체 중 상자 객체의 각 Index 저장
@@ -144,6 +146,8 @@ void CGraphicEditorDoc::Serialize(CArchive& ar)
 		LTRT_Location.Serialize (ar) ;			// 그린 모든 객체 중 왼쪽 -> 오른쪽 삼각형 객체의 각 Index 저장
 		RTLT_Location.Serialize (ar) ;			// 그린 모든 객체 중 오른쪽 -> 왼쪽 객체의 각 Index 저장
 		Text_Location.Serialize (ar) ;			// 그린 모든 객체 중 Text 객체의 각 Index 저장
+		G_Location.Serialize (ar) ;
+
 		R_IsNoFill.Serialize (ar) ;
 		E_IsNoFill.Serialize (ar) ;
 		T_IsNoFill.Serialize (ar) ;
@@ -232,6 +236,7 @@ void CGraphicEditorDoc::Serialize(CArchive& ar)
 		ar >> LTRT_Count ;
 		ar >> RTLT_Count ;
 		ar >> Text_Count ;
+		ar >> G_Count ;
 
 		L_Location.Serialize (ar) ;				// 그린 모든 객체 중 선 객체의 각 Index 불러오기
 		R_Location.Serialize (ar) ;				// 그린 모든 객체 중 상자 객체의 각 Index 불러오기
@@ -244,6 +249,8 @@ void CGraphicEditorDoc::Serialize(CArchive& ar)
 		LTRT_Location.Serialize (ar) ;			// 그린 모든 객체 중 왼쪽 -> 오른쪽 삼각형 객체의 각 Index 불러오기
 		RTLT_Location.Serialize (ar) ;			// 그린 모든 객체 중 오른쪽 -> 왼쪽 객체의 각 Index 불러오기
 		Text_Location.Serialize (ar) ;			// 그린 모든 객체 중 Text 객체의 각 Index 불러오기
+		G_Location.Serialize (ar) ;
+
 		R_IsNoFill.Serialize (ar) ;
 		E_IsNoFill.Serialize (ar) ;
 		T_IsNoFill.Serialize (ar) ;

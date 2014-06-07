@@ -123,6 +123,9 @@
     <ClInclude Include="LinePattern.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="CGroup.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GraphicEditor.cpp">
@@ -159,6 +162,9 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="LinePattern.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="CGroup.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

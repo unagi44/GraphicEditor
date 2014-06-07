@@ -35,9 +35,17 @@ public:
 	char m_Thickness ;
 	char m_IsFillPattern ;
 	char m_IsLinePattern ;
+	char m_IsSelectGroup ;
 	char m_PSkeleton ;
 	int m_FillPattern ;
 	int m_LinePattern ;
+
+	// 그룹화에 필요한 변수
+	CRect G_Include ;
+	CPoint G_Start ;
+	int G_FindCount ;
+	int G_Current ;
+	char G_IsMakeGroup ;
 
 	// 이동 툴바에 필요한 변수들
 	CRect M_Rect ;

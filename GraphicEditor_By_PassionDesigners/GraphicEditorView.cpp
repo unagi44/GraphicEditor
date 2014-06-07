@@ -75,6 +75,10 @@ CGraphicEditorView::CGraphicEditorView()
 	m_IsThickness = 'x' ;
 	m_PSkeleton = 'x' ;
 	m_Thickness = 1 ;
+	m_IsSelectGroup = 'x' ;
+
+	// 그룹화에 필요한 변수 초기화
+	G_IsMakeGroup = 'x' ;
 
 	// 이동 툴바에 필요한 변수 초기화
 	M_IsMove = 'x' ;
@@ -2644,6 +2648,7 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 		// 텍스트 객체일 경우
 		else if ( pDoc -> What.GetAt (i) == _T ("Text") ) {
 
+			// 폰트 지정한 경우
 			if ( pDoc -> Text_Text.GetAt ( Text_Number ).IsFont == 'o' ) {
 
 				CFont Font ;
@@ -2653,7 +2658,7 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 
 				CSize strSize ;
 
-				if ( Text_IsKeyDown == 'o' || Text_IsChange == 'o' ) {
+				if ( (Text_IsKeyDown == 'o' && Text_Number == pDoc -> Text_Text.GetCount () - 1) || (Text_IsChange == 'o' && Text_Number == M_Number) ) {
 					strSize = pDC -> GetTextExtent ( pDoc -> Text_Text.GetAt ( Text_Number ).Text ) ;
 					Text_CurPoint.x = pDoc -> Text_Text.GetAt ( Text_Number ).Location.x + strSize.cx ;
 					Text_CurPoint.y = pDoc -> Text_Text.GetAt ( Text_Number ).Location.y ;
@@ -2661,7 +2666,7 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 					ShowCaret () ;
 				}
 
-				if ( M_IsDraw != 'o' || (M_IsDraw == 'o' && Text_IsChange == 'o') ) {
+				if ( (M_IsDraw != 'o' && Text_Number == pDoc -> Text_Text.GetCount () - 1) || (M_IsDraw == 'o' && Text_IsChange == 'o' && Text_Number == M_Number) ) {
 					pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.top = pDoc -> Text_Text.GetAt ( Text_Number ).Location.y + pDoc -> Text_Text.GetAt ( Text_Number ).Font.lfHeight - 10 ;
 					pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.left = pDoc -> Text_Text.GetAt ( Text_Number ).Location.x - 10 ;
 					pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.bottom = pDoc -> Text_Text.GetAt ( Text_Number ).Location.y + 10 ;
@@ -2697,19 +2702,20 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 								 pDoc -> Text_Text.GetAt ( Text_Number ).Text ) ;
 				pDC -> SelectObject ( def_font ) ;
 			}
+			// 폰트 지정을 하지 않은 경우
 			else {
 
 				CSize strSize ;
 
-				if ( Text_IsKeyDown == 'o' || Text_IsChange == 'o' ) {
+				if ( (Text_IsKeyDown == 'o' && Text_Number == pDoc -> Text_Text.GetCount () - 1) || (Text_IsChange == 'o' && Text_Number == M_Number) ) {
 					strSize = pDC -> GetTextExtent ( pDoc -> Text_Text.GetAt ( Text_Number ).Text ) ;
 					Text_CurPoint.x = pDoc -> Text_Text.GetAt ( Text_Number ).Location.x + strSize.cx ;
 					Text_CurPoint.y = pDoc -> Text_Text.GetAt ( Text_Number ).Location.y ;
 					SetCaretPos ( Text_CurPoint ) ;
 					ShowCaret () ;
 				}
-
-				if ( M_IsDraw != 'o' || (M_IsDraw == 'o' && Text_IsChange == 'o') ) {
+				
+				if ( (M_IsDraw != 'o' && Text_Number == pDoc -> Text_Text.GetCount () - 1) || (M_IsDraw == 'o' && Text_IsChange == 'o' && Text_Number == M_Number) ) {
 					pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.top = pDoc -> Text_Text.GetAt ( Text_Number ).Location.y - 10 ;
 					pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.left = pDoc -> Text_Text.GetAt ( Text_Number ).Location.x - 10 ;
 					pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.bottom = pDoc -> Text_Text.GetAt ( Text_Number ).Location.y + 26 ;
@@ -2747,6 +2753,14 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 			}
 			Text_Number++ ;
 		}
+	}
+
+	if ( m_IsSelectGroup == 'o' ) {
+		CPen pen ( PS_DOT, 1.8, RGB (0, 0, 150) ) ;
+		CPen *Draw_Pen = pDC -> SelectObject(&pen);
+		pDC -> SelectStockObject ( NULL_BRUSH ) ;
+		pDC -> Rectangle ( G_Include.left, G_Include.top, G_Include.right, G_Include.bottom ) ;
+		pDC -> SelectObject ( Draw_Pen ) ;
 	}
 
 }
@@ -3350,6 +3364,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 	// 객체를 이동, 선택하는 경우
 	else if ( M_IsMove == 'o' && P_CanMove == 'x' ) {
 
+		char Find = 'x' ;
 		// 선 객체를 변경시키는 경우
 		if ( M_IsLineSelect == 'o' &&
 			((pDoc -> L_Line.GetAt ( M_Number ).Start.x - 15 <= point.x && pDoc -> L_Line.GetAt ( M_Number ).Start.x + 15 >= point.x
@@ -3663,7 +3678,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 											M_Rect.right = temp ;
 										}
 									}
-									Invalidate () ; M_IsLineSelect = 'o' ; Text_IsChange = 'x' ; break ;
+									Invalidate () ; M_IsLineSelect = 'o' ; Text_IsChange = 'x' ; Find = 'o' ; break ;
 							}
 						}
 						else if ( pDoc -> L_Line.GetAt ( L_Number ).Start.y < pDoc -> L_Line.GetAt ( L_Number ).Last.y ) {
@@ -3713,7 +3728,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 											M_Rect.right = temp ;
 										}
 									}
-									Invalidate () ; M_IsLineSelect = 'o' ; Text_IsChange = 'x' ; break ;
+									Invalidate () ; M_IsLineSelect = 'o' ; Text_IsChange = 'x' ; Find = 'o' ; break ;
 							}
 						}
 					}
@@ -3753,7 +3768,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 											M_Rect.bottom -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
 										}
 									}
-									Invalidate () ; M_IsLineSelect = 'o' ; Text_IsChange = 'x' ; break ;
+									Invalidate () ; M_IsLineSelect = 'o' ; Text_IsChange = 'x' ; Find = 'o' ; break ;
 							}
 						}
 						else if ( pDoc -> L_Line.GetAt ( L_Number ).Start.y < pDoc -> L_Line.GetAt ( L_Number ).Last.y ) {
@@ -3791,7 +3806,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 											M_Rect.bottom -= pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
 										}
 									}
-									Invalidate () ; M_IsLineSelect = 'o' ; Text_IsChange = 'x' ; break ;
+									Invalidate () ; M_IsLineSelect = 'o' ; Text_IsChange = 'x' ; Find = 'o' ; break ;
 							}
 						}
 					}
@@ -3811,7 +3826,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 							M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
 							M_What.Format ( _T ("R") ) ; M_Number = R_Number ;
 							M_IsDraw = 'o' ; P_IsContinue = 'x' ; Text_IsChange = 'x' ;
-							Invalidate () ; M_IsRectSelect = 'o' ; break ;
+							Invalidate () ; M_IsRectSelect = 'o' ; Find = 'o' ; break ;
 					}
 					R_Number-- ;
 				}
@@ -3851,7 +3866,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 						P_Insert.P_Color = pDoc -> P_Poly.GetAt ( M_Number ).P_Color ;
 						P_Insert.thickness = pDoc -> P_Poly.GetAt ( M_Number ).thickness ;
 						P_CurrentPoint = pDoc -> P_Poly.GetAt ( M_Number ).Poly_point.GetCount () - 1 ;
-						Invalidate () ; P_IsContinue = 'o' ; m_PSkeleton = 'x' ; Text_IsChange = 'x' ; break ;
+						Invalidate () ; P_IsContinue = 'o' ; m_PSkeleton = 'x' ; Text_IsChange = 'x' ; Find = 'o' ; break ;
 					}
 					P_Number-- ;
 				}
@@ -3869,7 +3884,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 							M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
 							M_What.Format ( _T ("E") ) ; M_Number = E_Number ;
 							M_IsDraw = 'o' ; P_IsContinue = 'x' ; Text_IsChange = 'x' ;
-							Invalidate () ; M_IsEllipseSelect = 'o' ; break ;
+							Invalidate () ; M_IsEllipseSelect = 'o' ; Find = 'o' ; break ;
 					}
 					E_Number-- ;
 
@@ -3888,7 +3903,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 							M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
 							M_What.Format ( _T ("T") ) ; M_Number = T_Number ;
 							M_IsDraw = 'o' ; P_IsContinue = 'x' ; Text_IsChange = 'x' ;
-							Invalidate () ; break ;
+							Invalidate () ; Find = 'o' ; break ;
 					}
 					T_Number-- ;
 				}
@@ -3906,7 +3921,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 							M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
 							M_What.Format ( _T ("RT") ) ; M_Number = RT_Number ;
 							M_IsDraw = 'o' ; P_IsContinue = 'x' ; Text_IsChange = 'x' ;
-							Invalidate () ; break ;
+							Invalidate () ; Find = 'o' ; break ;
 					}
 					RT_Number-- ;
 				}
@@ -3924,7 +3939,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 							M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
 							M_What.Format ( _T ("RightT") ) ; M_Number = RightT_Number ;
 							M_IsDraw = 'o' ; P_IsContinue = 'x' ; Text_IsChange = 'x' ;
-							Invalidate () ; break ;
+							Invalidate () ; Find = 'o' ; break ;
 					}
 					RightT_Number-- ;
 				}
@@ -3942,7 +3957,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 							M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
 							M_What.Format ( _T ("RRightT") ) ; M_Number = RRightT_Number ;
 							M_IsDraw = 'o' ; P_IsContinue = 'x' ; Text_IsChange = 'x' ;
-							Invalidate () ; break ;
+							Invalidate () ; Find = 'o' ; break ;
 					}
 					RRightT_Number-- ;
 				}
@@ -3960,7 +3975,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 							M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
 							M_What.Format ( _T ("LTRT") ) ; M_Number = LTRT_Number ;
 							M_IsDraw = 'o' ; P_IsContinue = 'x' ; Text_IsChange = 'x' ;
-							Invalidate () ; break ;
+							Invalidate () ; Find = 'o' ; break ;
 					}
 					LTRT_Number-- ;
 				}
@@ -3978,7 +3993,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 							M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
 							M_What.Format ( _T ("RTLT") ) ; M_Number = RTLT_Number ;
 							M_IsDraw = 'o' ; P_IsContinue = 'x' ; Text_IsChange = 'x' ;
-							Invalidate () ; break ;
+							Invalidate () ; Find = 'o' ; break ;
 					}
 					RTLT_Number-- ;
 				}
@@ -3989,16 +4004,22 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 							M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
 							M_What.Format ( _T ("Text") ) ; M_Number = Text_Number ;
 							M_IsDraw = 'o' ; P_IsContinue = 'x' ;
-							Invalidate () ; Text_IsChange = 'o' ; break ;
+							Invalidate () ; Text_IsChange = 'o' ; Find = 'o' ; break ;
 					}
 					Text_Number-- ;
 				}
 
 			}
-			if ( i == 0 ) {
-				M_IsLineSelect = 'x' ;
-
+			if ( Find == 'x') {
+				P_IsContinue = 'x' ;
+				P_Insert.Poly_point.RemoveAll () ;
+				M_IsDraw = 'x' ;
 				Invalidate () ;
+
+				m_IsSelectGroup = 'o' ;
+				G_Include.top = point.y ; G_Include.bottom = point.y ;
+				G_Include.left = point.x ; G_Include.right = point.x ;
+				G_Start = point ;
 			}
 		}
 	}
@@ -4723,6 +4744,13 @@ void CGraphicEditorView::OnMouseMove(UINT nFlags, CPoint point)
 
 		Invalidate () ;
 	}
+	else if ( m_IsSelectGroup == 'o' ) {
+		G_Include.right += point.x - G_Start.x ;
+		G_Include.bottom += point.y - G_Start.y ;
+
+		G_Start = point ;
+		Invalidate () ;
+	}
 	
 	CScrollView::OnMouseMove(nFlags, point);
 }
@@ -5158,6 +5186,253 @@ void CGraphicEditorView::OnLButtonUp(UINT nFlags, CPoint point)
 		pDoc -> RTLT_Triangle.SetAt ( RTLT_Current, RTLT_Insert ) ;
 		Invalidate () ;
 		RTLT_CanMove = 'x' ;
+	}
+	// 그룹화 다중 선택을 하다가 클릭을 땐 경우
+	else if ( m_IsSelectGroup == 'o' ) {
+		G_Include.right = point.x ;
+		G_Include.bottom = point.y ;
+
+		if ( G_Include.left > G_Include.right ) {
+			int temp = G_Include.right ;
+			G_Include.right = G_Include.left ;
+			G_Include.left = temp ;
+		}
+		if ( G_Include.top > G_Include.bottom ) {
+			int temp = G_Include.bottom ;
+			G_Include.bottom = G_Include.top ;
+			G_Include.top = temp ;
+		}
+
+		G_Current = pDoc -> G_Count ;
+		pDoc -> G_Group.SetSize ( pDoc -> G_Count + 1 ) ;
+		pDoc -> G_Count++ ;
+
+		int L_Number = 0 ;
+		int R_Number = 0 ;
+		int P_Number = 0 ;
+		int E_Number = 0 ;
+		int T_Number = 0 ;
+		int RT_Number = 0 ;
+		int RightT_Number = 0 ;
+		int RRightT_Number = 0 ;
+		int LTRT_Number = 0 ;
+		int RTLT_Number = 0 ;
+		int Text_Number = 0 ;
+
+		G_FindCount = 0 ;
+
+		for ( int i = 0 ; i < pDoc -> What.GetCount () ; i++ ) {
+			if ( pDoc -> What.GetAt (i) == _T ("L") ) {
+				if ( pDoc -> L_Line.GetAt ( L_Number ).Start.x >= G_Include.left && pDoc -> L_Line.GetAt ( L_Number ).Start.x <= G_Include.right &&
+					 pDoc -> L_Line.GetAt ( L_Number ).Last.x >= G_Include.left && pDoc -> L_Line.GetAt ( L_Number ).Last.x <= G_Include.right &&
+					 pDoc -> L_Line.GetAt ( L_Number ).Start.y >= G_Include.top && pDoc -> L_Line.GetAt ( L_Number ).Start.y <= G_Include.bottom &&
+					 pDoc -> L_Line.GetAt ( L_Number ).Last.y >= G_Include.top && pDoc -> L_Line.GetAt ( L_Number ).Last.y <= G_Include.bottom ) {
+
+						 pDoc -> G_Group.GetAt ( G_Current ).Line.Add ( pDoc -> L_Line.GetAt ( L_Number ) ) ;
+						 pDoc -> G_Group.GetAt ( G_Current ).L_Count++ ;
+						 G_FindCount++ ;
+
+						 if ( i == 0 ) {
+							 if ( pDoc -> L_Line.GetAt ( L_Number ).Start.x >= pDoc -> L_Line.GetAt ( L_Number ).Last.x ) {
+								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> L_Line.GetAt ( L_Number ).Last.x ;
+								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> L_Line.GetAt ( L_Number ).Start.x ;
+							 }
+							 else {
+								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> L_Line.GetAt ( L_Number ).Start.x ;
+								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> L_Line.GetAt ( L_Number ).Last.x ;
+							 }
+
+							 if ( pDoc -> L_Line.GetAt ( L_Number ).Start.y >= pDoc -> L_Line.GetAt ( L_Number ).Last.y ) {
+								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> L_Line.GetAt ( L_Number ).Last.y ;
+								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> L_Line.GetAt ( L_Number ).Start.y ;
+							 }
+							 else {
+								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> L_Line.GetAt ( L_Number ).Start.y ;
+								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> L_Line.GetAt ( L_Number ).Last.y ;
+							 }
+						 }
+						 else {
+							 if ( pDoc -> L_Line.GetAt ( L_Number ).Start.x > pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right )
+								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> L_Line.GetAt ( L_Number ).Start.x ;
+							 else if ( pDoc -> L_Line.GetAt ( L_Number ).Start.x < pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left )
+								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> L_Line.GetAt ( L_Number ).Start.x ;
+
+							 if ( pDoc -> L_Line.GetAt ( L_Number ).Last.x > pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right )
+								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> L_Line.GetAt ( L_Number ).Last.x ;
+							 else if ( pDoc -> L_Line.GetAt ( L_Number ).Last.x < pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left )
+								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> L_Line.GetAt ( L_Number ).Last.x ;
+
+							 if ( pDoc -> L_Line.GetAt ( L_Number ).Start.y > pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom )
+								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> L_Line.GetAt ( L_Number ).Start.y ;
+							 else if ( pDoc -> L_Line.GetAt ( L_Number ).Start.y < pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top )
+								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> L_Line.GetAt ( L_Number ).Start.y ;
+
+							 if ( pDoc -> L_Line.GetAt ( L_Number ).Last.y > pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom )
+								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> L_Line.GetAt ( L_Number ).Last.y ;
+							 else if ( pDoc -> L_Line.GetAt ( L_Number ).Last.y < pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top )
+								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> L_Line.GetAt ( L_Number ).Last.y ;
+						 }
+				}
+				L_Number++ ;
+			}
+			else if ( pDoc -> What.GetAt (i) == _T ("P") ) {
+				
+				int j ;
+				for ( j = 0 ; j < pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetCount () ; j++ ) {
+					if ( pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (j).x < G_Include.left || pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (j).x > G_Include.right ||
+						 pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (j).y < G_Include.top || pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (j).y > G_Include.bottom )
+						break ;
+				}
+
+				if ( j == pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetCount () ) {
+					pDoc -> G_Group.GetAt ( G_Current ).Poly.SetSize (P_Number+1) ;
+					pDoc -> G_Group.GetAt ( G_Current ).Poly.GetAt (P_Number).Poly_point.SetSize (j) ;
+
+					int Max_x = pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (0).x ;
+					int Max_y = pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (0).y ;
+					int Min_x = Max_x ;
+					int Min_y = Max_y ;
+
+					for ( int k = 0 ; k < j ; k++ ) {
+						pDoc -> G_Group.GetAt ( G_Current ).Poly.GetAt (P_Number).Poly_point.SetAt (k, pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt(k)) ;
+
+						if ( Max_x < pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (k).x )
+							Max_x = pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (k).x ;
+						else if ( Min_x > pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (k).x )
+							Min_x = pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (k).x ;
+
+						if ( Max_y < pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (k).y )
+							Max_y = pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (k).y ;
+						else if ( Min_y > pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (k).y )
+							Min_y = pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (k).y ;
+					}
+					pDoc -> G_Group.GetAt ( G_Current ).Poly.GetAt (P_Number).Pattern = pDoc -> P_Poly.GetAt (P_Number).Pattern ;
+					pDoc -> G_Group.GetAt ( G_Current ).Poly.GetAt (P_Number).P_Color = pDoc -> P_Poly.GetAt (P_Number).P_Color ;
+					pDoc -> G_Group.GetAt ( G_Current ).Poly.GetAt (P_Number).thickness = pDoc -> P_Poly.GetAt (P_Number).thickness ;
+					pDoc -> G_Group.GetAt ( G_Current ).P_Count++ ;
+					G_FindCount++ ;
+
+					if ( i == 0 ) {
+						pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = Min_y ;
+						pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = Max_y ;
+						pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = Min_x ;
+						pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = Max_x ;
+					}
+					else {
+						if ( Min_x < pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left )
+							pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = Min_x ;
+						if ( Max_x > pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right )
+							pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = Max_x ;
+						if ( Max_y > pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom )
+							pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = Max_y ;
+						if ( Min_y < pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top )
+							pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = Min_y ;
+					}
+				}
+				P_Number++ ;
+			}
+			else if ( pDoc -> What.GetAt (i) == _T ("R") ) {
+				if ( pDoc -> R_Rec.GetAt ( R_Number ).top >= G_Include.top && pDoc -> R_Rec.GetAt ( R_Number ).bottom <= G_Include.bottom &&
+					 pDoc -> R_Rec.GetAt ( R_Number ).left >= G_Include.left && pDoc -> R_Rec.GetAt ( R_Number ).right <= G_Include.right ) {
+
+						 pDoc -> G_Group.GetAt ( G_Current ).Rect.Add ( pDoc -> R_Rec.GetAt ( R_Number ) ) ;
+						 pDoc -> G_Group.GetAt ( G_Current ).R_Color.Add ( pDoc -> R_Color.GetAt (R_Number) ) ;
+						 pDoc -> G_Group.GetAt ( G_Current ).R_FillColor.Add ( pDoc -> R_FillColor.GetAt (R_Number) ) ;
+						 pDoc -> G_Group.GetAt ( G_Current ).R_Count++ ;
+						 pDoc -> G_Group.GetAt ( G_Current ).R_IsNoFill.Add ( pDoc -> R_IsNoFill.GetAt (R_Number) ) ;
+						 pDoc -> G_Group.GetAt ( G_Current ).R_FillPattern.Add ( pDoc -> R_FillPattern.GetAt (R_Number) ) ;
+						 pDoc -> G_Group.GetAt ( G_Current ).R_LinePattern.Add ( pDoc -> R_LinePattern.GetAt (R_Number) ) ;
+						 pDoc -> G_Group.GetAt ( G_Current ).R_Thickness.Add ( pDoc -> R_Thickness.GetAt (R_Number) ) ;
+						 G_FindCount++ ;
+
+						 if ( i == 0 ) {
+							 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> R_Rec.GetAt ( R_Number ).top ;
+							 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> R_Rec.GetAt ( R_Number ).bottom ;
+							 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> R_Rec.GetAt ( R_Number ).left ;
+							 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> R_Rec.GetAt ( R_Number ).right ;
+						 }
+						 else {
+							 if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top > pDoc -> R_Rec.GetAt ( R_Number ).top )
+								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> R_Rec.GetAt ( R_Number ).top ;
+							 if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom < pDoc -> R_Rec.GetAt ( R_Number ).bottom )
+								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> R_Rec.GetAt ( R_Number ).bottom ;
+							 if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left > pDoc -> R_Rec.GetAt ( R_Number ).left )
+								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> R_Rec.GetAt ( R_Number ).left ;
+							 if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right < pDoc -> R_Rec.GetAt ( R_Number ).right )
+								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> R_Rec.GetAt ( R_Number ).right ;
+						 }
+				}
+				R_Number++ ;
+			}
+			else if ( pDoc -> What.GetAt (i) == _T ("E") ) {
+				if ( pDoc -> E_Ellipse.GetAt ( E_Number ).top >= G_Include.top && pDoc -> E_Ellipse.GetAt ( E_Number ).bottom <= G_Include.bottom &&
+					 pDoc -> E_Ellipse.GetAt ( E_Number ).left >= G_Include.left && pDoc -> E_Ellipse.GetAt ( E_Number ).right <= G_Include.right ) {
+
+						 pDoc -> G_Group.GetAt ( G_Current ).Ellipse.Add ( pDoc -> E_Ellipse.GetAt ( E_Number ) ) ;
+						 pDoc -> G_Group.GetAt ( G_Current ).E_Color.Add ( pDoc -> E_Color.GetAt (E_Number) ) ;
+						 pDoc -> G_Group.GetAt ( G_Current ).E_FillColor.Add ( pDoc -> E_FillColor.GetAt (E_Number) ) ;
+						 pDoc -> G_Group.GetAt ( G_Current ).E_Count++ ;
+						 pDoc -> G_Group.GetAt ( G_Current ).E_IsNoFill.Add ( pDoc -> E_IsNoFill.GetAt (E_Number) ) ;
+						 pDoc -> G_Group.GetAt ( G_Current ).E_FillPattern.Add ( pDoc -> E_FillPattern.GetAt (E_Number) ) ;
+						 pDoc -> G_Group.GetAt ( G_Current ).E_LinePattern.Add ( pDoc -> E_LinePattern.GetAt (E_Number) ) ;
+						 pDoc -> G_Group.GetAt ( G_Current ).E_Thickness.Add ( pDoc -> E_Thickness.GetAt (E_Number) ) ;
+						 G_FindCount++ ;
+
+						 if ( i == 0 ) {
+							 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> E_Ellipse.GetAt ( E_Number ).top ;
+							 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> E_Ellipse.GetAt ( E_Number ).bottom ;
+							 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> E_Ellipse.GetAt ( E_Number ).left ;
+							 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> E_Ellipse.GetAt ( E_Number ).right ;
+						 }
+						 else {
+							 if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top > pDoc -> E_Ellipse.GetAt ( E_Number ).top )
+								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> E_Ellipse.GetAt ( E_Number ).top ;
+							 if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom < pDoc -> E_Ellipse.GetAt ( E_Number ).bottom )
+								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> E_Ellipse.GetAt ( E_Number ).bottom ;
+							 if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left > pDoc -> E_Ellipse.GetAt ( E_Number ).left )
+								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> E_Ellipse.GetAt ( E_Number ).left ;
+							 if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right < pDoc -> E_Ellipse.GetAt ( E_Number ).right )
+								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> E_Ellipse.GetAt ( E_Number ).right ;
+						 }
+				}
+				E_Number++ ;
+			}
+			else if ( pDoc -> What.GetAt (i) == _T ("Text") ) {
+				if ( pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.top >= G_Include.top && pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.bottom <= G_Include.bottom &&
+					 pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.left >= G_Include.left && pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.right <= G_Include.right ) {
+
+						 pDoc -> G_Group.GetAt ( G_Current ).Text.Add ( pDoc -> Text_Text.GetAt ( Text_Number ) ) ;
+						 pDoc -> G_Group.GetAt ( G_Current ).Text_Count++ ;
+						 G_FindCount++ ;
+
+						 if ( i == 0 ) {
+							 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.top ;
+							 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.bottom ;
+							 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.left ;
+							 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.right ;
+						 }
+						 else {
+							 if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top > pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.top )
+								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.top ;
+							 if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom < pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.bottom )
+								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.bottom ;
+							 if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left > pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.left )
+								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.left ;
+							 if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right < pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.right )
+								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.right ;
+						 }
+				}
+				Text_Number++ ;
+			}
+		}
+
+		if ( G_FindCount > 1 ) {
+			pDoc -> What.Add ( _T ("G") ) ;
+			pDoc -> G_Count++ ;
+			pDoc -> G_Location.Add ( pDoc -> What.GetCount () - 1 ) ;
+		}
+		Invalidate () ;
+		m_IsSelectGroup = 'x' ;
 	}
 	
 	CScrollView::OnLButtonUp(nFlags, point);
@@ -6811,14 +7086,11 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 							}
 						}
 					}
-					M_Number = 0 ;
 				}
 				else {
 					pDoc -> P_Poly.GetAt ( M_Number ).Poly_point.RemoveAt ( PSkeleton ) ;
 					P_Insert.Poly_point.RemoveAt ( PSkeleton ) ;
 
-					if ( PSkeleton == P_CurrentPoint - 1 && (P_IsStart == 'o' || (P_IsStart == 'x' && P_ChangeSkeleton == 0)))
-						P_CurrentPoint-- ;
 					P_CurrentPoint-- ;
 
 					int Max_x = pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt (0).x ;
@@ -7977,6 +8249,8 @@ void CGraphicEditorView::OnTextbgcolor()
 			if ( M_What == _T("Text") ) {
 				pDoc -> Text_Text.GetAt ( M_Number ).IsNoFill = 'x' ;
 				pDoc -> Text_Text.GetAt ( M_Number ).BGColor = Text_BGColor ;
+
+				Invalidate () ;
 			}
 		}
 	}

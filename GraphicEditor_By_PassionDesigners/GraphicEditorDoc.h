@@ -9,6 +9,7 @@
 #include "CLine.h"	// 선을 그리기 위한 헤더파일 참조
 #include "CPolyLine.h"	// PolyLine을 그리기 위한 헤더파일 참조
 #include "CText.h"		// Text 삽입을 하기 위한 헤더파일 참조
+#include "CGroup.h"
 
 #pragma once
 
@@ -32,6 +33,7 @@ public:
 	CArray < CRect, CRect& > RTLT_Triangle ;	// 오른쪽 -> 왼쪽 삼각형 그리기 배열
 	CArray < CRect, CRect& > LTRT_Triangle ;	// 왼쪽 -> 오른쪽 삼각형 그리기 배열
 	CArray < CText, CText& > Text_Text ;		// 텍스트 삽입 배열
+	CArray < CGroup, CGroup& > G_Group ;		// 그룹화 배열
 
 // 작업입니다.
 public:
@@ -65,6 +67,7 @@ public:
 	CArray < int, int > E_Location ;			// 그린 모든 객체 중 원 객체의 각 Index
 	CArray < int, int > T_Location ;			// 그린 모든 객체 중 세모 객체의 각 Index
 	CArray < int, int > RT_Location ;			// 그린 모든 객체 중 역 삼각형 객체의 각 Index
+	CArray < int, int > G_Location ;			// 만든 모든 그룹화 객체의 각 index
 	CArray < int, int > RightT_Location ;		// 그린 모든 객체 중 직각 삼각형 객체의 각 Index
 	CArray < int, int > RRightT_Location ;		// 그린 모든 객체 중 역 직각 삼각형 객체의 각 Index
 	CArray < int, int > LTRT_Location ;			// 그린 모든 객체 중 왼쪽 -> 오른쪽 삼각형 객체의 각 Index
@@ -111,6 +114,7 @@ public:
 	int LTRT_Count ;		// 왼쪽 -> 오른쪽 삼각형 객체의 개수
 	int RTLT_Count ;		// 오른쪽 -> 왼쪽 객체의 개수
 	int Text_Count ;		// 텍스트 객체의 개수
+	int G_Count ;			// 그룹화 개수
 
 // 재정의입니다.
 public:
