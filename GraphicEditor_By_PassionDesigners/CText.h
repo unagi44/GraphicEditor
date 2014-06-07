@@ -10,5 +10,7 @@ public:
 	CRect Text_Rect ;
 	CPoint Location ;
 	CString Text ;
-	CFont Font ;
+	LOGFONT Font ;
+	COLORREF BGColor ;
+	COLORREF Color ;
 };

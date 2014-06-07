@@ -86,6 +86,9 @@ public:
 	char Text_IsText ;
 	char Text_IsKeyDown ;
 	char Text_IsFont ;
+	char Text_IsBGColor ;
+	COLORREF Text_BGColor ;
+	COLORREF Text_Color ;
 
 	// 선 그리기에 필요한 변수들
 	CLine L_Insert ;
@@ -219,6 +222,7 @@ public:
 	afx_msg void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnFillpattern();
 	afx_msg void OnLinepattern();
+	afx_msg void OnTextbgcolor();
 };
 
 #ifndef _DEBUG  // GraphicEditorView.cpp의 디버그 버전

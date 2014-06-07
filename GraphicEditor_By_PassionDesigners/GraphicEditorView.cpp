@@ -60,6 +60,7 @@ ON_WM_KEYDOWN()
 ON_WM_CHAR()
 ON_COMMAND(ID_FillPattern, &CGraphicEditorView::OnFillpattern)
 ON_COMMAND(ID_LinePattern, &CGraphicEditorView::OnLinepattern)
+ON_COMMAND(ID_TextBGColor, &CGraphicEditorView::OnTextbgcolor)
 END_MESSAGE_MAP()
 
 // CGraphicEditorView 생성/소멸
@@ -2643,9 +2644,11 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 		else if ( pDoc -> What.GetAt (i) == _T ("Text") ) {
 
 			if ( pDoc -> Text_Text.GetAt ( Text_Number ).IsFont == 'o' ) {
-				CFont* def_font = pDC -> SelectObject ( &(pDoc -> Text_Text.GetAt ( Text_Number ).Font) ) ;
-				pDC -> TextOut ( pDoc -> Text_Text.GetAt ( Text_Number ).Location.x, pDoc -> Text_Text.GetAt ( Text_Number ).Location.y,
-								 pDoc -> Text_Text.GetAt ( Text_Number ).Text ) ;
+
+				CFont Font ;
+				Font.CreateFontIndirect ( &(pDoc -> Text_Text.GetAt ( Text_Number ).Font) ) ;
+				CFont* def_font = pDC -> SelectObject ( &Font ) ;
+				pDC -> SetTextColor ( pDoc -> Text_Text.GetAt ( Text_Number ).Color ) ;
 
 				CSize strSize ;
 
@@ -2656,11 +2659,44 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 					SetCaretPos ( Text_CurPoint ) ;
 					ShowCaret () ;
 				}
+
+				if ( M_IsDraw != 'o' ) {
+					pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.top = pDoc -> Text_Text.GetAt ( Text_Number ).Location.y + pDoc -> Text_Text.GetAt ( Text_Number ).Font.lfHeight - 10 ;
+					pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.left = pDoc -> Text_Text.GetAt ( Text_Number ).Location.x - 10 ;
+					pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.bottom = pDoc -> Text_Text.GetAt ( Text_Number ).Location.y + 10 ;
+					pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.right = Text_CurPoint.x + 10 ;
+				}
+
+				// 배경색 추가한 경우
+				if ( pDoc -> Text_Text.GetAt ( Text_Number ).IsNoFill == 'x' ) {
+					pDC->SetBkMode(TRANSPARENT);
+					pDC -> SelectStockObject ( NULL_PEN ) ;
+					CBrush brush ;
+					brush.CreateSolidBrush ( pDoc -> Text_Text.GetAt ( Text_Number ).BGColor ) ;
+					CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+
+					pDC -> Rectangle ( pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.left, pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.top,
+									   pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.right, pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.bottom ) ;
+					pDC -> SelectObject ( oldBrush ) ;
+				}
+				
+				// 텍스트 입력중이면 테두리 사각형 출력
+				if ( Text_Number == pDoc -> Text_Text.GetCount () - 1 && Text_IsKeyDown == 'o' ||
+					(M_IsDraw == 'o' && Text_Number == M_Number) ) {
+					pDC -> SelectStockObject ( NULL ) ;
+					pDC -> SelectStockObject ( NULL_BRUSH ) ;
+					CPen pen ( PS_DOT, 1.8, RGB (100, 100, 255) );
+					CPen *Draw_Pen = pDC -> SelectObject(&pen);
+					pDC -> Rectangle ( pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.left, pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.top,
+									   pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.right, pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.bottom ) ;
+					pDC->SelectObject(Draw_Pen) ;
+				}
+
+				pDC -> TextOut ( pDoc -> Text_Text.GetAt ( Text_Number ).Location.x, pDoc -> Text_Text.GetAt ( Text_Number ).Location.y + pDoc -> Text_Text.GetAt ( Text_Number ).Font.lfHeight,
+								 pDoc -> Text_Text.GetAt ( Text_Number ).Text ) ;
 				pDC -> SelectObject ( def_font ) ;
 			}
 			else {
-				pDC -> TextOut ( pDoc -> Text_Text.GetAt ( Text_Number ).Location.x, pDoc -> Text_Text.GetAt ( Text_Number ).Location.y,
-								 pDoc -> Text_Text.GetAt ( Text_Number ).Text ) ;
 
 				CSize strSize ;
 
@@ -2671,6 +2707,42 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 					SetCaretPos ( Text_CurPoint ) ;
 					ShowCaret () ;
 				}
+
+				if ( M_IsDraw != 'o' ) {
+					pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.top = pDoc -> Text_Text.GetAt ( Text_Number ).Location.y - 10 ;
+					pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.left = pDoc -> Text_Text.GetAt ( Text_Number ).Location.x - 10 ;
+					pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.bottom = pDoc -> Text_Text.GetAt ( Text_Number ).Location.y + 26 ;
+					pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.right = Text_CurPoint.x + 10 ;
+				}
+
+				// 배경색 추가한 경우
+				if ( pDoc -> Text_Text.GetAt ( Text_Number ).IsNoFill == 'x' ) {
+					pDC->SetBkMode(TRANSPARENT);
+					pDC -> SelectStockObject ( NULL_PEN ) ;
+					CBrush brush ;
+					brush.CreateSolidBrush ( pDoc -> Text_Text.GetAt ( Text_Number ).BGColor ) ;
+					CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+
+					pDC -> Rectangle ( pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.left, pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.top,
+									   pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.right, pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.bottom ) ;
+					pDC -> SelectObject ( oldBrush ) ;
+				}
+
+				// 텍스트 입력중이면 테두리 사각형 출력
+				if ( Text_Number == pDoc -> Text_Text.GetCount () - 1 && Text_IsKeyDown == 'o' ||
+					(M_IsDraw == 'o' && Text_Number == M_Number) ) {
+					pDC -> SelectStockObject ( NULL ) ;
+					pDC -> SelectStockObject ( NULL_BRUSH ) ;
+					CPen pen ( PS_DOT, 1.8, RGB (100, 100, 255) );
+					CPen *Draw_Pen = pDC -> SelectObject(&pen);
+					pDC -> Rectangle ( pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.left, pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.top,
+									   pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.right, pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.bottom ) ;
+					pDC->SelectObject(Draw_Pen) ;
+				}
+
+				pDC -> TextOut ( pDoc -> Text_Text.GetAt ( Text_Number ).Location.x, pDoc -> Text_Text.GetAt ( Text_Number ).Location.y,
+								 pDoc -> Text_Text.GetAt ( Text_Number ).Text ) ;
+
 			}
 			Text_Number++ ;
 		}
@@ -3248,15 +3320,24 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 		pDoc -> Text_Count++ ;
 		pDoc -> Text_Text.GetAt ( Text_Current ).Location = point ;
 
+		// 폰트 설정을 한 경우
 		if ( Text_IsFont == 'o' ) {
-			pDoc -> Text_Text.GetAt ( Text_Current ).Font.CreateFontIndirect ( &Text_lf ) ;
+			pDoc -> Text_Text.GetAt ( Text_Current ).Font = Text_lf ;
 			pDoc -> Text_Text.GetAt ( Text_Current ).IsFont = 'o' ;
-			pDoc -> Text_Text.GetAt ( Text_Current ).Font.GetLogFont ( &Text_Each ) ;
-			CreateSolidCaret ( 1, Text_Each.lfHeight ) ;
+			CreateSolidCaret ( 1, Text_lf.lfHeight ) ;
+			pDoc -> Text_Text.GetAt ( Text_Current ).Color = Text_Color ;
 		}
 		else {
 			pDoc -> Text_Text.GetAt ( Text_Current ).IsFont = 'x' ;
 			CreateSolidCaret ( 1, 16 ) ;
+		}
+
+		if ( Text_IsBGColor == 'o' ) {
+			pDoc -> Text_Text.GetAt ( Text_Current ).BGColor = Text_BGColor ;
+			pDoc -> Text_Text.GetAt ( Text_Current ).IsNoFill = 'x' ;
+		}
+		else {
+			pDoc -> Text_Text.GetAt ( Text_Current ).IsNoFill = 'o' ;
 		}
 
 		SetCaretPos ( point ) ;
@@ -3524,6 +3605,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 			int RRightT_Number = pDoc -> RRightT_Count - 1;
 			int LTRT_Number = pDoc -> LTRT_Count - 1;
 			int RTLT_Number = pDoc -> RTLT_Count - 1;
+			int Text_Number = pDoc -> Text_Count - 1;
 
 			// 선택한 좌표에 객체가 있는지 전부 확인합니다.
 			// 늦게 그린 객체부터 확인합니다.
@@ -3898,6 +3980,17 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 							Invalidate () ; break ;
 					}
 					RTLT_Number-- ;
+				}
+				else if ( pDoc -> What.GetAt (i-1) == _T ("Text") ) {
+					if ( pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.left - 2 <= point.x && pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.right + 2 >= point.x &&
+						pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.top - 2 <= point.y && pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.bottom + 2 >= point.y ) {
+
+							M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
+							M_What.Format ( _T ("Text") ) ; M_Number = Text_Number ;
+							M_IsDraw = 'o' ; P_IsContinue = 'x' ;
+							Invalidate () ; break ;
+					}
+					Text_Number-- ;
 				}
 
 			}
@@ -4614,6 +4707,18 @@ void CGraphicEditorView::OnMouseMove(UINT nFlags, CPoint point)
 			M_Start.x = point.x ;
 			M_Start.y = point.y ;
 		}
+		else if ( M_What == _T ("Text") ) {
+			pDoc -> Text_Text.GetAt ( M_Number ).Text_Rect.top += point.y - M_Start.y ;
+			pDoc -> Text_Text.GetAt ( M_Number ).Text_Rect.bottom += point.y - M_Start.y ;
+			pDoc -> Text_Text.GetAt ( M_Number ).Text_Rect.left += point.x - M_Start.x ;
+			pDoc -> Text_Text.GetAt ( M_Number ).Text_Rect.right += point.x - M_Start.x ;
+
+			pDoc -> Text_Text.GetAt ( M_Number ).Location.x += point.x - M_Start.x ;
+			pDoc -> Text_Text.GetAt ( M_Number ).Location.y += point.y - M_Start.y ;
+
+			M_Start.x = point.x ;
+			M_Start.y = point.y ;
+		}
 
 		Invalidate () ;
 	}
@@ -5062,6 +5167,7 @@ void CGraphicEditorView::OnDrawline()
 {
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 	
+	HideCaret () ;
 	M_IsSelect = 'x' ;
 	M_IsDraw = 'x' ;
 	M_IsMove = 'x' ;
@@ -5610,6 +5716,7 @@ void CGraphicEditorView::OnDrawrec()
 {
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 
+	HideCaret () ;
 	M_IsSelect = 'x' ;
 	M_IsDraw = 'x' ;
 	M_IsMove = 'x' ;
@@ -5639,6 +5746,7 @@ void CGraphicEditorView::OnDrawpoly()
 {
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 
+	HideCaret () ;
 	M_IsSelect = 'x' ;
 	M_IsDraw = 'x' ;
 	M_IsMove = 'x' ;
@@ -5669,6 +5777,7 @@ void CGraphicEditorView::OnDrawellipse()
 {
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 	
+	HideCaret () ;
 	M_IsSelect = 'x' ;
 	M_IsDraw = 'x' ;
 	M_IsMove = 'x' ;
@@ -5697,6 +5806,7 @@ void CGraphicEditorView::OnSelectobject()
 {
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 
+	HideCaret () ;
 	M_IsSelect = 'x' ;
 	M_IsDraw = 'x' ;
 	Text_IsText = 'x' ;
@@ -5777,6 +5887,7 @@ void CGraphicEditorView::OnLButtonDblClk(UINT nFlags, CPoint point)
 {
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
 
+	HideCaret () ;
 	P_CanMove = 'x' ;
 	IsNormal = 'o' ;
 	P_Insert.Poly_point.RemoveAll () ;
@@ -5952,6 +6063,7 @@ void CGraphicEditorView::OnDrawtriangle()
 {
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 	
+	HideCaret () ;
 	M_IsSelect = 'x' ;
 	M_IsDraw = 'x' ;
 	M_IsMove = 'x' ;
@@ -5981,6 +6093,7 @@ void CGraphicEditorView::OnDrawreversetri()
 {
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 
+	HideCaret () ;
 	M_IsSelect = 'x' ;
 	M_IsDraw = 'x' ;
 	M_IsMove = 'x' ;
@@ -6138,6 +6251,7 @@ void CGraphicEditorView::OnRightangledtri()
 {
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 
+	HideCaret () ;
 	M_IsSelect = 'x' ;
 	M_IsDraw = 'x' ;
 	M_IsMove = 'x' ;
@@ -6167,6 +6281,7 @@ void CGraphicEditorView::OnRRrightangledtri()
 {
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 
+	HideCaret () ;
 	M_IsSelect = 'x' ;
 	M_IsDraw = 'x' ;
 	M_IsMove = 'x' ;
@@ -6196,6 +6311,7 @@ void CGraphicEditorView::OnRighttolefttri()
 {
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 
+	HideCaret () ;
 	M_IsSelect = 'x' ;
 	M_IsDraw = 'x' ;
 	M_IsMove = 'x' ;
@@ -6225,6 +6341,7 @@ void CGraphicEditorView::OnLefttorighttri()
 {
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 
+	HideCaret () ;
 	M_IsSelect = 'x' ;
 	M_IsDraw = 'x' ;
 	M_IsMove = 'x' ;
@@ -6253,11 +6370,35 @@ void CGraphicEditorView::OnLefttorighttri()
 void CGraphicEditorView::OnFont()
 {
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+
+	CGraphicEditorDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	if (!pDoc)
+		return;
+
 	CFontDialog dlg ;
-	if( dlg.DoModal() == IDOK )
-	{
-		dlg.GetCurrentFont (&Text_lf) ;
-		Text_IsFont = 'o' ;
+	if ( M_IsDraw != 'o' ) {
+		if( dlg.DoModal() == IDOK )
+		{
+			dlg.GetCurrentFont (&Text_lf) ;
+			Text_IsFont = 'o' ;
+			Text_Color = dlg.GetColor () ;
+		}
+	}
+	else {
+		if( dlg.DoModal() == IDOK )
+		{
+			Text_IsFont = 'o' ;
+			Text_Color = dlg.GetColor () ;
+			dlg.GetCurrentFont (&Text_lf) ;
+			if ( M_What == _T ("Text") ) {
+				pDoc -> Text_Text.GetAt ( M_Number ).Font = Text_lf ;
+				pDoc -> Text_Text.GetAt ( M_Number ).Color = Text_Color ;
+				pDoc -> Text_Text.GetAt ( M_Number ).IsFont = 'o' ;
+
+				Invalidate () ;
+			}
+		} 
 	}
 }
 
@@ -7504,6 +7645,122 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 				}
 				M_Number = 0 ;
 			}
+			else if ( M_What == _T ("Text") ) {
+				M_IsSelect = 'x' ;
+				M_IsDraw = 'x' ;
+				int location = pDoc -> Text_Location.GetAt ( M_Number ) ;
+				pDoc -> Text_Text.RemoveAt ( M_Number ) ;
+				pDoc -> Text_Count-- ;
+				pDoc -> What.RemoveAt ( pDoc -> Text_Location.GetAt ( M_Number ) ) ;
+				pDoc -> Text_Location.RemoveAt ( M_Number ) ;
+				for ( int i = M_Number ; i < pDoc -> Text_Text.GetCount () ; i++ ) {
+					pDoc -> Text_Location.GetAt (i)-- ;
+				}
+
+				int R_For = 0 ;
+				int P_For = 0 ;
+				int E_For = 0 ;
+				int T_For = 0 ;
+				int RT_For = 0 ;
+				int RightT_For = 0 ;
+				int RRightT_For = 0 ;
+				int LTRT_For = 0 ;
+				int L_For = 0 ;
+				int RTLT_For = 0 ;
+				for ( int i = location ; i < pDoc -> What.GetCount () ; i++ ) {
+					if ( pDoc -> What.GetAt (i) == _T ("R") ) {
+						for ( int j = R_For ; j < pDoc -> R_Location.GetCount () ; j++ ) {
+							if ( pDoc -> R_Location.GetAt (j) == i+1 ) {
+								pDoc -> R_Location.SetAt (j, i) ;
+								R_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("P") ) {
+						for ( int j = P_For ; j < pDoc -> P_Location.GetCount () ; j++ ) {
+							if ( pDoc -> P_Location.GetAt (j) == i+1 ) {
+								pDoc -> P_Location.SetAt (j, i) ;
+								P_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("E") ) {
+						for ( int j = E_For ; j < pDoc -> E_Location.GetCount () ; j++ ) {
+							if ( pDoc -> E_Location.GetAt (j) == i+1 ) {
+								pDoc -> E_Location.SetAt (j, i) ;
+								E_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("T") ) {
+						for ( int j = T_For ; j < pDoc -> T_Location.GetCount () ; j++ ) {
+							if ( pDoc -> T_Location.GetAt (j) == i+1 ) {
+								pDoc -> T_Location.SetAt (j, i) ;
+								T_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("RT") ) {
+						for ( int j = RT_For ; j < pDoc -> RT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> RT_Location.GetAt (j) == i+1 ) {
+								pDoc -> RT_Location.SetAt (j, i) ;
+								RT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("RightT") ) {
+						for ( int j = RightT_For ; j < pDoc -> RightT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> RightT_Location.GetAt (j) == i+1 ) {
+								pDoc -> RightT_Location.SetAt (j, i) ;
+								RightT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("RRightT") ) {
+						for ( int j = RRightT_For ; j < pDoc -> RRightT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> RRightT_Location.GetAt (j) == i+1 ) {
+								pDoc -> RRightT_Location.SetAt (j, i) ;
+								RRightT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("LTRT") ) {
+						for ( int j = LTRT_For ; j < pDoc -> LTRT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> LTRT_Location.GetAt (j) == i+1 ) {
+								pDoc -> LTRT_Location.SetAt (j, i) ;
+								LTRT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("L") ) {
+						for ( int j = L_For ; j < pDoc -> L_Location.GetCount () ; j++ ) {
+							if ( pDoc -> L_Location.GetAt (j) == i+1 ) {
+								pDoc -> L_Location.SetAt (j, i) ;
+								L_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("RTLT") ) {
+						for ( int j = RTLT_For ; j < pDoc -> RTLT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> RTLT_Location.GetAt (j) == i+1 ) {
+								pDoc -> RTLT_Location.SetAt (j, i) ;
+								RTLT_For = j ;
+								break ;
+							}
+						}
+					}
+				}
+				M_Number = 0 ;
+			}
 
 			Invalidate () ;
 		}
@@ -7581,6 +7838,7 @@ void CGraphicEditorView::OnFillpattern()
 		if( dlg.DoModal() == IDOK )
 		{
 			m_IsFillPattern = 'o' ;
+			m_FillPattern = dlg.GetPattern () ;
 			if ( M_What == _T("R") )
 				pDoc -> R_FillPattern.GetAt ( M_Number ) = dlg.GetPattern () ;
 			else if ( M_What == _T("E") )
@@ -7619,12 +7877,14 @@ void CGraphicEditorView::OnLinepattern()
 		{
 			m_IsLinePattern = 'o' ;
 			m_LinePattern = dlg.GetPattern () ;
+
 		}
 	}
 	else {
 		if( dlg.DoModal() == IDOK )
 		{
 			m_IsLinePattern = 'o' ;
+			m_LinePattern = dlg.GetPattern () ;
 			if ( M_What == _T("R") )
 				pDoc -> R_LinePattern.GetAt ( M_Number ) = dlg.GetPattern () ;
 			else if ( M_What == _T("L") )
@@ -7647,6 +7907,36 @@ void CGraphicEditorView::OnLinepattern()
 				pDoc -> RTLT_LinePattern.GetAt ( M_Number ) = dlg.GetPattern () ;
 
 			Invalidate () ;
+		}
+	}
+}
+
+void CGraphicEditorView::OnTextbgcolor()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+
+	CGraphicEditorDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	if (!pDoc)
+		return;
+
+	CColorDialog dlgColor(0, CC_FULLOPEN, NULL) ;
+	
+	if ( M_IsDraw != 'o' ) {
+		if( dlgColor.DoModal() == IDOK ) {
+			Text_IsBGColor = 'o' ;
+			Text_BGColor = dlgColor.GetColor () ;
+		}
+	}
+	else {
+		if( dlgColor.DoModal() == IDOK ) {
+			Text_IsBGColor = 'o' ;
+			Text_BGColor = dlgColor.GetColor () ;
+
+			if ( M_What == _T("Text") ) {
+				pDoc -> Text_Text.GetAt ( M_Number ).IsNoFill = 'x' ;
+				pDoc -> Text_Text.GetAt ( M_Number ).BGColor = Text_BGColor ;
+			}
 		}
 	}
 }
