@@ -24,6 +24,7 @@ protected: // serialization에서만 만들어집니다.
 public:
 	CGraphicEditorDoc* GetDocument() const;
 	CRect ChangeRect ;
+	int PSkeleton ;
 	char IsNormal ;
 	COLORREF m_Color ;
 	COLORREF m_FillColor ;
@@ -34,6 +35,7 @@ public:
 	char m_Thickness ;
 	char m_IsFillPattern ;
 	char m_IsLinePattern ;
+	char m_PSkeleton ;
 	int m_FillPattern ;
 	int m_LinePattern ;
 

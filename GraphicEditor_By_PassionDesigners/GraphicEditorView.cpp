@@ -72,6 +72,7 @@ CGraphicEditorView::CGraphicEditorView()
 	m_IsColor = 'x' ;
 	m_IsFillColor = 'x' ;
 	m_IsThickness = 'x' ;
+	m_PSkeleton = 'x' ;
 	m_Thickness = 1 ;
 
 	// 이동 툴바에 필요한 변수 초기화
@@ -758,7 +759,8 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 
 		// PolyLine 객체인 경우
 		else if ( pDoc -> What.GetAt (i) == _T ("P") ) {
-			for ( int j = 0 ; j < pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetCount () - 1 ; j++ ) {
+			int j ;
+			for ( j = 0 ; j < pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetCount () - 1 ; j++ ) {
 
 				// PolyLine이 색상을 가지지 않을 경우의 출력
 				if ( pDoc -> P_Poly.GetAt (P_Number).P_Color == RGB (0,0,0) ) {
@@ -888,10 +890,35 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 					ChangeRect.right = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (j+1).x + 4 ;
 					ChangeRect.top = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (j+1).y - 4 ;
 					ChangeRect.bottom = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (j+1).y + 4 ;
-					pDC->SelectObject(Draw_Pen2);
 
 					pDC -> Rectangle ( ChangeRect ) ;
+					pDC->SelectObject(Draw_Pen2);
+
+					if ( m_PSkeleton == 'o' && j == PSkeleton ) {
+						pDC -> SelectStockObject ( NULL_BRUSH ) ;
+						CPen pen2 ( PS_DOT, 1.8, RGB (150,0,0) ) ;
+						CPen *Draw_Pen2 = pDC -> SelectObject (&pen2) ;
+						ChangeRect.left = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (j).x - 8 ;
+						ChangeRect.right = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (j).x + 8 ;
+						ChangeRect.top = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (j).y - 8 ;
+						ChangeRect.bottom = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (j).y + 8 ;
+
+						pDC -> Rectangle ( ChangeRect ) ;
+						pDC->SelectObject(Draw_Pen2);
+					}
 				}
+			}
+			if ( m_PSkeleton == 'o' && j == PSkeleton && M_Number == P_Number ) {
+				pDC -> SelectStockObject ( NULL_BRUSH ) ;
+				CPen pen2 ( PS_DOT, 1.8, RGB (150,0,0) ) ;
+				CPen *Draw_Pen2 = pDC -> SelectObject (&pen2) ;
+				ChangeRect.left = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (j).x - 8 ;
+				ChangeRect.right = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (j).x + 8 ;
+				ChangeRect.top = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (j).y - 8 ;
+				ChangeRect.bottom = pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt (j).y + 8 ;
+
+				pDC -> Rectangle ( ChangeRect ) ;
+				pDC->SelectObject(Draw_Pen2);
 			}
 
 			P_Number++ ;
@@ -2786,13 +2813,20 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 					if ( (P_Insert.Poly_point.GetAt ( 0 ).x <= point.x + 15 &&
 						  P_Insert.Poly_point.GetAt ( 0 ).x >= point.x - 15 &&
 						  P_Insert.Poly_point.GetAt ( 0 ).y <= point.y + 15 &&
-						  P_Insert.Poly_point.GetAt ( 0 ).y >= point.y - 15) )
+						  P_Insert.Poly_point.GetAt ( 0 ).y >= point.y - 15) ) {
 						P_IsStart = 'o' ;
-					else
+						PSkeleton = 0 ;
+						m_PSkeleton = 'o' ;
+					}
+					else {
 						P_CurrentPoint++ ;
+						PSkeleton = 1 ;
+						m_PSkeleton = 'o' ;
+					}
 
 					P_ChangeSkeleton = 0 ;
 					P_CanMove = 'o' ;
+					m_PSkeleton = 'o' ;
 			}
 		}
 		// PolyLine의 Skeleton이 3개 이상인 경우
@@ -2808,6 +2842,8 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 					P_ChangeSkeleton = i ;
 					P_CanMove = 'o' ;
 					P_Flag = 'o' ;
+					PSkeleton = i ;
+					m_PSkeleton = 'o' ;
 					break ;
 				}
 			}
@@ -2820,7 +2856,9 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 					P_Insert.Poly_point.GetAt ( 0 ).y >= point.y - 15) ) {
 						P_IsStart = 'o' ;
 						P_CanMove = 'o' ;
+						PSkeleton = 0 ;
 						P_ChangeSkeleton = 0 ;
+						m_PSkeleton = 'o' ;
 				}
 				// 마지막 Skeleton을 건드리면 그 Skeleton을 변경한다.
 				else if ( (P_Insert.Poly_point.GetAt ( P_CurrentPoint ).x <= point.x + 15 &&
@@ -2828,8 +2866,10 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 					P_Insert.Poly_point.GetAt ( P_CurrentPoint ).y <= point.y + 15 &&
 					P_Insert.Poly_point.GetAt ( P_CurrentPoint ).y >= point.y - 15) ) {
 						P_CanMove = 'o' ;
+						PSkeleton = P_CurrentPoint ;
 						P_CurrentPoint++ ;
 						P_ChangeSkeleton = 0 ;
+						m_PSkeleton = 'o' ;
 				}
 			}
 		}
@@ -3226,7 +3266,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 		Text_IsKeyDown = 'o' ;
 	}
 	// 객체를 이동, 선택하는 경우
-	else if ( M_IsMove == 'o' ) {
+	else if ( M_IsMove == 'o' && P_CanMove == 'x' ) {
 
 		// 선 객체를 변경시키는 경우
 		if ( M_IsLineSelect == 'o' &&
@@ -3728,9 +3768,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 						P_Insert.P_Color = pDoc -> P_Poly.GetAt ( M_Number ).P_Color ;
 						P_Insert.thickness = pDoc -> P_Poly.GetAt ( M_Number ).thickness ;
 						P_CurrentPoint = pDoc -> P_Poly.GetAt ( M_Number ).Poly_point.GetCount () - 1 ;
-						if ( P_ChangeSkeleton == 0 && P_IsStart == 'x' && P_IsContinue == 'o' )
-							P_CurrentPoint++ ;
-						Invalidate () ; P_IsContinue = 'o' ; break ;
+						Invalidate () ; P_IsContinue = 'o' ; m_PSkeleton = 'x' ; break ;
 					}
 					P_Number-- ;
 				}
@@ -3915,7 +3953,8 @@ void CGraphicEditorView::OnMouseMove(UINT nFlags, CPoint point)
 	}
 	// PolyLine 그리기 선택후 드래그 하는 경우
 	else if ( P_CanMove == 'o' ) {
-
+		
+		m_PSkeleton = 'x' ;
 		// 마지막 Skeleton을 클릭하여 변형 하는 경우
 		if ( P_IsStart == 'x' && P_ChangeSkeleton == 0 ) {
 			if ( P_Insert.Poly_point.GetSize () == P_CurrentPoint )
@@ -4646,14 +4685,21 @@ void CGraphicEditorView::OnLButtonUp(UINT nFlags, CPoint point)
 	else if ( M_IsDraw == 'o' && P_IsContinue == 'o' && P_CanMove == 'o' ) {
 		// 만약 같은 좌표에 클릭, 땠을 경우 그리기 취소
 		if ( P_IsMove == 'x' ) {
-			P_CanMove = 'x' ; P_IsStart = 'x' ;
-			P_Insert.Poly_point.RemoveAll () ;
-			P_CanMove = 'x' ;
-			P_IsContinue = 'x' ;
+			if ( m_PSkeleton == 'o' ) {
+				P_CanMove = 'x' ; P_IsStart = 'x' ;
+				if ( PSkeleton + 1 == P_CurrentPoint && P_IsStart == 'x' && P_ChangeSkeleton == 0 )
+					P_CurrentPoint-- ;
+			}
+			else {
+				P_CanMove = 'x' ; P_IsStart = 'x' ;
+				P_Insert.Poly_point.RemoveAll () ;
+				P_IsContinue = 'x' ;
+			}
 			Invalidate () ;
 		}
 		// 같은 좌표에 클릭, 땐 경우가 아니라면 그리기 모드
 		else {
+			m_PSkeleton = 'o' ;
 			// 만약 마지막 Skeleton을 변경한 경우
 			if ( P_IsStart == 'x' && P_ChangeSkeleton == 0 ) {
 				P_Insert.Poly_point.SetAt ( P_CurrentPoint, point ) ;
@@ -5031,6 +5077,7 @@ void CGraphicEditorView::OnDrawline()
 	P_Insert.Poly_point.RemoveAll () ;
 	P_CanMove = 'x' ;
 	P_IsContinue = 'x' ;
+	m_PSkeleton = 'x' ;
 	P_IsDraw = 'x' ;
 	L_IsDraw = 'o' ;
 	IsNormal = 'x' ;
@@ -5579,6 +5626,7 @@ void CGraphicEditorView::OnDrawrec()
 	P_Insert.Poly_point.RemoveAll () ;
 	P_CanMove = 'x' ;
 	P_IsContinue = 'x' ;
+	m_PSkeleton = 'x' ;
 	P_IsDraw = 'x' ;
 	R_IsDraw = 'o' ;
 	IsNormal = 'x' ;
@@ -5608,6 +5656,7 @@ void CGraphicEditorView::OnDrawpoly()
 	P_Insert.Poly_point.RemoveAll () ;
 	P_CanMove = 'x' ;
 	P_IsContinue = 'x' ;
+	m_PSkeleton = 'x' ;
 	P_IsDraw = 'x' ;
 	Invalidate () ;
 
@@ -5636,6 +5685,7 @@ void CGraphicEditorView::OnDrawellipse()
 	P_Insert.Poly_point.RemoveAll () ;
 	P_CanMove = 'x' ;
 	P_IsContinue = 'x' ;
+	m_PSkeleton = 'x' ;
 	P_IsDraw = 'x' ;
 	E_IsDraw = 'o' ;
 	IsNormal = 'x' ;
@@ -5663,6 +5713,7 @@ void CGraphicEditorView::OnSelectobject()
 	P_Insert.Poly_point.RemoveAll () ;
 	P_CanMove = 'x' ;
 	P_IsContinue = 'x' ;
+	m_PSkeleton = 'x' ;
 	P_IsDraw = 'x' ;
 	IsNormal = 'x' ;
 	M_IsMove = 'o' ;
@@ -5731,6 +5782,7 @@ void CGraphicEditorView::OnLButtonDblClk(UINT nFlags, CPoint point)
 	P_Insert.Poly_point.RemoveAll () ;
 	P_ChangeSkeleton = 0 ;
 	P_IsContinue = 'x' ;
+	m_PSkeleton = 'x' ;
 	P_DrawContinue = 'x' ;
 	P_IsStart = 'x' ;
 	P_IsMove = 'x' ;
@@ -5916,6 +5968,7 @@ void CGraphicEditorView::OnDrawtriangle()
 	P_Insert.Poly_point.RemoveAll () ;
 	P_CanMove = 'x' ;
 	P_IsContinue = 'x' ;
+	m_PSkeleton = 'x' ;
 	P_IsDraw = 'x' ;
 	E_IsDraw = 'x' ;
 	IsNormal = 'x' ;
@@ -5944,6 +5997,7 @@ void CGraphicEditorView::OnDrawreversetri()
 	P_Insert.Poly_point.RemoveAll () ;
 	P_CanMove = 'x' ;
 	P_IsContinue = 'x' ;
+	m_PSkeleton = 'x' ;
 	P_IsDraw = 'x' ;
 	E_IsDraw = 'x' ;
 	IsNormal = 'x' ;
@@ -5971,6 +6025,7 @@ void CGraphicEditorView::OnThickness()
 			P_Insert.Poly_point.RemoveAll () ;
 			P_CanMove = 'x' ;
 			P_IsContinue = 'x' ;
+			m_PSkeleton = 'x' ;
 		}
 	}
 	else {
@@ -6099,6 +6154,7 @@ void CGraphicEditorView::OnRightangledtri()
 	P_Insert.Poly_point.RemoveAll () ;
 	P_CanMove = 'x' ;
 	P_IsContinue = 'x' ;
+	m_PSkeleton = 'x' ;
 	P_IsDraw = 'x' ;
 	E_IsDraw = 'x' ;
 	IsNormal = 'x' ;
@@ -6127,6 +6183,7 @@ void CGraphicEditorView::OnRRrightangledtri()
 	P_Insert.Poly_point.RemoveAll () ;
 	P_CanMove = 'x' ;
 	P_IsContinue = 'x' ;
+	m_PSkeleton = 'x' ;
 	P_IsDraw = 'x' ;
 	E_IsDraw = 'x' ;
 	IsNormal = 'x' ;
@@ -6155,6 +6212,7 @@ void CGraphicEditorView::OnRighttolefttri()
 	P_Insert.Poly_point.RemoveAll () ;
 	P_CanMove = 'x' ;
 	P_IsContinue = 'x' ;
+	m_PSkeleton = 'x' ;
 	P_IsDraw = 'x' ;
 	E_IsDraw = 'x' ;
 	IsNormal = 'x' ;
@@ -6183,6 +6241,7 @@ void CGraphicEditorView::OnLefttorighttri()
 	P_Insert.Poly_point.RemoveAll () ;
 	P_CanMove = 'x' ;
 	P_IsContinue = 'x' ;
+	m_PSkeleton = 'x' ;
 	P_IsDraw = 'x' ;
 	E_IsDraw = 'x' ;
 	IsNormal = 'x' ;
@@ -6223,6 +6282,7 @@ void CGraphicEditorView::OnText()
 	P_Insert.Poly_point.RemoveAll () ;
 	P_CanMove = 'x' ;
 	P_IsContinue = 'x' ;
+	m_PSkeleton = 'x' ;
 	P_IsDraw = 'x' ;
 	E_IsDraw = 'x' ;
 	IsNormal = 'x' ;
@@ -6481,120 +6541,156 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 				M_Number = 0 ;
 			}
 			else if ( M_What == _T ("P") ) {
-				M_IsSelect = 'x' ;
-				M_IsDraw = 'x' ;
-				int location = pDoc -> P_Location.GetAt ( M_Number ) ;
-				pDoc -> P_Poly.RemoveAt ( M_Number ) ;
-				pDoc -> P_Count-- ;
-				pDoc -> What.RemoveAt ( pDoc -> P_Location.GetAt ( M_Number ) ) ;
-				pDoc -> P_Location.RemoveAt ( M_Number ) ;
-				for ( int i = M_Number ; i < pDoc -> P_Poly.GetCount () ; i++ ) {
-					pDoc -> P_Location.GetAt (i)-- ;
-				}
 
-				int R_For = 0 ;
-				int L_For = 0 ;
-				int E_For = 0 ;
-				int T_For = 0 ;
-				int RT_For = 0 ;
-				int RightT_For = 0 ;
-				int RRightT_For = 0 ;
-				int LTRT_For = 0 ;
-				int RTLT_For = 0 ;
-				int Text_For = 0 ;
-				for ( int i = location ; i < pDoc -> What.GetCount () ; i++ ) {
-					if ( pDoc -> What.GetAt (i) == _T ("R") ) {
-						for ( int j = R_For ; j < pDoc -> R_Location.GetCount () ; j++ ) {
-							if ( pDoc -> R_Location.GetAt (j) == i+1 ) {
-								pDoc -> R_Location.SetAt (j, i) ;
-								R_For = j ;
-								break ;
+				if ( m_PSkeleton != 'o' || pDoc -> P_Poly.GetAt (M_Number).Poly_point.GetCount () == 2 ) {
+					M_IsSelect = 'x' ;
+					M_IsDraw = 'x' ;
+					int location = pDoc -> P_Location.GetAt ( M_Number ) ;
+					pDoc -> P_Poly.RemoveAt ( M_Number ) ;
+					pDoc -> P_Count-- ;
+					pDoc -> What.RemoveAt ( pDoc -> P_Location.GetAt ( M_Number ) ) ;
+					pDoc -> P_Location.RemoveAt ( M_Number ) ;
+					for ( int i = M_Number ; i < pDoc -> P_Poly.GetCount () ; i++ ) {
+						pDoc -> P_Location.GetAt (i)-- ;
+					}
+
+					int R_For = 0 ;
+					int L_For = 0 ;
+					int E_For = 0 ;
+					int T_For = 0 ;
+					int RT_For = 0 ;
+					int RightT_For = 0 ;
+					int RRightT_For = 0 ;
+					int LTRT_For = 0 ;
+					int RTLT_For = 0 ;
+					int Text_For = 0 ;
+					for ( int i = location ; i < pDoc -> What.GetCount () ; i++ ) {
+						if ( pDoc -> What.GetAt (i) == _T ("R") ) {
+							for ( int j = R_For ; j < pDoc -> R_Location.GetCount () ; j++ ) {
+								if ( pDoc -> R_Location.GetAt (j) == i+1 ) {
+									pDoc -> R_Location.SetAt (j, i) ;
+									R_For = j ;
+									break ;
+								}
+							}
+						}
+						else if ( pDoc -> What.GetAt (i) == _T("L") ) {
+							for ( int j = L_For ; j < pDoc -> L_Location.GetCount () ; j++ ) {
+								if ( pDoc -> L_Location.GetAt (j) == i+1 ) {
+									pDoc -> L_Location.SetAt (j, i) ;
+									L_For = j ;
+									break ;
+								}
+							}
+						}
+						else if ( pDoc -> What.GetAt (i) == _T("E") ) {
+							for ( int j = E_For ; j < pDoc -> E_Location.GetCount () ; j++ ) {
+								if ( pDoc -> E_Location.GetAt (j) == i+1 ) {
+									pDoc -> E_Location.SetAt (j, i) ;
+									E_For = j ;
+									break ;
+								}
+							}
+						}
+						else if ( pDoc -> What.GetAt (i) == _T("T") ) {
+							for ( int j = T_For ; j < pDoc -> T_Location.GetCount () ; j++ ) {
+								if ( pDoc -> T_Location.GetAt (j) == i+1 ) {
+									pDoc -> T_Location.SetAt (j, i) ;
+									T_For = j ;
+									break ;
+								}
+							}
+						}
+						else if ( pDoc -> What.GetAt (i) == _T("RT") ) {
+							for ( int j = RT_For ; j < pDoc -> RT_Location.GetCount () ; j++ ) {
+								if ( pDoc -> RT_Location.GetAt (j) == i+1 ) {
+									pDoc -> RT_Location.SetAt (j, i) ;
+									RT_For = j ;
+									break ;
+								}
+							}
+						}
+						else if ( pDoc -> What.GetAt (i) == _T("RightT") ) {
+							for ( int j = RightT_For ; j < pDoc -> RightT_Location.GetCount () ; j++ ) {
+								if ( pDoc -> RightT_Location.GetAt (j) == i+1 ) {
+									pDoc -> RightT_Location.SetAt (j, i) ;
+									RightT_For = j ;
+									break ;
+								}
+							}
+						}
+						else if ( pDoc -> What.GetAt (i) == _T("RRightT") ) {
+							for ( int j = RRightT_For ; j < pDoc -> RRightT_Location.GetCount () ; j++ ) {
+								if ( pDoc -> RRightT_Location.GetAt (j) == i+1 ) {
+									pDoc -> RRightT_Location.SetAt (j, i) ;
+									RRightT_For = j ;
+									break ;
+								}
+							}
+						}
+						else if ( pDoc -> What.GetAt (i) == _T("LTRT") ) {
+							for ( int j = LTRT_For ; j < pDoc -> LTRT_Location.GetCount () ; j++ ) {
+								if ( pDoc -> LTRT_Location.GetAt (j) == i+1 ) {
+									pDoc -> LTRT_Location.SetAt (j, i) ;
+									LTRT_For = j ;
+									break ;
+								}
+							}
+						}
+						else if ( pDoc -> What.GetAt (i) == _T("RTLT") ) {
+							for ( int j = RTLT_For ; j < pDoc -> RTLT_Location.GetCount () ; j++ ) {
+								if ( pDoc -> RTLT_Location.GetAt (j) == i+1 ) {
+									pDoc -> RTLT_Location.SetAt (j, i) ;
+									RTLT_For = j ;
+									break ;
+								}
+							}
+						}
+						else if ( pDoc -> What.GetAt (i) == _T("Text") ) {
+							for ( int j = Text_For ; j < pDoc -> Text_Location.GetCount () ; j++ ) {
+								if ( pDoc -> Text_Location.GetAt (j) == i+1 ) {
+									pDoc -> Text_Location.SetAt (j, i) ;
+									Text_For = j ;
+									break ;
+								}
 							}
 						}
 					}
-					else if ( pDoc -> What.GetAt (i) == _T("L") ) {
-						for ( int j = L_For ; j < pDoc -> L_Location.GetCount () ; j++ ) {
-							if ( pDoc -> L_Location.GetAt (j) == i+1 ) {
-								pDoc -> L_Location.SetAt (j, i) ;
-								L_For = j ;
-								break ;
-							}
-						}
-					}
-					else if ( pDoc -> What.GetAt (i) == _T("E") ) {
-						for ( int j = E_For ; j < pDoc -> E_Location.GetCount () ; j++ ) {
-							if ( pDoc -> E_Location.GetAt (j) == i+1 ) {
-								pDoc -> E_Location.SetAt (j, i) ;
-								E_For = j ;
-								break ;
-							}
-						}
-					}
-					else if ( pDoc -> What.GetAt (i) == _T("T") ) {
-						for ( int j = T_For ; j < pDoc -> T_Location.GetCount () ; j++ ) {
-							if ( pDoc -> T_Location.GetAt (j) == i+1 ) {
-								pDoc -> T_Location.SetAt (j, i) ;
-								T_For = j ;
-								break ;
-							}
-						}
-					}
-					else if ( pDoc -> What.GetAt (i) == _T("RT") ) {
-						for ( int j = RT_For ; j < pDoc -> RT_Location.GetCount () ; j++ ) {
-							if ( pDoc -> RT_Location.GetAt (j) == i+1 ) {
-								pDoc -> RT_Location.SetAt (j, i) ;
-								RT_For = j ;
-								break ;
-							}
-						}
-					}
-					else if ( pDoc -> What.GetAt (i) == _T("RightT") ) {
-						for ( int j = RightT_For ; j < pDoc -> RightT_Location.GetCount () ; j++ ) {
-							if ( pDoc -> RightT_Location.GetAt (j) == i+1 ) {
-								pDoc -> RightT_Location.SetAt (j, i) ;
-								RightT_For = j ;
-								break ;
-							}
-						}
-					}
-					else if ( pDoc -> What.GetAt (i) == _T("RRightT") ) {
-						for ( int j = RRightT_For ; j < pDoc -> RRightT_Location.GetCount () ; j++ ) {
-							if ( pDoc -> RRightT_Location.GetAt (j) == i+1 ) {
-								pDoc -> RRightT_Location.SetAt (j, i) ;
-								RRightT_For = j ;
-								break ;
-							}
-						}
-					}
-					else if ( pDoc -> What.GetAt (i) == _T("LTRT") ) {
-						for ( int j = LTRT_For ; j < pDoc -> LTRT_Location.GetCount () ; j++ ) {
-							if ( pDoc -> LTRT_Location.GetAt (j) == i+1 ) {
-								pDoc -> LTRT_Location.SetAt (j, i) ;
-								LTRT_For = j ;
-								break ;
-							}
-						}
-					}
-					else if ( pDoc -> What.GetAt (i) == _T("RTLT") ) {
-						for ( int j = RTLT_For ; j < pDoc -> RTLT_Location.GetCount () ; j++ ) {
-							if ( pDoc -> RTLT_Location.GetAt (j) == i+1 ) {
-								pDoc -> RTLT_Location.SetAt (j, i) ;
-								RTLT_For = j ;
-								break ;
-							}
-						}
-					}
-					else if ( pDoc -> What.GetAt (i) == _T("Text") ) {
-						for ( int j = Text_For ; j < pDoc -> Text_Location.GetCount () ; j++ ) {
-							if ( pDoc -> Text_Location.GetAt (j) == i+1 ) {
-								pDoc -> Text_Location.SetAt (j, i) ;
-								Text_For = j ;
-								break ;
-							}
-						}
-					}
+					M_Number = 0 ;
 				}
-				M_Number = 0 ;
+				else {
+					pDoc -> P_Poly.GetAt ( M_Number ).Poly_point.RemoveAt ( PSkeleton ) ;
+					P_Insert.Poly_point.RemoveAt ( PSkeleton ) ;
+
+					if ( PSkeleton == P_CurrentPoint - 1 && (P_IsStart == 'o' || (P_IsStart == 'x' && P_ChangeSkeleton == 0)))
+						P_CurrentPoint-- ;
+					P_CurrentPoint-- ;
+
+					int Max_x = pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt (0).x ;
+					int Min_x = Max_x ;
+					int Max_y = pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt (0).y ;
+					int Min_y = Max_y ;
+
+					for ( int i = 1 ; i < pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetCount () ; i++ ) {
+						if ( pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt (i).x > Max_x )
+							Max_x = pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt (i).x ;
+						else if ( pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt (i).x < Min_x )
+							Min_x = pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt (i).x ;
+
+						if ( pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt (i).y > Max_y )
+							Max_y = pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt (i).y ;
+						else if ( pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt (i).y < Min_y )
+							Min_y = pDoc -> P_Poly.GetAt ( P_Current ).Poly_point.GetAt (i).y ;
+					}
+
+					M_Rect.top = Min_y - pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 ;
+					M_Rect.left = Min_x - pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 ;
+					M_Rect.bottom = Max_y + pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 ;
+					M_Rect.right = Max_x + pDoc -> P_Poly.GetAt ( P_Current ).thickness / 2 ;
+
+					Invalidate () ;
+					P_ChangeSkeleton = 0 ;
+				}
 			}
 			else if ( M_What == _T ("E") ) {
 				M_IsSelect = 'x' ;
