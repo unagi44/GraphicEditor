@@ -3706,6 +3706,22 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 						CFont* def_font = pDC -> SelectObject ( &Font ) ;
 						pDC -> SetTextColor ( pDoc -> G_Group.GetAt (G_Number).Text.GetAt ( Text_Number ).Color ) ;
 
+						CSize strSize ;
+
+						if ( Text_IsFont == 'o' ) {
+							strSize = pDC -> GetTextExtent ( pDoc -> G_Group.GetAt (G_Number).Text.GetAt ( Text_Number ).Text ) ;
+							Text_CurPoint.x = pDoc -> G_Group.GetAt (G_Number).Text.GetAt ( Text_Number ).Location.x + strSize.cx ;
+							Text_CurPoint.y = pDoc -> G_Group.GetAt (G_Number).Text.GetAt ( Text_Number ).Location.y ;
+							SetCaretPos ( Text_CurPoint ) ;
+						}
+
+						if ( Text_IsFont == 'o' ) {
+							pDoc -> G_Group.GetAt (G_Number).Text.GetAt ( Text_Number ).Text_Rect.top = pDoc -> G_Group.GetAt (G_Number).Text.GetAt ( Text_Number ).Location.y + pDoc -> G_Group.GetAt (G_Number).Text.GetAt ( Text_Number ).Font.lfHeight - 10 ;
+							pDoc -> G_Group.GetAt (G_Number).Text.GetAt ( Text_Number ).Text_Rect.left = pDoc -> G_Group.GetAt (G_Number).Text.GetAt ( Text_Number ).Location.x - 10 ;
+							pDoc -> G_Group.GetAt (G_Number).Text.GetAt ( Text_Number ).Text_Rect.bottom = pDoc -> G_Group.GetAt (G_Number).Text.GetAt ( Text_Number ).Location.y + 10 ;
+							pDoc -> G_Group.GetAt (G_Number).Text.GetAt ( Text_Number ).Text_Rect.right = Text_CurPoint.x + 10 ;
+						}
+
 						// 배경색 추가한 경우
 						if ( pDoc -> G_Group.GetAt (G_Number).Text.GetAt ( Text_Number ).IsNoFill == 'x' ) {
 							pDC->SetBkMode(TRANSPARENT);
@@ -8013,6 +8029,41 @@ void CGraphicEditorView::OnChangecolor()
 				pDoc -> LTRT_Color.GetAt ( M_Number ) = m_Color ;
 			else if ( M_What == _T ("RTLT") )
 				pDoc -> RTLT_Color.GetAt ( M_Number ) = m_Color ;
+			else if ( M_What == _T ("G") ) {
+				for ( int i = 0 ; i < pDoc -> G_Group.GetAt ( M_Number ).E_Color.GetCount () ; i++ ) {
+					pDoc -> G_Group.GetAt ( M_Number ).E_Color.GetAt (i) = m_Color ;
+				}
+
+				for ( int i = 0 ; i < pDoc -> G_Group.GetAt ( M_Number ).Line.GetCount () ; i++ ) {
+					pDoc -> G_Group.GetAt ( M_Number ).Line.GetAt (i).L_Color = m_Color ;
+				}
+
+				for ( int i = 0 ; i < pDoc -> G_Group.GetAt ( M_Number ).Poly.GetCount () ; i++ ) {
+					pDoc -> G_Group.GetAt ( M_Number ).Poly.GetAt (i).P_Color = m_Color ;
+				}
+
+				for ( int i = 0 ; i < pDoc -> G_Group.GetAt ( M_Number ).R_Color.GetCount () ; i++ ) {
+					pDoc -> G_Group.GetAt ( M_Number ).R_Color.GetAt (i) = m_Color ;
+				}
+
+				for ( int i = 0 ; i < pDoc -> G_Group.GetAt ( M_Number ).Index.GetCount () ; i++ ) {
+					for ( int j = 0 ; j < pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).E_Color.GetCount () ; j++ ) {
+						pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).E_Color.GetAt (j) = m_Color ;
+					}
+
+					for ( int j = 0 ; j < pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).R_Color.GetCount () ; j++ ) {
+						pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).R_Color.GetAt (j) = m_Color ;
+					}
+
+					for ( int j = 0 ; j < pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).Line.GetCount () ; j++ ) {
+						pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).Line.GetAt (j).L_Color = m_Color ;
+					}
+
+					for ( int j = 0 ; j < pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).Poly.GetCount () ; j++ ) {
+						pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).Poly.GetAt (j).P_Color = m_Color ;
+					}
+				}
+			}
 
 			m_IsColor = 'o' ;
 
@@ -8141,6 +8192,29 @@ void CGraphicEditorView::OnChangefillcolor()
 				pDoc -> RTLT_FillColor.GetAt ( M_Number ) = m_FillColor ;
 				pDoc -> RTLT_IsNoFill.GetAt ( M_Number ) = 'x' ;
 			}
+			else if ( M_What == _T ("G") ) {
+				for ( int i = 0 ; i < pDoc -> G_Group.GetAt ( M_Number ).E_FillColor.GetCount () ; i++ ) {
+					pDoc -> G_Group.GetAt ( M_Number ).E_FillColor.GetAt (i) = m_FillColor ;
+					pDoc -> G_Group.GetAt ( M_Number ).E_IsNoFill.GetAt (i) = 'x' ;
+				}
+
+				for ( int i = 0 ; i < pDoc -> G_Group.GetAt ( M_Number ).R_FillColor.GetCount () ; i++ ) {
+					pDoc -> G_Group.GetAt ( M_Number ).R_FillColor.GetAt (i) = m_FillColor ;
+					pDoc -> G_Group.GetAt ( M_Number ).R_IsNoFill.GetAt (i) = 'x' ;
+				}
+
+				for ( int i = 0 ; i < pDoc -> G_Group.GetAt ( M_Number ).Index.GetCount () ; i++ ) {
+					for ( int j = 0 ; j < pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).E_FillColor.GetCount () ; j++ ) {
+						pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).E_FillColor.GetAt (j) = m_FillColor ;
+						pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).E_IsNoFill.GetAt (j) = 'x' ;
+					}
+
+					for ( int j = 0 ; j < pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).R_FillColor.GetCount () ; j++ ) {
+						pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).R_FillColor.GetAt (j) = m_FillColor ;
+						pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).R_IsNoFill.GetAt (j) = 'x' ;
+					}
+				}
+			}
 		}
 
 		Invalidate () ;
@@ -8194,7 +8268,25 @@ void CGraphicEditorView::OnNofillcolor()
 			pDoc -> LTRT_IsNoFill.GetAt ( M_Number ) = 'o' ;
 		else if ( M_What == _T("RTLT") )
 			pDoc -> RTLT_IsNoFill.GetAt ( M_Number ) = 'o' ;
+		else if ( M_What == _T ("G") ) {
+			for ( int i = 0 ; i < pDoc -> G_Group.GetAt ( M_Number ).E_FillColor.GetCount () ; i++ ) {
+				pDoc -> G_Group.GetAt ( M_Number ).E_IsNoFill.GetAt (i) = 'o' ;
+			}
 
+			for ( int i = 0 ; i < pDoc -> G_Group.GetAt ( M_Number ).R_FillColor.GetCount () ; i++ ) {
+				pDoc -> G_Group.GetAt ( M_Number ).R_IsNoFill.GetAt (i) = 'o' ;
+			}
+
+			for ( int i = 0 ; i < pDoc -> G_Group.GetAt ( M_Number ).Index.GetCount () ; i++ ) {
+				for ( int j = 0 ; j < pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).E_FillColor.GetCount () ; j++ ) {
+					pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).E_IsNoFill.GetAt (j) = 'o' ;
+				}
+
+				for ( int j = 0 ; j < pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).R_FillColor.GetCount () ; j++ ) {
+					pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).R_IsNoFill.GetAt (j) = 'o' ;
+				}
+			}
+		}
 		Invalidate () ;
 	}
 }
@@ -8385,6 +8477,79 @@ void CGraphicEditorView::OnThickness()
 				M_Rect.left = pDoc -> RTLT_Triangle.GetAt ( M_Number ).left - pDoc -> RTLT_Thickness.GetAt ( M_Number ) / 2 ;
 				M_Rect.right = pDoc -> RTLT_Triangle.GetAt ( M_Number ).right + pDoc -> RTLT_Thickness.GetAt ( M_Number ) / 2 ;
 			}
+			else if ( M_What == _T ("G") ) {
+				for ( int i = 0 ; i < pDoc -> G_Group.GetAt ( M_Number ).R_Thickness.GetCount () ; i++ ) {
+					pDoc -> G_Group.GetAt ( M_Number ).R_Thickness.GetAt (i) = m_Thickness ;
+				}
+
+				for ( int i = 0 ; i < pDoc -> G_Group.GetAt ( M_Number ).E_Thickness.GetCount () ; i++ ) {
+					pDoc -> G_Group.GetAt ( M_Number ).E_Thickness.GetAt (i) = m_Thickness ;
+				}
+
+				for ( int i = 0 ; i < pDoc -> G_Group.GetAt ( M_Number ).Line.GetCount () ; i++ ) {
+					pDoc -> G_Group.GetAt ( M_Number ).Line.GetAt (i).Thickness = m_Thickness ;
+				}
+
+				for ( int i = 0 ; i < pDoc -> G_Group.GetAt ( M_Number ).Poly.GetCount () ; i++ ) {
+					pDoc -> G_Group.GetAt ( M_Number ).Poly.GetAt (i).thickness = m_Thickness ;
+				}
+
+				for ( int i = 0 ; i < pDoc -> G_Group.GetAt ( M_Number ).Index.GetCount () ; i++ ) {
+
+					for ( int j = 0 ; j < pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).R_Thickness.GetCount () ; j++ ) {
+						pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).R_Thickness.GetAt (j) = m_Thickness ;
+					}
+
+					for ( int j = 0 ; j < pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).E_Thickness.GetCount () ; j++ ) {
+						pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).E_Thickness.GetAt (j) = m_Thickness ;
+					}
+
+					for ( int j = 0 ; j < pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).Line.GetCount () ; j++ ) {
+						pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).Line.GetAt (j).Thickness = m_Thickness ;
+					}
+
+					for ( int j = 0 ; j < pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).Poly.GetCount () ; j++ ) {
+						pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).Poly.GetAt (j).thickness = m_Thickness ;
+					}
+				}
+			}
+
+			if ( M_What == _T ("G") ) {
+				int Min_x = 0 ;
+				int Min_y = 0 ;
+				int Max_x = Min_x ;
+				int Max_y = Min_y ;
+
+				for ( int i = 0 ; i < pDoc -> G_Group.GetAt ( M_Number ).R_Thickness.GetCount () ; i++ ) {
+					if ( pDoc -> G_Group.GetAt ( M_Number ).Rect.GetAt (i).top - pDoc -> G_Group.GetAt ( M_Number ).R_Thickness.GetAt (i) / 2 < pDoc -> G_Group.GetAt ( M_Number ).GroupBox.top )
+						pDoc -> G_Group.GetAt ( M_Number ).GroupBox.top = pDoc -> G_Group.GetAt ( M_Number ).Rect.GetAt (i).top - pDoc -> G_Group.GetAt ( M_Number ).R_Thickness.GetAt (i) / 2 ;
+				}
+
+				for ( int i = 0 ; i < pDoc -> G_Group.GetAt ( M_Number ).E_Thickness.GetCount () ; i++ ) {
+				}
+
+				for ( int i = 0 ; i < pDoc -> G_Group.GetAt ( M_Number ).Line.GetCount () ; i++ ) {
+				}
+
+				for ( int i = 0 ; i < pDoc -> G_Group.GetAt ( M_Number ).Poly.GetCount () ; i++ ) {
+				}
+
+				for ( int i = 0 ; i < pDoc -> G_Group.GetAt ( M_Number ).Index.GetCount () ; i++ ) {
+
+					for ( int j = 0 ; j < pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).R_Thickness.GetCount () ; j++ ) {
+					}
+
+					for ( int j = 0 ; j < pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).E_Thickness.GetCount () ; j++ ) {
+					}
+
+					for ( int j = 0 ; j < pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).Line.GetCount () ; j++ ) {
+					}
+
+					for ( int j = 0 ; j < pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).Poly.GetCount () ; j++ ) {
+					}
+				}
+
+			}
 
 			Invalidate () ;
 		}
@@ -8548,9 +8713,26 @@ void CGraphicEditorView::OnFont()
 				pDoc -> Text_Text.GetAt ( M_Number ).Font = Text_lf ;
 				pDoc -> Text_Text.GetAt ( M_Number ).Color = Text_Color ;
 				pDoc -> Text_Text.GetAt ( M_Number ).IsFont = 'o' ;
-
-				Invalidate () ;
 			}
+			else if ( M_What == _T ("G") ) {
+				
+				for ( int i = 0 ; i < pDoc -> G_Group.GetAt ( M_Number ).Text.GetCount () ; i++ ) {
+					pDoc -> G_Group.GetAt ( M_Number ).Text.GetAt (i).Font = Text_lf ;
+					pDoc -> G_Group.GetAt ( M_Number ).Text.GetAt (i).Color = Text_Color ;
+					pDoc -> G_Group.GetAt ( M_Number ).Text.GetAt (i).IsFont = 'o' ;
+				}
+
+				for ( int i = 0 ; i < pDoc -> G_Group.GetAt ( M_Number ).Index.GetCount () ; i++ ) {
+
+					for ( int j = 0 ; j < pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).Text.GetCount () ; j++ ) {
+						pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).Text.GetAt (j).Font = Text_lf ;
+						pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).Text.GetAt (j).Color = Text_Color ;
+						pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).Text.GetAt (j).IsFont = 'o' ;
+					}
+				}
+			}
+
+			Invalidate () ;
 		} 
 	}
 }
@@ -10342,6 +10524,27 @@ void CGraphicEditorView::OnFillpattern()
 				pDoc -> LTRT_FillPattern.GetAt ( M_Number ) = dlg.GetPattern () ;
 			else if ( M_What == _T("RTLT") )
 				pDoc -> RTLT_FillPattern.GetAt ( M_Number ) = dlg.GetPattern () ;
+			else if ( M_What == _T("G") ) {
+
+				for ( int i = 0 ; i < pDoc -> G_Group.GetAt ( M_Number ).E_FillPattern.GetCount () ; i++ ) {
+					pDoc -> G_Group.GetAt ( M_Number ).E_FillPattern.GetAt (i) = dlg.GetPattern () ;
+				}
+
+				for ( int i = 0 ; i < pDoc -> G_Group.GetAt ( M_Number ).R_FillPattern.GetCount () ; i++ ) {
+					pDoc -> G_Group.GetAt ( M_Number ).R_FillPattern.GetAt (i) = dlg.GetPattern () ;
+				}
+
+				for ( int i = 0 ; i < pDoc -> G_Group.GetAt ( M_Number ).Index.GetCount () ; i++ ) {
+
+					for ( int j = 0 ; j < pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).E_FillPattern.GetCount () ; j++ ) {
+						pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).E_FillPattern.GetAt (j) = dlg.GetPattern () ;
+					}
+
+					for ( int j = 0 ; j < pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).R_FillColor.GetCount () ; j++ ) {
+						pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).R_FillColor.GetAt (j) = dlg.GetPattern () ;
+					}
+				}
+			}
 
 			Invalidate () ;
 		}
@@ -10392,6 +10595,43 @@ void CGraphicEditorView::OnLinepattern()
 				pDoc -> LTRT_LinePattern.GetAt ( M_Number ) = dlg.GetPattern () ;
 			else if ( M_What == _T("RTLT") )
 				pDoc -> RTLT_LinePattern.GetAt ( M_Number ) = dlg.GetPattern () ;
+			else if ( M_What == _T("G") ) {
+
+				for ( int i = 0 ; i < pDoc -> G_Group.GetAt ( M_Number ).Line.GetCount () ; i ++ ) {
+					pDoc -> G_Group.GetAt ( M_Number ).Line.GetAt (i).Pattern = dlg.GetPattern () ;
+				}
+
+				for ( int i = 0 ; i < pDoc -> G_Group.GetAt ( M_Number ).Poly.GetCount () ; i ++ ) {
+					pDoc -> G_Group.GetAt ( M_Number ).Poly.GetAt (i).Pattern = dlg.GetPattern () ;
+				}
+
+				for ( int i = 0 ; i < pDoc -> G_Group.GetAt ( M_Number ).E_LinePattern.GetCount () ; i ++ ) {
+					pDoc -> G_Group.GetAt ( M_Number ).E_LinePattern.GetAt (i) = dlg.GetPattern () ;
+				}
+
+				for ( int i = 0 ; i < pDoc -> G_Group.GetAt ( M_Number ).R_LinePattern.GetCount () ; i ++ ) {
+					pDoc -> G_Group.GetAt ( M_Number ).R_LinePattern.GetAt (i) = dlg.GetPattern () ;
+				}
+
+				for ( int i = 0 ; i < pDoc -> G_Group.GetAt ( M_Number ).Index.GetCount () ; i++ ) {
+
+					for ( int j = 0 ; j < pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).Line.GetCount () ; j++ ) {
+						pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).Line.GetAt (j).Pattern = dlg.GetPattern () ;
+					}
+
+					for ( int j = 0 ; j < pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).Poly.GetCount () ; j++ ) {
+						pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).Poly.GetAt (j).Pattern = dlg.GetPattern () ;
+					}
+
+					for ( int j = 0 ; j < pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).E_LinePattern.GetCount () ; j++ ) {
+						pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).E_LinePattern.GetAt (j) = dlg.GetPattern () ;
+					}
+
+					for ( int j = 0 ; j < pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).R_LinePattern.GetCount () ; j++ ) {
+						pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).R_LinePattern.GetAt (j) = dlg.GetPattern () ;
+					}
+				}
+			}
 
 			Invalidate () ;
 		}
@@ -10422,7 +10662,51 @@ void CGraphicEditorView::OnTextbgcolor()
 
 			if ( M_What == _T("Text") ) {
 				pDoc -> Text_Text.GetAt ( M_Number ).IsNoFill = 'x' ;
-				pDoc -> Text_Text.GetAt ( M_Number ).BGColor = Text_BGColor ;
+				pDoc -> Text_Text.GetAt ( M_Number ).BGColor = Text_BGColor ;	
+			}
+			else if ( M_What == _T("G") ) {
+
+				for ( int i = 0 ; i < pDoc -> G_Group.GetAt ( M_Number ).Text.GetCount () ; i++ ) {
+					pDoc -> G_Group.GetAt ( M_Number ).Text.GetAt (i).BGColor = Text_BGColor ;
+					pDoc -> G_Group.GetAt ( M_Number ).Text.GetAt (i).IsNoFill = 'x' ;
+				}
+
+				for ( int i = 0 ; i < pDoc -> G_Group.GetAt ( M_Number ).Index.GetCount () ; i++ ) {
+
+					for ( int j = 0 ; j < pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).Text.GetCount () ; j++ ) {
+						pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).Text.GetAt (j).BGColor = Text_BGColor ;
+						pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).Text.GetAt (j).IsNoFill = 'x' ;
+					}
+				}
+			}
+
+			Invalidate () ;
+
+			if ( M_What == _T("G") ) {
+				for ( int i = 0 ; i < pDoc -> G_Group.GetAt ( M_Number ).Text.GetCount () ; i++ ) {
+					if ( pDoc -> G_Group.GetAt ( M_Number ).Text.GetAt (i).Text_Rect.top < pDoc -> G_Group.GetAt ( M_Number ).GroupBox.top )
+						pDoc -> G_Group.GetAt ( M_Number ).GroupBox.top = pDoc -> G_Group.GetAt ( M_Number ).Text.GetAt (i).Text_Rect.top - 5 ;
+					if ( pDoc -> G_Group.GetAt ( M_Number ).Text.GetAt (i).Text_Rect.bottom > pDoc -> G_Group.GetAt ( M_Number ).GroupBox.bottom )
+						pDoc -> G_Group.GetAt ( M_Number ).GroupBox.bottom = pDoc -> G_Group.GetAt ( M_Number ).Text.GetAt (i).Text_Rect.bottom + 5 ;
+					if ( pDoc -> G_Group.GetAt ( M_Number ).Text.GetAt (i).Text_Rect.left < pDoc -> G_Group.GetAt ( M_Number ).GroupBox.left )
+						pDoc -> G_Group.GetAt ( M_Number ).GroupBox.left = pDoc -> G_Group.GetAt ( M_Number ).Text.GetAt (i).Text_Rect.left - 5 ;
+					if ( pDoc -> G_Group.GetAt ( M_Number ).Text.GetAt (i).Text_Rect.right > pDoc -> G_Group.GetAt ( M_Number ).GroupBox.right )
+						pDoc -> G_Group.GetAt ( M_Number ).GroupBox.right = pDoc -> G_Group.GetAt ( M_Number ).Text.GetAt (i).Text_Rect.right + 5 ;
+				}
+
+				for ( int i = 0 ; i < pDoc -> G_Group.GetAt ( M_Number ).Index.GetCount () ; i++ ) {
+
+					for ( int j = 0 ; j < pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).Text.GetCount () ; j++ ) {
+						if ( pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).Text.GetAt (j).Text_Rect.top < pDoc -> G_Group.GetAt ( M_Number ).GroupBox.top )
+							pDoc -> G_Group.GetAt ( M_Number ).GroupBox.top = pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).Text.GetAt (j).Text_Rect.top - 5 ;
+						if ( pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).Text.GetAt (j).Text_Rect.bottom > pDoc -> G_Group.GetAt ( M_Number ).GroupBox.bottom )
+							pDoc -> G_Group.GetAt ( M_Number ).GroupBox.bottom = pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).Text.GetAt (j).Text_Rect.bottom + 5 ;
+						if ( pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).Text.GetAt (j).Text_Rect.left < pDoc -> G_Group.GetAt ( M_Number ).GroupBox.left )
+							pDoc -> G_Group.GetAt ( M_Number ).GroupBox.left = pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).Text.GetAt (j).Text_Rect.left - 5 ;
+						if ( pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).Text.GetAt (j).Text_Rect.right > pDoc -> G_Group.GetAt ( M_Number ).GroupBox.right )
+							pDoc -> G_Group.GetAt ( M_Number ).GroupBox.right = pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).Text.GetAt (j).Text_Rect.right + 5 ;
+					}
+				}
 
 				Invalidate () ;
 			}
@@ -10545,43 +10829,43 @@ void CGraphicEditorView::OnGroup()
 
 							if ( G_FindCount == 0 ) {
 								if ( pDoc -> L_Line.GetAt ( L_Number ).Start.x >= pDoc -> L_Line.GetAt ( L_Number ).Last.x ) {
-									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> L_Line.GetAt ( L_Number ).Last.x ;
-									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> L_Line.GetAt ( L_Number ).Start.x ;
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> L_Line.GetAt ( L_Number ).Last.x - pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> L_Line.GetAt ( L_Number ).Start.x + pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
 								}
 								else {
-									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> L_Line.GetAt ( L_Number ).Start.x ;
-									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> L_Line.GetAt ( L_Number ).Last.x ;
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> L_Line.GetAt ( L_Number ).Start.x - pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> L_Line.GetAt ( L_Number ).Last.x + pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
 								}
 
 								if ( pDoc -> L_Line.GetAt ( L_Number ).Start.y >= pDoc -> L_Line.GetAt ( L_Number ).Last.y ) {
-									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> L_Line.GetAt ( L_Number ).Last.y ;
-									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> L_Line.GetAt ( L_Number ).Start.y ;
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> L_Line.GetAt ( L_Number ).Last.y - pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> L_Line.GetAt ( L_Number ).Start.y + pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
 								}
 								else {
-									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> L_Line.GetAt ( L_Number ).Start.y ;
-									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> L_Line.GetAt ( L_Number ).Last.y ;
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> L_Line.GetAt ( L_Number ).Start.y - pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> L_Line.GetAt ( L_Number ).Last.y + pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
 								}
 							}
 							else {
-								if ( pDoc -> L_Line.GetAt ( L_Number ).Start.x > pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right )
-									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> L_Line.GetAt ( L_Number ).Start.x ;
-								else if ( pDoc -> L_Line.GetAt ( L_Number ).Start.x < pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left )
-									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> L_Line.GetAt ( L_Number ).Start.x ;
+								if ( pDoc -> L_Line.GetAt ( L_Number ).Start.x + pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 > pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right )
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> L_Line.GetAt ( L_Number ).Start.x + pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+								else if ( pDoc -> L_Line.GetAt ( L_Number ).Start.x - pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 < pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left )
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> L_Line.GetAt ( L_Number ).Start.x - pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
 
-								if ( pDoc -> L_Line.GetAt ( L_Number ).Last.x > pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right )
-									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> L_Line.GetAt ( L_Number ).Last.x ;
-								else if ( pDoc -> L_Line.GetAt ( L_Number ).Last.x < pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left )
-									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> L_Line.GetAt ( L_Number ).Last.x ;
+								if ( pDoc -> L_Line.GetAt ( L_Number ).Last.x + pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 > pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right )
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> L_Line.GetAt ( L_Number ).Last.x + pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+								else if ( pDoc -> L_Line.GetAt ( L_Number ).Last.x - pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 < pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left )
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> L_Line.GetAt ( L_Number ).Last.x - pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
 
-								if ( pDoc -> L_Line.GetAt ( L_Number ).Start.y > pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom )
-									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> L_Line.GetAt ( L_Number ).Start.y ;
-								else if ( pDoc -> L_Line.GetAt ( L_Number ).Start.y < pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top )
-									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> L_Line.GetAt ( L_Number ).Start.y ;
+								if ( pDoc -> L_Line.GetAt ( L_Number ).Start.y + pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 > pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom )
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> L_Line.GetAt ( L_Number ).Start.y + pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+								else if ( pDoc -> L_Line.GetAt ( L_Number ).Start.y - pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 < pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top )
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> L_Line.GetAt ( L_Number ).Start.y - pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
 
-								if ( pDoc -> L_Line.GetAt ( L_Number ).Last.y > pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom )
-									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> L_Line.GetAt ( L_Number ).Last.y ;
-								else if ( pDoc -> L_Line.GetAt ( L_Number ).Last.y < pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top )
-									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> L_Line.GetAt ( L_Number ).Last.y ;
+								if ( pDoc -> L_Line.GetAt ( L_Number ).Last.y + pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 > pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom )
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> L_Line.GetAt ( L_Number ).Last.y + pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
+								else if ( pDoc -> L_Line.GetAt ( L_Number ).Last.y - pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 < pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top )
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> L_Line.GetAt ( L_Number ).Last.y - pDoc -> L_Line.GetAt ( L_Number ).Thickness / 2 ;
 							}
 							G_FindCount++ ;
 
@@ -10750,20 +11034,20 @@ void CGraphicEditorView::OnGroup()
 						pDoc -> G_Group.GetAt ( G_Current ).P_Count++ ;
 
 						if ( G_FindCount == 0 ) {
-							pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = Min_y ;
-							pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = Max_y ;
-							pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = Min_x ;
-							pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = Max_x ;
+							pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = Min_y - pDoc -> P_Poly.GetAt ( P_Number ).thickness / 2 ;
+							pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = Max_y + pDoc -> P_Poly.GetAt ( P_Number ).thickness / 2 ;
+							pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = Min_x - pDoc -> P_Poly.GetAt ( P_Number ).thickness / 2 ;
+							pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = Max_x + pDoc -> P_Poly.GetAt ( P_Number ).thickness / 2 ;
 						}
 						else {
-							if ( Min_x < pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left )
-								pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = Min_x ;
-							if ( Max_x > pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right )
-								pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = Max_x ;
-							if ( Max_y > pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom )
-								pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = Max_y ;
-							if ( Min_y < pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top )
-								pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = Min_y ;
+							if ( Min_x - pDoc -> P_Poly.GetAt ( P_Number ).thickness / 2 < pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left )
+								pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = Min_x - pDoc -> P_Poly.GetAt ( P_Number ).thickness / 2 ;
+							if ( Max_x + pDoc -> P_Poly.GetAt ( P_Number ).thickness / 2 > pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right )
+								pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = Max_x + pDoc -> P_Poly.GetAt ( P_Number ).thickness / 2 ;
+							if ( Max_y + pDoc -> P_Poly.GetAt ( P_Number ).thickness / 2 > pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom )
+								pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = Max_y + pDoc -> P_Poly.GetAt ( P_Number ).thickness / 2 ;
+							if ( Min_y - pDoc -> P_Poly.GetAt ( P_Number ).thickness / 2 < pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top )
+								pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = Min_y - pDoc -> P_Poly.GetAt ( P_Number ).thickness / 2 ;
 						}
 						G_FindCount++ ;
 
@@ -10910,20 +11194,20 @@ void CGraphicEditorView::OnGroup()
 							pDoc -> G_Group.GetAt ( G_Current ).What.Add ( _T ("R") ) ;
 
 							if ( G_FindCount == 0 ) {
-								pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> R_Rec.GetAt ( R_Number ).top ;
-								pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> R_Rec.GetAt ( R_Number ).bottom ;
-								pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> R_Rec.GetAt ( R_Number ).left ;
-								pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> R_Rec.GetAt ( R_Number ).right ;
+								pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> R_Rec.GetAt ( R_Number ).top - pDoc -> R_Thickness.GetAt (R_Number) / 2 ;
+								pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> R_Rec.GetAt ( R_Number ).bottom + pDoc -> R_Thickness.GetAt (R_Number) / 2 ;
+								pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> R_Rec.GetAt ( R_Number ).left - pDoc -> R_Thickness.GetAt (R_Number) / 2 ;
+								pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> R_Rec.GetAt ( R_Number ).right + pDoc -> R_Thickness.GetAt (R_Number) / 2 ;
 							}
 							else {
-								if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top > pDoc -> R_Rec.GetAt ( R_Number ).top )
-									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> R_Rec.GetAt ( R_Number ).top ;
-								if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom < pDoc -> R_Rec.GetAt ( R_Number ).bottom )
-									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> R_Rec.GetAt ( R_Number ).bottom ;
-								if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left > pDoc -> R_Rec.GetAt ( R_Number ).left )
-									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> R_Rec.GetAt ( R_Number ).left ;
-								if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right < pDoc -> R_Rec.GetAt ( R_Number ).right )
-									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> R_Rec.GetAt ( R_Number ).right ;
+								if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top > pDoc -> R_Rec.GetAt ( R_Number ).top - pDoc -> R_Thickness.GetAt (R_Number) / 2 )
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> R_Rec.GetAt ( R_Number ).top - pDoc -> R_Thickness.GetAt (R_Number) / 2 ;
+								if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom < pDoc -> R_Rec.GetAt ( R_Number ).bottom + pDoc -> R_Thickness.GetAt (R_Number) / 2 )
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> R_Rec.GetAt ( R_Number ).bottom + pDoc -> R_Thickness.GetAt (R_Number) / 2 ;
+								if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left > pDoc -> R_Rec.GetAt ( R_Number ).left - pDoc -> R_Thickness.GetAt (R_Number) / 2 )
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> R_Rec.GetAt ( R_Number ).left - pDoc -> R_Thickness.GetAt (R_Number) / 2 ;
+								if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right < pDoc -> R_Rec.GetAt ( R_Number ).right + pDoc -> R_Thickness.GetAt (R_Number) / 2 )
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> R_Rec.GetAt ( R_Number ).right + pDoc -> R_Thickness.GetAt (R_Number) / 2 ;
 							}
 							G_FindCount++ ;
 
@@ -11076,20 +11360,20 @@ void CGraphicEditorView::OnGroup()
 							pDoc -> G_Group.GetAt ( G_Current ).What.Add ( _T ("E") ) ;
 
 							if ( G_FindCount == 0 ) {
-								pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> E_Ellipse.GetAt ( E_Number ).top ;
-								pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> E_Ellipse.GetAt ( E_Number ).bottom ;
-								pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> E_Ellipse.GetAt ( E_Number ).left ;
-								pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> E_Ellipse.GetAt ( E_Number ).right ;
+								pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> E_Ellipse.GetAt ( E_Number ).top - pDoc -> E_Thickness.GetAt (E_Number) / 2 ;
+								pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> E_Ellipse.GetAt ( E_Number ).bottom + pDoc -> E_Thickness.GetAt (E_Number) / 2 ;
+								pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> E_Ellipse.GetAt ( E_Number ).left - pDoc -> E_Thickness.GetAt (E_Number) / 2 ;
+								pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> E_Ellipse.GetAt ( E_Number ).right + pDoc -> E_Thickness.GetAt (E_Number) / 2 ;
 							}
 							else {
-								if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top > pDoc -> E_Ellipse.GetAt ( E_Number ).top )
-									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> E_Ellipse.GetAt ( E_Number ).top ;
-								if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom < pDoc -> E_Ellipse.GetAt ( E_Number ).bottom )
-									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> E_Ellipse.GetAt ( E_Number ).bottom ;
-								if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left > pDoc -> E_Ellipse.GetAt ( E_Number ).left )
-									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> E_Ellipse.GetAt ( E_Number ).left ;
-								if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right < pDoc -> E_Ellipse.GetAt ( E_Number ).right )
-									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> E_Ellipse.GetAt ( E_Number ).right ;
+								if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top > pDoc -> E_Ellipse.GetAt ( E_Number ).top - pDoc -> E_Thickness.GetAt (E_Number) / 2 )
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> E_Ellipse.GetAt ( E_Number ).top - pDoc -> E_Thickness.GetAt (E_Number) / 2 ;
+								if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom < pDoc -> E_Ellipse.GetAt ( E_Number ).bottom + pDoc -> E_Thickness.GetAt (E_Number) / 2 )
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> E_Ellipse.GetAt ( E_Number ).bottom + pDoc -> E_Thickness.GetAt (E_Number) / 2 ;
+								if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left > pDoc -> E_Ellipse.GetAt ( E_Number ).left - pDoc -> E_Thickness.GetAt (E_Number) / 2 )
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> E_Ellipse.GetAt ( E_Number ).left - pDoc -> E_Thickness.GetAt (E_Number) / 2 ;
+								if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right < pDoc -> E_Ellipse.GetAt ( E_Number ).right + pDoc -> E_Thickness.GetAt (E_Number) / 2 )
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> E_Ellipse.GetAt ( E_Number ).right + pDoc -> E_Thickness.GetAt (E_Number) / 2 ;
 							}
 							G_FindCount++ ;
 

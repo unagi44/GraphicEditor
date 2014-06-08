@@ -270,7 +270,7 @@ void CGraphicEditorDoc::Serialize(CArchive& ar)
 			P_Poly.GetAt (i).Poly_point.Serialize (ar) ;
 			ar >> P_Poly.GetAt (i).P_Color ;
 			ar >> P_Poly.GetAt (i).thickness ;
-			ar << P_Poly.GetAt (i).Pattern ;
+			ar >> P_Poly.GetAt (i).Pattern ;
 		}
 		
 		E_Ellipse.Serialize (ar) ;	// 원 그리기 배열 불러오기
