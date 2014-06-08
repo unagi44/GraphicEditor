@@ -7,4 +7,5 @@ CGroup::CGroup () {
 	R_Count = 0 ;			// 상자 객체의 개수
 	E_Count = 0 ;			// 원 객체의 개수
 	Text_Count = 0 ;		// 텍스트 객체의 개수
+	G_Count = 0 ;
 }

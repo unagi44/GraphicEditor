@@ -34,6 +34,7 @@ public:
 	CArray < CRect, CRect& > LTRT_Triangle ;	// 왼쪽 -> 오른쪽 삼각형 그리기 배열
 	CArray < CText, CText& > Text_Text ;		// 텍스트 삽입 배열
 	CArray < CGroup, CGroup& > G_Group ;		// 그룹화 배열
+	CArray < CGroup, CGroup& > G_InGroup ;		// 종속된 그룹화 배열
 
 // 작업입니다.
 public:
@@ -115,6 +116,7 @@ public:
 	int RTLT_Count ;		// 오른쪽 -> 왼쪽 객체의 개수
 	int Text_Count ;		// 텍스트 객체의 개수
 	int G_Count ;			// 그룹화 개수
+	int G_InCount ;			// 종속된 그룹화 개수
 
 // 재정의입니다.
 public:

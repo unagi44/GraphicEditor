@@ -10,6 +10,7 @@ public:
 	CGroup () ;
 	CRect GroupBox ;
 	CArray < CString, CString > What ;
+	CArray < int, int > Index ;
 
 	CArray < CLine, CLine& > Line ;
 	CArray < CPolyLine, CPolyLine& > Poly ;
@@ -39,5 +40,6 @@ public:
 	int R_Count ;			// 상자 객체의 개수
 	int E_Count ;			// 원 객체의 개수
 	int Text_Count ;		// 텍스트 객체의 개수
+	int G_Count ;			// 그룹화 객체의 개수
 
 };

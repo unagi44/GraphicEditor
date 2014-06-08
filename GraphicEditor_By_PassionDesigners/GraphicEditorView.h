@@ -46,6 +46,7 @@ public:
 	int G_FindCount ;
 	int G_Current ;
 	char G_IsMakeGroup ;
+	char G_ViewSelection ;
 
 	// 이동 툴바에 필요한 변수들
 	CRect M_Rect ;
@@ -233,6 +234,7 @@ public:
 	afx_msg void OnLinepattern();
 	afx_msg void OnTextbgcolor();
 	afx_msg void OnGroup();
+	afx_msg void OnGroupx();
 };
 
 #ifndef _DEBUG  // GraphicEditorView.cpp의 디버그 버전

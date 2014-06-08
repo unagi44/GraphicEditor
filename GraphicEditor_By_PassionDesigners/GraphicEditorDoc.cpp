@@ -47,6 +47,7 @@ CGraphicEditorDoc::CGraphicEditorDoc()
 	RTLT_Count = 0 ;
 	Text_Count = 0 ;
 	G_Count = 0 ;
+	G_InCount = 0 ;
 }
 
 CGraphicEditorDoc::~CGraphicEditorDoc()
@@ -77,7 +78,7 @@ void CGraphicEditorDoc::Serialize(CArchive& ar)
 		// TODO: 여기에 저장 코드를 추가합니다.
 		L_Line.Serialize (ar) ;	// 선 그리기 배열 저장
 		R_Rec.Serialize (ar) ;	// 상자 그리기 배열 저장
-		
+
 		// PolyLine 그리기 배열 저장
 		CPolyCount = P_Poly.GetCount () ;
 		ar << CPolyCount ;
@@ -85,8 +86,9 @@ void CGraphicEditorDoc::Serialize(CArchive& ar)
 			P_Poly.GetAt (i).Poly_point.Serialize (ar) ;
 			ar << P_Poly.GetAt (i).P_Color ;
 			ar << P_Poly.GetAt (i).thickness ;
+			ar << P_Poly.GetAt (i).Pattern ;
 		}
-
+		
 		E_Ellipse.Serialize (ar) ;	// 원 그리기 배열 저장
 		T_Triangle.Serialize (ar) ;	// 세모 그리기 배열 저장
 		RT_Triangle.Serialize (ar) ;// 역 삼각형 그리기 배열 저장
@@ -174,6 +176,86 @@ void CGraphicEditorDoc::Serialize(CArchive& ar)
 		RRightT_LinePattern.Serialize (ar) ;
 		LTRT_LinePattern.Serialize (ar) ;
 		RTLT_LinePattern.Serialize (ar) ;
+
+		// 그룹화 저장 가능
+		ar << G_Count ;
+		for ( int i = 0 ; i < G_Group.GetCount () ; i++ ) {
+			G_Group.GetAt (i).Index.Serialize (ar) ;
+			G_Group.GetAt (i).Ellipse.Serialize (ar) ;
+			G_Group.GetAt (i).E_Color.Serialize (ar) ;
+			ar << G_Group.GetAt (i).E_Count ;
+			G_Group.GetAt (i).E_FillColor.Serialize (ar) ;
+			G_Group.GetAt (i).E_FillPattern.Serialize (ar) ;
+			G_Group.GetAt (i).E_IsNoFill.Serialize (ar) ;
+			G_Group.GetAt (i).E_LinePattern.Serialize (ar) ;
+			G_Group.GetAt (i).E_Thickness.Serialize (ar) ;
+			ar << G_Group.GetAt (i).GroupBox ;
+			ar << G_Group.GetAt (i).G_Count ;
+			G_Group.GetAt (i).Line.Serialize (ar) ;
+			ar << G_Group.GetAt (i).L_Count ;
+
+			CPolyCount = G_Group.GetAt (i).Poly.GetCount () ;
+			ar << CPolyCount ;
+			for ( int j = 0 ; j < G_Group.GetAt (i).Poly.GetCount () ; j++ ) {
+				G_Group.GetAt (i).Poly.GetAt (j).Poly_point.Serialize (ar) ;
+				ar << G_Group.GetAt (i).Poly.GetAt (j).Pattern  ;
+				ar << G_Group.GetAt (i).Poly.GetAt (j).P_Color ;
+				ar << G_Group.GetAt (i).Poly.GetAt (j).thickness ;
+			}
+
+			ar << G_Group.GetAt (i).P_Count ;
+			G_Group.GetAt (i).Rect.Serialize (ar) ;
+			G_Group.GetAt (i).R_Color.Serialize (ar) ;
+			ar << G_Group.GetAt (i).R_Count ;
+			G_Group.GetAt (i).R_FillColor.Serialize (ar) ;
+			G_Group.GetAt (i).R_FillPattern.Serialize (ar) ;
+			G_Group.GetAt (i).R_IsNoFill.Serialize (ar) ;
+			G_Group.GetAt (i).R_LinePattern.Serialize (ar) ;
+			G_Group.GetAt (i).R_Thickness.Serialize (ar) ;
+			G_Group.GetAt (i).Text.Serialize (ar) ;
+			ar << G_Group.GetAt (i).Text_Count ;
+			G_Group.GetAt (i).What.Serialize (ar) ;
+		}
+		
+		// 종속된 그룹화 저장
+		ar << G_InCount ;
+		for ( int i = 0 ; i < G_InGroup.GetCount () ; i++ ) {
+			G_InGroup.GetAt (i).Index.Serialize (ar) ;
+			G_InGroup.GetAt (i).Ellipse.Serialize (ar) ;
+			G_InGroup.GetAt (i).E_Color.Serialize (ar) ;
+			ar << G_InGroup.GetAt (i).E_Count ;
+			G_InGroup.GetAt (i).E_FillColor.Serialize (ar) ;
+			G_InGroup.GetAt (i).E_FillPattern.Serialize (ar) ;
+			G_InGroup.GetAt (i).E_IsNoFill.Serialize (ar) ;
+			G_InGroup.GetAt (i).E_LinePattern.Serialize (ar) ;
+			G_InGroup.GetAt (i).E_Thickness.Serialize (ar) ;
+			ar << G_InGroup.GetAt (i).GroupBox ;
+			ar << G_InGroup.GetAt (i).G_Count ;
+			G_InGroup.GetAt (i).Line.Serialize (ar) ;
+			ar << G_InGroup.GetAt (i).L_Count ;
+
+			CPolyCount = G_InGroup.GetAt (i).Poly.GetCount () ;
+			ar << CPolyCount ;
+			for ( int j = 0 ; j < G_InGroup.GetAt (i).Poly.GetCount () ; j++ ) {
+				G_InGroup.GetAt (i).Poly.GetAt (j).Poly_point.Serialize (ar) ;
+				ar << G_InGroup.GetAt (i).Poly.GetAt (j).Pattern  ;
+				ar << G_InGroup.GetAt (i).Poly.GetAt (j).P_Color ;
+				ar << G_InGroup.GetAt (i).Poly.GetAt (j).thickness ;
+			}
+
+			ar << G_InGroup.GetAt (i).P_Count ;
+			G_InGroup.GetAt (i).Rect.Serialize (ar) ;
+			G_InGroup.GetAt (i).R_Color.Serialize (ar) ;
+			ar << G_InGroup.GetAt (i).R_Count ;
+			G_InGroup.GetAt (i).R_FillColor.Serialize (ar) ;
+			G_InGroup.GetAt (i).R_FillPattern.Serialize (ar) ;
+			G_InGroup.GetAt (i).R_IsNoFill.Serialize (ar) ;
+			G_InGroup.GetAt (i).R_LinePattern.Serialize (ar) ;
+			G_InGroup.GetAt (i).R_Thickness.Serialize (ar) ;
+			G_InGroup.GetAt (i).Text.Serialize (ar) ;
+			ar << G_InGroup.GetAt (i).Text_Count ;
+			G_InGroup.GetAt (i).What.Serialize (ar) ;
+		}
 	}
 	else
 	{
@@ -188,8 +270,9 @@ void CGraphicEditorDoc::Serialize(CArchive& ar)
 			P_Poly.GetAt (i).Poly_point.Serialize (ar) ;
 			ar >> P_Poly.GetAt (i).P_Color ;
 			ar >> P_Poly.GetAt (i).thickness ;
+			ar << P_Poly.GetAt (i).Pattern ;
 		}
-
+		
 		E_Ellipse.Serialize (ar) ;	// 원 그리기 배열 불러오기
 		T_Triangle.Serialize (ar) ;	// 세모 그리기 배열 불러오기
 		RT_Triangle.Serialize (ar) ;// 역 삼각형 그리기 배열 불러오기
@@ -277,6 +360,88 @@ void CGraphicEditorDoc::Serialize(CArchive& ar)
 		RRightT_LinePattern.Serialize (ar) ;
 		LTRT_LinePattern.Serialize (ar) ;
 		RTLT_LinePattern.Serialize (ar) ;
+
+		// 그룹화 불러오기
+		ar >> G_Count ;
+		G_Group.SetSize ( G_Count ) ;
+		for ( int i = 0 ; i < G_Count ; i++ ) {
+			G_Group.GetAt (i).Index.Serialize (ar) ;
+			G_Group.GetAt (i).Ellipse.Serialize (ar) ;
+			G_Group.GetAt (i).E_Color.Serialize (ar) ;
+			ar >> G_Group.GetAt (i).E_Count ;
+			G_Group.GetAt (i).E_FillColor.Serialize (ar) ;
+			G_Group.GetAt (i).E_FillPattern.Serialize (ar) ;
+			G_Group.GetAt (i).E_IsNoFill.Serialize (ar) ;
+			G_Group.GetAt (i).E_LinePattern.Serialize (ar) ;
+			G_Group.GetAt (i).E_Thickness.Serialize (ar) ;
+			ar >> G_Group.GetAt (i).GroupBox ;
+			ar >> G_Group.GetAt (i).G_Count ;
+			G_Group.GetAt (i).Line.Serialize (ar) ;
+			ar >> G_Group.GetAt (i).L_Count ;
+
+			ar >> CPolyCount ;
+			G_Group.GetAt (i).Poly.SetSize ( CPolyCount ) ;
+			for ( int j = 0 ; j < CPolyCount ; j++ ) {
+				G_Group.GetAt (i).Poly.GetAt (j).Poly_point.Serialize (ar) ;
+				ar >> G_Group.GetAt (i).Poly.GetAt (j).Pattern  ;
+				ar >> G_Group.GetAt (i).Poly.GetAt (j).P_Color ;
+				ar >> G_Group.GetAt (i).Poly.GetAt (j).thickness ;
+			}
+
+			ar >> G_Group.GetAt (i).P_Count ;
+			G_Group.GetAt (i).Rect.Serialize (ar) ;
+			G_Group.GetAt (i).R_Color.Serialize (ar) ;
+			ar >> G_Group.GetAt (i).R_Count ;
+			G_Group.GetAt (i).R_FillColor.Serialize (ar) ;
+			G_Group.GetAt (i).R_FillPattern.Serialize (ar) ;
+			G_Group.GetAt (i).R_IsNoFill.Serialize (ar) ;
+			G_Group.GetAt (i).R_LinePattern.Serialize (ar) ;
+			G_Group.GetAt (i).R_Thickness.Serialize (ar) ;
+			G_Group.GetAt (i).Text.Serialize (ar) ;
+			ar >> G_Group.GetAt (i).Text_Count ;
+			G_Group.GetAt (i).What.Serialize (ar) ;
+		}
+		
+		// 종속된 그룹화 불러오기
+		ar >> G_InCount ;
+		G_InGroup.SetSize ( G_InCount ) ;
+		for ( int i = 0 ; i < G_InCount ; i++ ) {
+			G_InGroup.GetAt (i).Index.Serialize (ar) ;
+			G_InGroup.GetAt (i).Ellipse.Serialize (ar) ;
+			G_InGroup.GetAt (i).E_Color.Serialize (ar) ;
+			ar >> G_InGroup.GetAt (i).E_Count ;
+			G_InGroup.GetAt (i).E_FillColor.Serialize (ar) ;
+			G_InGroup.GetAt (i).E_FillPattern.Serialize (ar) ;
+			G_InGroup.GetAt (i).E_IsNoFill.Serialize (ar) ;
+			G_InGroup.GetAt (i).E_LinePattern.Serialize (ar) ;
+			G_InGroup.GetAt (i).E_Thickness.Serialize (ar) ;
+			ar >> G_InGroup.GetAt (i).GroupBox ;
+			ar >> G_InGroup.GetAt (i).G_Count ;
+			G_InGroup.GetAt (i).Line.Serialize (ar) ;
+			ar >> G_InGroup.GetAt (i).L_Count ;
+
+			ar >> CPolyCount ;
+			G_InGroup.GetAt (i).Poly.SetSize ( CPolyCount ) ;
+			for ( int j = 0 ; j < CPolyCount ; j++ ) {
+				G_InGroup.GetAt (i).Poly.GetAt (j).Poly_point.Serialize (ar) ;
+				ar >> G_InGroup.GetAt (i).Poly.GetAt (j).Pattern  ;
+				ar >> G_InGroup.GetAt (i).Poly.GetAt (j).P_Color ;
+				ar >> G_InGroup.GetAt (i).Poly.GetAt (j).thickness ;
+			}
+
+			ar >> G_InGroup.GetAt (i).P_Count ;
+			G_InGroup.GetAt (i).Rect.Serialize (ar) ;
+			G_InGroup.GetAt (i).R_Color.Serialize (ar) ;
+			ar >> G_InGroup.GetAt (i).R_Count ;
+			G_InGroup.GetAt (i).R_FillColor.Serialize (ar) ;
+			G_InGroup.GetAt (i).R_FillPattern.Serialize (ar) ;
+			G_InGroup.GetAt (i).R_IsNoFill.Serialize (ar) ;
+			G_InGroup.GetAt (i).R_LinePattern.Serialize (ar) ;
+			G_InGroup.GetAt (i).R_Thickness.Serialize (ar) ;
+			G_InGroup.GetAt (i).Text.Serialize (ar) ;
+			ar >> G_InGroup.GetAt (i).Text_Count ;
+			G_InGroup.GetAt (i).What.Serialize (ar) ;
+		}
 	}
 }
 
