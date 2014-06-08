@@ -11,6 +11,7 @@ public:
 	CRect GroupBox ;
 	CArray < CString, CString > What ;
 	CArray < int, int > Index ;
+	CArray < int, int > Have_Group ;
 
 	CArray < CLine, CLine& > Line ;
 	CArray < CPolyLine, CPolyLine& > Poly ;
