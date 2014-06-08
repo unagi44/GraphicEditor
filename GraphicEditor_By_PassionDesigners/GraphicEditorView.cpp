@@ -61,6 +61,7 @@ ON_WM_CHAR()
 ON_COMMAND(ID_FillPattern, &CGraphicEditorView::OnFillpattern)
 ON_COMMAND(ID_LinePattern, &CGraphicEditorView::OnLinepattern)
 ON_COMMAND(ID_TextBGColor, &CGraphicEditorView::OnTextbgcolor)
+ON_COMMAND(ID_Group, &CGraphicEditorView::OnGroup)
 END_MESSAGE_MAP()
 
 // CGraphicEditorView 생성/소멸
@@ -113,6 +114,7 @@ CGraphicEditorView::CGraphicEditorView()
 	Text_IsFont = 'x' ;
 	Text_IsKeyDown = 'x' ;
 	Text_IsChange = 'x' ;
+	Text_IsBGColor = 'x' ;
 
 	// 선 그리기에 필요한 변수들 초기화
 	L_IsDraw = 'x' ;
@@ -194,6 +196,7 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 	int LTRT_Number = 0 ;
 	int RTLT_Number = 0 ;
 	int Text_Number = 0 ;
+	int G_Number = 0 ;
 
 	// 모든 객체의 수만큼 출력을 합니다.
 	// 그린 순서에 따라 출력됩니다.
@@ -2666,7 +2669,7 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 					ShowCaret () ;
 				}
 
-				if ( (M_IsDraw != 'o' && Text_Number == pDoc -> Text_Text.GetCount () - 1) || (M_IsDraw == 'o' && Text_IsChange == 'o' && Text_Number == M_Number) ) {
+				if ( (Text_IsKeyDown == 'o' && M_IsDraw != 'o' && Text_Number == pDoc -> Text_Text.GetCount () - 1) || (M_IsDraw == 'o' && Text_IsChange == 'o' && Text_Number == M_Number) ) {
 					pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.top = pDoc -> Text_Text.GetAt ( Text_Number ).Location.y + pDoc -> Text_Text.GetAt ( Text_Number ).Font.lfHeight - 10 ;
 					pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.left = pDoc -> Text_Text.GetAt ( Text_Number ).Location.x - 10 ;
 					pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.bottom = pDoc -> Text_Text.GetAt ( Text_Number ).Location.y + 10 ;
@@ -2715,7 +2718,7 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 					ShowCaret () ;
 				}
 				
-				if ( (M_IsDraw != 'o' && Text_Number == pDoc -> Text_Text.GetCount () - 1) || (M_IsDraw == 'o' && Text_IsChange == 'o' && Text_Number == M_Number) ) {
+				if ( (Text_IsKeyDown == 'o' && M_IsDraw != 'o' && Text_Number == pDoc -> Text_Text.GetCount () - 1) || (M_IsDraw == 'o' && Text_IsChange == 'o' && Text_Number == M_Number) ) {
 					pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.top = pDoc -> Text_Text.GetAt ( Text_Number ).Location.y - 10 ;
 					pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.left = pDoc -> Text_Text.GetAt ( Text_Number ).Location.x - 10 ;
 					pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.bottom = pDoc -> Text_Text.GetAt ( Text_Number ).Location.y + 26 ;
@@ -2753,9 +2756,996 @@ void CGraphicEditorView::OnDraw(CDC* pDC)
 			}
 			Text_Number++ ;
 		}
+
+		// 그룹화 객체일 경우의 출력
+		else if ( pDoc -> What.GetAt (i) == _T ("G") ) {
+
+			if ( M_Number == G_Number && M_IsDraw == 'o' && M_What == _T ("G") ) {
+				CPen pen ( PS_SOLID, 1.8, RGB (200, 0, 0) ) ;
+				CPen *Draw_Pen = pDC -> SelectObject(&pen);
+				pDC -> SelectStockObject ( NULL_BRUSH ) ;
+				pDC -> Rectangle ( M_Rect.left, M_Rect.top, M_Rect.right, M_Rect.bottom ) ;
+				pDC -> SelectObject ( Draw_Pen ) ;
+			}
+
+			int L_Number = 0 ;
+			int P_Number = 0 ;
+			int R_Number = 0 ;
+			int E_Number = 0 ;
+			int Text_Number = 0 ;
+
+			for ( int i = 0 ; i < pDoc -> G_Group.GetAt (G_Number).What.GetCount () ; i++ ) {
+
+				// 그룹화 중 '선'을 출력함
+				if ( pDoc -> G_Group.GetAt (G_Number).What.GetAt (i) == _T ("L") ) {
+					// 색상을 가지지 않을 경우의 출력
+					if ( pDoc -> G_Group.GetAt (G_Number).Line.GetAt (L_Number).L_Color == RGB (0,0,0) ) {
+						if ( pDoc -> G_Group.GetAt (G_Number).Line.GetAt (L_Number).Pattern == 1 ) {
+							CPen pen ( PS_SOLID, pDoc -> G_Group.GetAt (G_Number).Line.GetAt (L_Number).Thickness, RGB (0, 0, 0) ) ;
+							CPen *Draw_Pen = pDC -> SelectObject(&pen);
+							L_Insert.Start = pDoc -> G_Group.GetAt (G_Number).Line.GetAt (L_Number).Start ;
+							L_Insert.Last = pDoc -> G_Group.GetAt (G_Number).Line.GetAt (L_Number).Last ;
+							pDC -> MoveTo ( L_Insert.Start ) ;	// 선의 시작위치
+							pDC -> LineTo ( L_Insert.Last ) ;	// 선의 종착점
+							pDC->SelectObject(Draw_Pen);
+						}
+						else if ( pDoc -> G_Group.GetAt (G_Number).Line.GetAt (L_Number).Pattern == 2 ) {
+							CPen pen ( PS_DASH, pDoc -> G_Group.GetAt (G_Number).Line.GetAt (L_Number).Thickness, RGB (0, 0, 0) ) ;
+							CPen *Draw_Pen = pDC -> SelectObject(&pen);
+							L_Insert.Start = pDoc -> G_Group.GetAt (G_Number).Line.GetAt (L_Number).Start ;
+							L_Insert.Last = pDoc -> G_Group.GetAt (G_Number).Line.GetAt (L_Number).Last ;
+							pDC -> MoveTo ( L_Insert.Start ) ;	// 선의 시작위치
+							pDC -> LineTo ( L_Insert.Last ) ;	// 선의 종착점
+							pDC->SelectObject(Draw_Pen);
+						}
+						else if ( pDoc -> G_Group.GetAt (G_Number).Line.GetAt (L_Number).Pattern == 3 ) {
+							CPen pen ( PS_DOT, pDoc -> G_Group.GetAt (G_Number).Line.GetAt (L_Number).Thickness, RGB (0, 0, 0) ) ;
+							CPen *Draw_Pen = pDC -> SelectObject(&pen);
+							L_Insert.Start = pDoc -> G_Group.GetAt (G_Number).Line.GetAt (L_Number).Start ;
+							L_Insert.Last = pDoc -> G_Group.GetAt (G_Number).Line.GetAt (L_Number).Last ;
+							pDC -> MoveTo ( L_Insert.Start ) ;	// 선의 시작위치
+							pDC -> LineTo ( L_Insert.Last ) ;	// 선의 종착점
+							pDC->SelectObject(Draw_Pen);
+						}
+						else if ( pDoc -> G_Group.GetAt (G_Number).Line.GetAt (L_Number).Pattern == 4 ) {
+							CPen pen ( PS_DASHDOT, pDoc -> G_Group.GetAt (G_Number).Line.GetAt (L_Number).Thickness, RGB (0, 0, 0) ) ;
+							CPen *Draw_Pen = pDC -> SelectObject(&pen);
+							L_Insert.Start = pDoc -> G_Group.GetAt (G_Number).Line.GetAt (L_Number).Start ;
+							L_Insert.Last = pDoc -> G_Group.GetAt (G_Number).Line.GetAt (L_Number).Last ;
+							pDC -> MoveTo ( L_Insert.Start ) ;	// 선의 시작위치
+							pDC -> LineTo ( L_Insert.Last ) ;	// 선의 종착점
+							pDC->SelectObject(Draw_Pen);
+						}
+						else if ( pDoc -> G_Group.GetAt (G_Number).Line.GetAt (L_Number).Pattern == 5 ) {
+							CPen pen ( PS_DASHDOTDOT, pDoc -> G_Group.GetAt (G_Number).Line.GetAt (L_Number).Thickness, RGB (0, 0, 0) ) ;
+							CPen *Draw_Pen = pDC -> SelectObject(&pen);
+							L_Insert.Start = pDoc -> G_Group.GetAt (G_Number).Line.GetAt (L_Number).Start ;
+							L_Insert.Last = pDoc -> G_Group.GetAt (G_Number).Line.GetAt (L_Number).Last ;
+							pDC -> MoveTo ( L_Insert.Start ) ;	// 선의 시작위치
+							pDC -> LineTo ( L_Insert.Last ) ;	// 선의 종착점
+							pDC->SelectObject(Draw_Pen);
+						}
+					}
+					// 특정 색상을 가졌을 경우의 출력
+					else {
+						if ( pDoc ->  G_Group.GetAt (G_Number).Line.GetAt (L_Number).Pattern == 1 ) {
+							CPen pen ( PS_SOLID, pDoc ->  G_Group.GetAt (G_Number).Line.GetAt (L_Number).Thickness, pDoc ->  G_Group.GetAt (G_Number).Line.GetAt (L_Number).L_Color ) ;
+							CPen *Draw_Pen = pDC -> SelectObject(&pen);
+							L_Insert.Start = pDoc ->  G_Group.GetAt (G_Number).Line.GetAt (L_Number).Start ;
+							L_Insert.Last = pDoc ->  G_Group.GetAt (G_Number).Line.GetAt (L_Number).Last ;
+							pDC -> MoveTo ( L_Insert.Start ) ;	// 선의 시작위치
+							pDC -> LineTo ( L_Insert.Last ) ;	// 선의 종착점
+							pDC->SelectObject(Draw_Pen);
+						}
+						else if (pDoc ->  G_Group.GetAt (G_Number).Line.GetAt (L_Number).Pattern == 2 ) {
+							CPen pen ( PS_DASH, pDoc ->  G_Group.GetAt (G_Number).Line.GetAt (L_Number).Thickness, pDoc ->  G_Group.GetAt (G_Number).Line.GetAt (L_Number).L_Color ) ;
+							CPen *Draw_Pen = pDC -> SelectObject(&pen);
+							L_Insert.Start = pDoc ->  G_Group.GetAt (G_Number).Line.GetAt (L_Number).Start ;
+							L_Insert.Last = pDoc ->  G_Group.GetAt (G_Number).Line.GetAt (L_Number).Last ;
+							pDC -> MoveTo ( L_Insert.Start ) ;	// 선의 시작위치
+							pDC -> LineTo ( L_Insert.Last ) ;	// 선의 종착점
+							pDC->SelectObject(Draw_Pen);
+						}
+						else if (pDoc ->  G_Group.GetAt (G_Number).Line.GetAt (L_Number).Pattern == 3 ) {
+							CPen pen ( PS_DOT, pDoc ->  G_Group.GetAt (G_Number).Line.GetAt (L_Number).Thickness, pDoc ->  G_Group.GetAt (G_Number).Line.GetAt (L_Number).L_Color ) ;
+							CPen *Draw_Pen = pDC -> SelectObject(&pen);
+							L_Insert.Start = pDoc ->  G_Group.GetAt (G_Number).Line.GetAt (L_Number).Start ;
+							L_Insert.Last = pDoc ->  G_Group.GetAt (G_Number).Line.GetAt (L_Number).Last ;
+							pDC -> MoveTo ( L_Insert.Start ) ;	// 선의 시작위치
+							pDC -> LineTo ( L_Insert.Last ) ;	// 선의 종착점
+							pDC->SelectObject(Draw_Pen);
+						}
+						else if (pDoc ->  G_Group.GetAt (G_Number).Line.GetAt (L_Number).Pattern == 4 ) {
+							CPen pen ( PS_DASHDOT, pDoc ->  G_Group.GetAt (G_Number).Line.GetAt (L_Number).Thickness, pDoc ->  G_Group.GetAt (G_Number).Line.GetAt (L_Number).L_Color ) ;
+							CPen *Draw_Pen = pDC -> SelectObject(&pen);
+							L_Insert.Start = pDoc ->  G_Group.GetAt (G_Number).Line.GetAt (L_Number).Start ;
+							L_Insert.Last = pDoc ->  G_Group.GetAt (G_Number).Line.GetAt (L_Number).Last ;
+							pDC -> MoveTo ( L_Insert.Start ) ;	// 선의 시작위치
+							pDC -> LineTo ( L_Insert.Last ) ;	// 선의 종착점
+							pDC->SelectObject(Draw_Pen);
+						}
+						else if (pDoc ->  G_Group.GetAt (G_Number).Line.GetAt (L_Number).Pattern == 5 ) {
+							CPen pen ( PS_DASHDOTDOT, pDoc ->  G_Group.GetAt (G_Number).Line.GetAt (L_Number).Thickness, pDoc ->  G_Group.GetAt (G_Number).Line.GetAt (L_Number).L_Color ) ;
+							CPen *Draw_Pen = pDC -> SelectObject(&pen);
+							L_Insert.Start = pDoc ->  G_Group.GetAt (G_Number).Line.GetAt (L_Number).Start ;
+							L_Insert.Last = pDoc ->  G_Group.GetAt (G_Number).Line.GetAt (L_Number).Last ;
+							pDC -> MoveTo ( L_Insert.Start ) ;	// 선의 시작위치
+							pDC -> LineTo ( L_Insert.Last ) ;	// 선의 종착점
+							pDC->SelectObject(Draw_Pen);
+						}
+					}
+					L_Number++ ;
+				}
+
+				// 그룹화 중 PolyLine을 출력함
+				else if ( pDoc -> G_Group.GetAt (G_Number).What.GetAt (i) == _T ("P") ) {
+
+					int j ;
+					for ( j = 0 ; j < pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).Poly_point.GetCount () - 1 ; j++ ) {
+
+						// PolyLine이 색상을 가지지 않을 경우의 출력
+						if ( pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).P_Color == RGB (0,0,0) ) {
+							if ( pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).Pattern == 1 ) {
+								CPen pen ( PS_SOLID, pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).thickness, RGB (0, 0, 0) );
+								CPen *Draw_Pen = pDC -> SelectObject(&pen);
+								P_PointStart = pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).Poly_point.GetAt (j) ;
+								P_PointLast = pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).Poly_point.GetAt (j+1) ;
+								pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+								pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+								pDC->SelectObject(Draw_Pen);
+							}
+							else if ( pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).Pattern == 2 ) {
+								CPen pen ( PS_DASH, pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).thickness, RGB (0, 0, 0) );
+								CPen *Draw_Pen = pDC -> SelectObject(&pen);
+								P_PointStart = pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).Poly_point.GetAt (j) ;
+								P_PointLast = pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).Poly_point.GetAt (j+1) ;
+								pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+								pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+								pDC->SelectObject(Draw_Pen);
+							}
+							else if ( pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).Pattern == 3 ) {
+								CPen pen ( PS_DOT, pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).thickness, RGB (0, 0, 0) );
+								CPen *Draw_Pen = pDC -> SelectObject(&pen);
+								P_PointStart = pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).Poly_point.GetAt (j) ;
+								P_PointLast = pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).Poly_point.GetAt (j+1) ;
+								pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+								pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+								pDC->SelectObject(Draw_Pen);
+							}
+							else if ( pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).Pattern == 4 ) {
+								CPen pen ( PS_DASHDOT, pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).thickness, RGB (0, 0, 0) );
+								CPen *Draw_Pen = pDC -> SelectObject(&pen);
+								P_PointStart = pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).Poly_point.GetAt (j) ;
+								P_PointLast = pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).Poly_point.GetAt (j+1) ;
+								pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+								pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+								pDC->SelectObject(Draw_Pen);
+							}
+							else if ( pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).Pattern == 5 ) {
+								CPen pen ( PS_DASHDOTDOT, pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).thickness, RGB (0, 0, 0) );
+								CPen *Draw_Pen = pDC -> SelectObject(&pen);
+								P_PointStart = pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).Poly_point.GetAt (j) ;
+								P_PointLast = pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).Poly_point.GetAt (j+1) ;
+								pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+								pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+								pDC->SelectObject(Draw_Pen);
+							}
+
+						}
+						// PolyLine이 지정된 색상을 가졌을 경우의 출력
+						else {
+							if ( pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).Pattern == 1 ) {
+								CPen pen ( PS_SOLID, pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).thickness, pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).P_Color ) ;
+								CPen *Draw_Pen = pDC -> SelectObject(&pen) ;
+								P_PointStart = pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).Poly_point.GetAt (j) ;
+								P_PointLast = pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).Poly_point.GetAt (j+1) ;
+								pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+								pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+								pDC->SelectObject(Draw_Pen);
+							}
+							else if ( pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).Pattern == 2 ) {
+								CPen pen ( PS_DASH, pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).thickness, pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).P_Color ) ;
+								CPen *Draw_Pen = pDC -> SelectObject(&pen) ;
+								P_PointStart = pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).Poly_point.GetAt (j) ;
+								P_PointLast = pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).Poly_point.GetAt (j+1) ;
+								pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+								pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+								pDC->SelectObject(Draw_Pen);
+							}
+							else if ( pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).Pattern == 3 ) {
+								CPen pen ( PS_DOT, pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).thickness, pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).P_Color ) ;
+								CPen *Draw_Pen = pDC -> SelectObject(&pen) ;
+								P_PointStart = pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).Poly_point.GetAt (j) ;
+								P_PointLast = pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).Poly_point.GetAt (j+1) ;
+								pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+								pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+								pDC->SelectObject(Draw_Pen);
+							}
+							else if ( pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).Pattern == 4 ) {
+								CPen pen ( PS_DASHDOT, pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).thickness, pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).P_Color ) ;
+								CPen *Draw_Pen = pDC -> SelectObject(&pen) ;
+								P_PointStart = pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).Poly_point.GetAt (j) ;
+								P_PointLast = pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).Poly_point.GetAt (j+1) ;
+								pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+								pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+								pDC->SelectObject(Draw_Pen);
+							}
+							else if ( pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).Pattern == 5 ) {
+								CPen pen ( PS_DASHDOTDOT, pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).thickness, pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).P_Color ) ;
+								CPen *Draw_Pen = pDC -> SelectObject(&pen) ;
+								P_PointStart = pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).Poly_point.GetAt (j) ;
+								P_PointLast = pDoc -> G_Group.GetAt (G_Number).Poly.GetAt (P_Number).Poly_point.GetAt (j+1) ;
+								pDC -> MoveTo ( P_PointStart ) ;		// 선의 시작위치
+								pDC -> LineTo ( P_PointLast ) ;		// 선의 종착점
+								pDC->SelectObject(Draw_Pen);
+							}
+						}
+
+					}
+					P_Number++ ;
+				}
+
+				// 그룹화 중 상자 객체를 출력함
+				else if ( pDoc -> G_Group.GetAt (G_Number).What.GetAt (i) == _T ("R") ) {
+					// 선 색을 가지지 않았을 경우의 출력
+					if ( pDoc -> G_Group.GetAt (G_Number).R_Color.GetAt (R_Number) == RGB (0,0,0) ) {
+
+						// 채우기 색상을 가지지 않았을 경우의 출력
+						if ( pDoc -> G_Group.GetAt (G_Number).R_IsNoFill.GetAt (R_Number) == 'o' ) {
+							if ( pDoc -> G_Group.GetAt (G_Number).R_LinePattern.GetAt (R_Number) == 1 ) {
+								CPen pen;
+								pen.CreatePen( PS_SOLID, pDoc -> G_Group.GetAt (G_Number).R_Thickness.GetAt (R_Number), RGB (0,0,0) ) ;
+								CPen* oldPen = pDC->SelectObject( &pen ) ;
+								pDC -> SelectStockObject ( NULL_BRUSH ) ;
+								pDC -> Rectangle ( pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].left, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].top, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].right, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].bottom ) ;
+								pDC -> SelectObject ( oldPen ) ;
+							}
+							else if ( pDoc -> G_Group.GetAt (G_Number).R_LinePattern.GetAt (R_Number) == 2 ) {
+								CPen pen;
+								pen.CreatePen( PS_DASH, pDoc -> G_Group.GetAt (G_Number).R_Thickness.GetAt (R_Number), RGB (0,0,0) ) ;
+								CPen* oldPen = pDC->SelectObject( &pen ) ;
+								pDC -> SelectStockObject ( NULL_BRUSH ) ;
+								pDC -> Rectangle ( pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].left, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].top, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].right, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].bottom ) ;
+								pDC -> SelectObject ( oldPen ) ;
+							}
+							else if ( pDoc -> G_Group.GetAt (G_Number).R_LinePattern.GetAt (R_Number) == 3 ) {
+								CPen pen;
+								pen.CreatePen( PS_DOT, pDoc -> G_Group.GetAt (G_Number).R_Thickness.GetAt (R_Number), RGB (0,0,0) ) ;
+								CPen* oldPen = pDC->SelectObject( &pen ) ;
+								pDC -> SelectStockObject ( NULL_BRUSH ) ;
+								pDC -> Rectangle ( pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].left, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].top, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].right, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].bottom ) ;
+								pDC -> SelectObject ( oldPen ) ;
+							}
+							else if ( pDoc -> G_Group.GetAt (G_Number).R_LinePattern.GetAt (R_Number) == 4 ) {
+								CPen pen;
+								pen.CreatePen( PS_DASHDOT, pDoc -> G_Group.GetAt (G_Number).R_Thickness.GetAt (R_Number), RGB (0,0,0) ) ;
+								CPen* oldPen = pDC->SelectObject( &pen ) ;
+								pDC -> SelectStockObject ( NULL_BRUSH ) ;
+								pDC -> Rectangle ( pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].left, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].top, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].right, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].bottom ) ;
+								pDC -> SelectObject ( oldPen ) ;
+							}
+							else if ( pDoc -> G_Group.GetAt (G_Number).R_LinePattern.GetAt (R_Number) == 5 ) {
+								CPen pen;
+								pen.CreatePen( PS_DASHDOTDOT, pDoc -> G_Group.GetAt (G_Number).R_Thickness.GetAt (R_Number), RGB (0,0,0) ) ;
+								CPen* oldPen = pDC->SelectObject( &pen ) ;
+								pDC -> SelectStockObject ( NULL_BRUSH ) ;
+								pDC -> Rectangle ( pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].left, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].top, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].right, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].bottom ) ;
+								pDC -> SelectObject ( oldPen ) ;
+							}
+						}
+						// 채우기 색상을 가졌을 경우의 출력
+						else {
+							if ( pDoc -> G_Group.GetAt (G_Number).R_LinePattern.GetAt (R_Number) == 1 ) {
+								CPen pen;
+								pen.CreatePen( PS_SOLID, pDoc -> G_Group.GetAt (G_Number).R_Thickness.GetAt (R_Number), RGB (0,0,0) ) ;
+								CPen* oldPen = pDC->SelectObject( &pen ) ;
+								CBrush brush;
+								if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 1 )
+									brush.CreateSolidBrush( pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 2 )
+									brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 3 )
+									brush.CreateHatchBrush ( HS_CROSS, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 4 )
+									brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 5 )
+									brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 6 )
+									brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 7 )
+									brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+
+								CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+								pDC -> Rectangle ( pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].left, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].top, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].right, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].bottom ) ;
+								pDC -> SelectObject ( oldBrush ) ;
+								pDC -> SelectObject ( oldPen ) ;
+							}
+							else if ( pDoc -> G_Group.GetAt (G_Number).R_LinePattern.GetAt (R_Number) == 2 ) {
+								CPen pen;
+								pen.CreatePen( PS_DASH, pDoc -> G_Group.GetAt (G_Number).R_Thickness.GetAt (R_Number), RGB (0,0,0) ) ;
+								CPen* oldPen = pDC->SelectObject( &pen ) ;
+								CBrush brush;
+								if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 1 )
+									brush.CreateSolidBrush( pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 2 )
+									brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 3 )
+									brush.CreateHatchBrush ( HS_CROSS, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 4 )
+									brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 5 )
+									brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 6 )
+									brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 7 )
+									brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+
+								CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+								pDC -> Rectangle ( pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].left, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].top, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].right, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].bottom ) ;
+								pDC -> SelectObject ( oldBrush ) ;
+								pDC -> SelectObject ( oldPen ) ;
+							}
+							else if ( pDoc -> G_Group.GetAt (G_Number).R_LinePattern.GetAt (R_Number) == 3 ) {
+								CPen pen;
+								pen.CreatePen( PS_DOT, pDoc -> G_Group.GetAt (G_Number).R_Thickness.GetAt (R_Number), RGB (0,0,0) ) ;
+								CPen* oldPen = pDC->SelectObject( &pen ) ;
+								CBrush brush;
+								if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 1 )
+									brush.CreateSolidBrush( pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 2 )
+									brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 3 )
+									brush.CreateHatchBrush ( HS_CROSS, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 4 )
+									brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 5 )
+									brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 6 )
+									brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 7 )
+									brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+
+								CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+								pDC -> Rectangle ( pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].left, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].top, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].right, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].bottom ) ;
+								pDC -> SelectObject ( oldBrush ) ;
+								pDC -> SelectObject ( oldPen ) ;
+							}
+							else if ( pDoc -> G_Group.GetAt (G_Number).R_LinePattern.GetAt (R_Number) == 4 ) {
+								CPen pen;
+								pen.CreatePen( PS_DASHDOT, pDoc -> G_Group.GetAt (G_Number).R_Thickness.GetAt (R_Number), RGB (0,0,0) ) ;
+								CPen* oldPen = pDC->SelectObject( &pen ) ;
+								CBrush brush;
+								if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 1 )
+									brush.CreateSolidBrush( pDoc -> R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 2 )
+									brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 3 )
+									brush.CreateHatchBrush ( HS_CROSS, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 4 )
+									brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 5 )
+									brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 6 )
+									brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 7 )
+									brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+
+								CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+								pDC -> Rectangle ( pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].left, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].top, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].right, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].bottom ) ;
+								pDC -> SelectObject ( oldBrush ) ;
+								pDC -> SelectObject ( oldPen ) ;
+							}
+							else if ( pDoc -> G_Group.GetAt (G_Number).R_LinePattern.GetAt (R_Number) == 5 ) {
+								CPen pen;
+								pen.CreatePen( PS_DASHDOTDOT, pDoc -> G_Group.GetAt (G_Number).R_Thickness.GetAt (R_Number), RGB (0,0,0) ) ;
+								CPen* oldPen = pDC->SelectObject( &pen ) ;
+								CBrush brush;
+								if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 1 )
+									brush.CreateSolidBrush( pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 2 )
+									brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 3 )
+									brush.CreateHatchBrush ( HS_CROSS, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 4 )
+									brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 5 )
+									brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 6 )
+									brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 7 )
+									brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+
+								CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+								pDC -> Rectangle ( pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].left, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].top, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].right, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].bottom ) ;
+								pDC -> SelectObject ( oldBrush ) ;
+								pDC -> SelectObject ( oldPen ) ;
+							}
+						}
+					}
+					// 특정 선 색상을 가졌을 경우의 출력
+					else {
+
+						// 채우기 색상을 가지지 않았을 경우의 출력
+						if ( pDoc -> G_Group.GetAt (G_Number).R_IsNoFill.GetAt (R_Number) == 'o' ) {
+							if ( pDoc -> G_Group.GetAt (G_Number).R_LinePattern.GetAt (R_Number) == 1 ) {
+								CPen pen;
+								pen.CreatePen( PS_SOLID, pDoc -> G_Group.GetAt (G_Number).R_Thickness.GetAt (R_Number), pDoc -> G_Group.GetAt (G_Number).R_Color.GetAt (R_Number) ) ;
+								CPen* oldPen = pDC->SelectObject( &pen ) ;
+								pDC -> SelectStockObject ( NULL_BRUSH ) ;
+								pDC -> Rectangle ( pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].left, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].top, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].right, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].bottom ) ;
+								pDC ->SelectObject ( oldPen ) ;
+							}
+							else if ( pDoc -> G_Group.GetAt (G_Number).R_LinePattern.GetAt (R_Number) == 2 ) {
+								CPen pen;
+								pen.CreatePen( PS_DASH, pDoc -> G_Group.GetAt (G_Number).R_Thickness.GetAt (R_Number), pDoc -> G_Group.GetAt (G_Number).R_Color.GetAt (R_Number) ) ;
+								CPen* oldPen = pDC->SelectObject( &pen ) ;
+								pDC -> SelectStockObject ( NULL_BRUSH ) ;
+								pDC -> Rectangle ( pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].left, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].top, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].right, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].bottom ) ;
+								pDC ->SelectObject ( oldPen ) ;
+							}
+							else if ( pDoc -> G_Group.GetAt (G_Number).R_LinePattern.GetAt (R_Number) == 3 ) {
+								CPen pen;
+								pen.CreatePen( PS_DOT, pDoc -> G_Group.GetAt (G_Number).R_Thickness.GetAt (R_Number), pDoc -> G_Group.GetAt (G_Number).R_Color.GetAt (R_Number) ) ;
+								CPen* oldPen = pDC->SelectObject( &pen ) ;
+								pDC -> SelectStockObject ( NULL_BRUSH ) ;
+								pDC -> Rectangle ( pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].left, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].top, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].right, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].bottom ) ;
+								pDC ->SelectObject ( oldPen ) ;
+							}
+							else if ( pDoc -> G_Group.GetAt (G_Number).R_LinePattern.GetAt (R_Number) == 4 ) {
+								CPen pen;
+								pen.CreatePen( PS_DASHDOT, pDoc -> G_Group.GetAt (G_Number).R_Thickness.GetAt (R_Number), pDoc -> G_Group.GetAt (G_Number).R_Color.GetAt (R_Number) ) ;
+								CPen* oldPen = pDC->SelectObject( &pen ) ;
+								pDC -> SelectStockObject ( NULL_BRUSH ) ;
+								pDC -> Rectangle ( pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].left, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].top, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].right, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].bottom ) ;
+								pDC ->SelectObject ( oldPen ) ;
+							}
+							else if ( pDoc -> G_Group.GetAt (G_Number).R_LinePattern.GetAt (R_Number) == 5 ) {
+								CPen pen;
+								pen.CreatePen( PS_DASHDOTDOT, pDoc -> G_Group.GetAt (G_Number).R_Thickness.GetAt (R_Number), pDoc -> G_Group.GetAt (G_Number).R_Color.GetAt (R_Number) ) ;
+								CPen* oldPen = pDC->SelectObject( &pen ) ;
+								pDC -> SelectStockObject ( NULL_BRUSH ) ;
+								pDC -> Rectangle ( pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].left, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].top, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].right, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].bottom ) ;
+								pDC ->SelectObject ( oldPen ) ;
+							}
+						}
+						// 채우기 색상을 가졌을 경우의 출력
+						else {
+							if ( pDoc -> G_Group.GetAt (G_Number).R_LinePattern.GetAt (R_Number) == 1 ) {
+								CPen pen;
+								pen.CreatePen( PS_SOLID, pDoc -> G_Group.GetAt (G_Number).R_Thickness.GetAt (R_Number), pDoc -> G_Group.GetAt (G_Number).R_Color.GetAt (R_Number) ) ;
+								CPen* oldPen = pDC->SelectObject( &pen ) ;
+								CBrush brush;
+								if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 1 )
+									brush.CreateSolidBrush( pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 2 )
+									brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 3 )
+									brush.CreateHatchBrush ( HS_CROSS, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 4 )
+									brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 5 )
+									brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 6 )
+									brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 7 )
+									brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+
+								CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+								pDC -> Rectangle ( pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].left, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].top, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].right, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].bottom ) ;
+								pDC -> SelectObject ( oldPen ) ;
+								pDC -> SelectObject ( oldBrush ) ;
+							}
+							else if ( pDoc -> G_Group.GetAt (G_Number).R_LinePattern.GetAt (R_Number) == 2 ) {
+								CPen pen;
+								pen.CreatePen( PS_DASH, pDoc -> G_Group.GetAt (G_Number).R_Thickness.GetAt (R_Number), pDoc -> G_Group.GetAt (G_Number).R_Color.GetAt (R_Number) ) ;
+								CPen* oldPen = pDC->SelectObject( &pen ) ;
+								CBrush brush;
+								if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 1 )
+									brush.CreateSolidBrush( pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 2 )
+									brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 3 )
+									brush.CreateHatchBrush ( HS_CROSS, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 4 )
+									brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 5 )
+									brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 6 )
+									brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 7 )
+									brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+
+								CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+								pDC -> Rectangle ( pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].left, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].top, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].right, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].bottom ) ;
+								pDC -> SelectObject ( oldPen ) ;
+								pDC -> SelectObject ( oldBrush ) ;
+							}
+							else if ( pDoc -> G_Group.GetAt (G_Number).R_LinePattern.GetAt (R_Number) == 3 ) {
+								CPen pen;
+								pen.CreatePen( PS_DOT, pDoc -> G_Group.GetAt (G_Number).R_Thickness.GetAt (R_Number), pDoc -> G_Group.GetAt (G_Number).R_Color.GetAt (R_Number) ) ;
+								CPen* oldPen = pDC->SelectObject( &pen ) ;
+								CBrush brush;
+								if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 1 )
+									brush.CreateSolidBrush( pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 2 )
+									brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 3 )
+									brush.CreateHatchBrush ( HS_CROSS, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 4 )
+									brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 5 )
+									brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 6 )
+									brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 7 )
+									brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+
+								CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+								pDC -> Rectangle ( pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].left, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].top, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].right, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].bottom ) ;
+								pDC -> SelectObject ( oldPen ) ;
+								pDC -> SelectObject ( oldBrush ) ;
+							}
+							else if ( pDoc -> G_Group.GetAt (G_Number).R_LinePattern.GetAt (R_Number) == 4 ) {
+								CPen pen;
+								pen.CreatePen( PS_DASHDOT, pDoc -> G_Group.GetAt (G_Number).R_Thickness.GetAt (R_Number), pDoc -> G_Group.GetAt (G_Number).R_Color.GetAt (R_Number) ) ;
+								CPen* oldPen = pDC->SelectObject( &pen ) ;
+								CBrush brush;
+								if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 1 )
+									brush.CreateSolidBrush( pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 2 )
+									brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 3 )
+									brush.CreateHatchBrush ( HS_CROSS, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 4 )
+									brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 5 )
+									brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 6 )
+									brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 7 )
+									brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+
+								CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+								pDC -> Rectangle ( pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].left, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].top, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].right, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].bottom ) ;
+								pDC -> SelectObject ( oldPen ) ;
+								pDC -> SelectObject ( oldBrush ) ;
+							}
+							else if ( pDoc -> G_Group.GetAt (G_Number).R_LinePattern.GetAt (R_Number) == 5 ) {
+								CPen pen;
+								pen.CreatePen( PS_DASHDOTDOT, pDoc -> G_Group.GetAt (G_Number).R_Thickness.GetAt (R_Number), pDoc -> G_Group.GetAt (G_Number).R_Color.GetAt (R_Number) ) ;
+								CPen* oldPen = pDC->SelectObject( &pen ) ;
+								CBrush brush;
+								if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 1 )
+									brush.CreateSolidBrush( pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 2 )
+									brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 3 )
+									brush.CreateHatchBrush ( HS_CROSS, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 4 )
+									brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 5 )
+									brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 6 )
+									brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).R_FillPattern.GetAt (R_Number) == 7 )
+									brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> G_Group.GetAt (G_Number).R_FillColor.GetAt (R_Number) ) ;
+
+								CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+								pDC -> Rectangle ( pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].left, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].top, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].right, pDoc -> G_Group.GetAt (G_Number).Rect [R_Number].bottom ) ;
+								pDC -> SelectObject ( oldPen ) ;
+								pDC -> SelectObject ( oldBrush ) ;
+							}
+						}
+					}
+					R_Number++ ;
+				}
+
+				// 그룹화 객체중 원을 출력
+				else if ( pDoc -> G_Group.GetAt (G_Number).What.GetAt (i) == _T ("E") ) {
+					// 선 색을 가지지 않았을 경우의 출력
+					if ( pDoc -> G_Group.GetAt (G_Number).E_Color.GetAt (E_Number) == RGB (0,0,0) ) {
+						// 채우기 색상을 가지지 않았을 경우의 출력
+						if ( pDoc -> G_Group.GetAt (G_Number).E_IsNoFill.GetAt (E_Number) == 'o' ) {
+							if ( pDoc -> G_Group.GetAt (G_Number).E_LinePattern.GetAt (E_Number) == 1 ) {
+								CPen pen;
+								pen.CreatePen( PS_SOLID, pDoc -> G_Group.GetAt (G_Number).E_Thickness.GetAt (E_Number), RGB (0,0,0) ) ;
+								CPen* oldPen = pDC->SelectObject( &pen ) ;
+								pDC -> SelectStockObject ( NULL_BRUSH ) ;
+								pDC -> Ellipse ( pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].left, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].top, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].right, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].bottom ) ;
+								pDC -> SelectObject ( oldPen ) ;
+							}
+							else if ( pDoc -> G_Group.GetAt (G_Number).E_LinePattern.GetAt (E_Number) == 2 ) {
+								CPen pen;
+								pen.CreatePen( PS_DASH, pDoc -> G_Group.GetAt (G_Number).E_Thickness.GetAt (E_Number), RGB (0,0,0) ) ;
+								CPen* oldPen = pDC->SelectObject( &pen ) ;
+								pDC -> SelectStockObject ( NULL_BRUSH ) ;
+								pDC -> Ellipse ( pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].left, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].top, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].right, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].bottom ) ;
+								pDC -> SelectObject ( oldPen ) ;
+							}
+							else if ( pDoc -> G_Group.GetAt (G_Number).E_LinePattern.GetAt (E_Number) == 3 ) {
+								CPen pen;
+								pen.CreatePen( PS_DOT, pDoc -> G_Group.GetAt (G_Number).E_Thickness.GetAt (E_Number), RGB (0,0,0) ) ;
+								CPen* oldPen = pDC->SelectObject( &pen ) ;
+								pDC -> SelectStockObject ( NULL_BRUSH ) ;
+								pDC -> Ellipse ( pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].left, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].top, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].right, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].bottom ) ;
+								pDC -> SelectObject ( oldPen ) ;
+							}
+							else if ( pDoc -> G_Group.GetAt (G_Number).E_LinePattern.GetAt (E_Number) == 4 ) {
+								CPen pen;
+								pen.CreatePen( PS_DASHDOT, pDoc -> G_Group.GetAt (G_Number).E_Thickness.GetAt (E_Number), RGB (0,0,0) ) ;
+								CPen* oldPen = pDC->SelectObject( &pen ) ;
+								pDC -> SelectStockObject ( NULL_BRUSH ) ;
+								pDC -> Ellipse ( pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].left, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].top, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].right, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].bottom ) ;
+								pDC -> SelectObject ( oldPen ) ;
+							}
+							else if ( pDoc -> G_Group.GetAt (G_Number).E_LinePattern.GetAt (E_Number) == 5 ) {
+								CPen pen;
+								pen.CreatePen( PS_DASHDOTDOT, pDoc -> G_Group.GetAt (G_Number).E_Thickness.GetAt (E_Number), RGB (0,0,0) ) ;
+								CPen* oldPen = pDC->SelectObject( &pen ) ;
+								pDC -> SelectStockObject ( NULL_BRUSH ) ;
+								pDC -> Ellipse ( pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].left, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].top, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].right, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].bottom ) ;
+								pDC -> SelectObject ( oldPen ) ;
+							}
+						}
+						// 채우기 색상을 가졌을 경우의 출력
+						else {
+							if ( pDoc -> G_Group.GetAt (G_Number).E_LinePattern.GetAt (E_Number) == 1 ) {
+								CPen pen;
+								pen.CreatePen( PS_SOLID, pDoc -> G_Group.GetAt (G_Number).E_Thickness.GetAt (E_Number), RGB (0,0,0) ) ;
+								CPen* oldPen = pDC->SelectObject( &pen ) ;
+								CBrush brush;
+								if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 1 )
+									brush.CreateSolidBrush( pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 2 )
+									brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 3 )
+									brush.CreateHatchBrush ( HS_CROSS, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 4 )
+									brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 5 )
+									brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 6 )
+									brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 7 )
+									brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+
+								CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+								pDC -> Ellipse ( pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].left, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].top, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].right, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].bottom ) ;
+								pDC -> SelectObject ( oldBrush ) ;
+								pDC -> SelectObject ( oldPen ) ;
+							}
+							else if ( pDoc -> G_Group.GetAt (G_Number).E_LinePattern.GetAt (E_Number) == 2 ) {
+								CPen pen;
+								pen.CreatePen( PS_DASH, pDoc -> G_Group.GetAt (G_Number).E_Thickness.GetAt (E_Number), RGB (0,0,0) ) ;
+								CPen* oldPen = pDC->SelectObject( &pen ) ;
+								CBrush brush;
+								if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 1 )
+									brush.CreateSolidBrush( pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 2 )
+									brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 3 )
+									brush.CreateHatchBrush ( HS_CROSS, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 4 )
+									brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 5 )
+									brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 6 )
+									brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 7 )
+									brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+
+								CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+								pDC -> Ellipse ( pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].left, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].top, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].right, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].bottom ) ;
+								pDC -> SelectObject ( oldBrush ) ;
+								pDC -> SelectObject ( oldPen ) ;
+							}
+							else if ( pDoc -> G_Group.GetAt (G_Number).E_LinePattern.GetAt (E_Number) == 3 ) {
+								CPen pen;
+								pen.CreatePen( PS_DOT, pDoc -> G_Group.GetAt (G_Number).E_Thickness.GetAt (E_Number), RGB (0,0,0) ) ;
+								CPen* oldPen = pDC->SelectObject( &pen ) ;
+								CBrush brush;
+								if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 1 )
+									brush.CreateSolidBrush( pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 2 )
+									brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 3 )
+									brush.CreateHatchBrush ( HS_CROSS, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 4 )
+									brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 5 )
+									brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 6 )
+									brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 7 )
+									brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+
+								CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+								pDC -> Ellipse ( pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].left, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].top, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].right, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].bottom ) ;
+								pDC -> SelectObject ( oldBrush ) ;
+								pDC -> SelectObject ( oldPen ) ;
+							}
+							else if ( pDoc -> G_Group.GetAt (G_Number).E_LinePattern.GetAt (E_Number) == 4 ) {
+								CPen pen;
+								pen.CreatePen( PS_DASHDOT, pDoc -> G_Group.GetAt (G_Number).E_Thickness.GetAt (E_Number), RGB (0,0,0) ) ;
+								CPen* oldPen = pDC->SelectObject( &pen ) ;
+								CBrush brush;
+								if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 1 )
+									brush.CreateSolidBrush( pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 2 )
+									brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 3 )
+									brush.CreateHatchBrush ( HS_CROSS, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 4 )
+									brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 5 )
+									brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 6 )
+									brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 7 )
+									brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+
+								CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+								pDC -> Ellipse ( pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].left, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].top, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].right, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].bottom ) ;
+								pDC -> SelectObject ( oldBrush ) ;
+								pDC -> SelectObject ( oldPen ) ;
+							}
+							else if ( pDoc -> G_Group.GetAt (G_Number).E_LinePattern.GetAt (E_Number) == 5 ) {
+								CPen pen;
+								pen.CreatePen( PS_DASHDOTDOT, pDoc -> G_Group.GetAt (G_Number).E_Thickness.GetAt (E_Number), RGB (0,0,0) ) ;
+								CPen* oldPen = pDC->SelectObject( &pen ) ;
+								CBrush brush;
+								if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 1 )
+									brush.CreateSolidBrush( pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 2 )
+									brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 3 )
+									brush.CreateHatchBrush ( HS_CROSS, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 4 )
+									brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 5 )
+									brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 6 )
+									brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 7 )
+									brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+
+								CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+								pDC -> Ellipse ( pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].left, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].top, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].right, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].bottom ) ;
+								pDC -> SelectObject ( oldBrush ) ;
+								pDC -> SelectObject ( oldPen ) ;
+							}
+						}
+					}
+					// 특정 선 색상을 가졌을 경우의 출력
+					else {
+						// 채우기 색상을 가지지 않았을 경우의 출력
+						if ( pDoc -> G_Group.GetAt (G_Number).E_IsNoFill.GetAt (E_Number) == 'o' ) {
+							if ( pDoc -> G_Group.GetAt (G_Number).E_LinePattern.GetAt (E_Number) == 1 ) {
+								CPen pen;
+								pen.CreatePen( PS_SOLID, pDoc -> G_Group.GetAt (G_Number).E_Thickness.GetAt (E_Number), pDoc -> G_Group.GetAt (G_Number).E_Color.GetAt (E_Number) ) ;
+								CPen* oldPen = pDC->SelectObject( &pen ) ;
+								pDC -> SelectStockObject ( NULL_BRUSH ) ;
+								pDC -> Ellipse ( pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].left, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].top, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].right, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].bottom ) ;
+								pDC -> SelectObject ( oldPen ) ;
+							}
+							else if ( pDoc -> G_Group.GetAt (G_Number).E_LinePattern.GetAt (E_Number) == 2 ) {
+								CPen pen;
+								pen.CreatePen( PS_DASH, pDoc -> G_Group.GetAt (G_Number).E_Thickness.GetAt (E_Number), pDoc -> G_Group.GetAt (G_Number).E_Color.GetAt (E_Number) ) ;
+								CPen* oldPen = pDC->SelectObject( &pen ) ;
+								pDC -> SelectStockObject ( NULL_BRUSH ) ;
+								pDC -> Ellipse ( pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].left, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].top, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].right, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].bottom ) ;
+								pDC -> SelectObject ( oldPen ) ;
+							}
+							else if ( pDoc -> G_Group.GetAt (G_Number).E_LinePattern.GetAt (E_Number) == 3 ) {
+								CPen pen;
+								pen.CreatePen( PS_DOT, pDoc -> G_Group.GetAt (G_Number).E_Thickness.GetAt (E_Number), pDoc -> G_Group.GetAt (G_Number).E_Color.GetAt (E_Number) ) ;
+								CPen* oldPen = pDC->SelectObject( &pen ) ;
+								pDC -> SelectStockObject ( NULL_BRUSH ) ;
+								pDC -> Ellipse ( pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].left, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].top, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].right, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].bottom ) ;
+								pDC -> SelectObject ( oldPen ) ;
+							}
+							else if ( pDoc -> G_Group.GetAt (G_Number).E_LinePattern.GetAt (E_Number) == 4 ) {
+								CPen pen;
+								pen.CreatePen( PS_DASHDOT, pDoc -> G_Group.GetAt (G_Number).E_Thickness.GetAt (E_Number), pDoc -> G_Group.GetAt (G_Number).E_Color.GetAt (E_Number) ) ;
+								CPen* oldPen = pDC->SelectObject( &pen ) ;
+								pDC -> SelectStockObject ( NULL_BRUSH ) ;
+								pDC -> Ellipse ( pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].left, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].top, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].right, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].bottom ) ;
+								pDC -> SelectObject ( oldPen ) ;
+							}
+							else if ( pDoc -> G_Group.GetAt (G_Number).E_LinePattern.GetAt (E_Number) == 5 ) {
+								CPen pen;
+								pen.CreatePen( PS_DASHDOTDOT, pDoc -> G_Group.GetAt (G_Number).E_Thickness.GetAt (E_Number), pDoc -> G_Group.GetAt (G_Number).E_Color.GetAt (E_Number) ) ;
+								CPen* oldPen = pDC->SelectObject( &pen ) ;
+								pDC -> SelectStockObject ( NULL_BRUSH ) ;
+								pDC -> Ellipse ( pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].left, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].top, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].right, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].bottom ) ;
+								pDC -> SelectObject ( oldPen ) ;
+							}
+						}
+						// 채우기 색상을 가졌을 경우의 출력
+						else {
+							if ( pDoc -> G_Group.GetAt (G_Number).E_LinePattern.GetAt (E_Number) == 1 ) {
+								CPen pen;
+								pen.CreatePen( PS_SOLID, pDoc -> G_Group.GetAt (G_Number).E_Thickness.GetAt (E_Number), pDoc -> G_Group.GetAt (G_Number).E_Color.GetAt (E_Number) ) ;
+								CPen* oldPen = pDC->SelectObject( &pen ) ;
+								CBrush brush;
+								if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 1 )
+									brush.CreateSolidBrush( pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 2 )
+									brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 3 )
+									brush.CreateHatchBrush ( HS_CROSS, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 4 )
+									brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 5 )
+									brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 6 )
+									brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 7 )
+									brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+
+								CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+								pDC -> Ellipse ( pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].left, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].top, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].right, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].bottom ) ;
+								pDC -> SelectObject ( oldPen ) ;
+								pDC -> SelectObject ( oldBrush ) ;
+							}
+							else if ( pDoc -> G_Group.GetAt (G_Number).E_LinePattern.GetAt (E_Number) == 2 ) {
+								CPen pen;
+								pen.CreatePen( PS_DASH, pDoc -> G_Group.GetAt (G_Number).E_Thickness.GetAt (E_Number), pDoc -> G_Group.GetAt (G_Number).E_Color.GetAt (E_Number) ) ;
+								CPen* oldPen = pDC->SelectObject( &pen ) ;
+								CBrush brush;
+								if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 1 )
+									brush.CreateSolidBrush( pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 2 )
+									brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 3 )
+									brush.CreateHatchBrush ( HS_CROSS, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 4 )
+									brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 5 )
+									brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 6 )
+									brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 7 )
+									brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+
+								CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+								pDC -> Ellipse ( pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].left, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].top, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].right, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].bottom ) ;
+								pDC -> SelectObject ( oldPen ) ;
+								pDC -> SelectObject ( oldBrush ) ;
+							}
+							else if ( pDoc -> G_Group.GetAt (G_Number).E_LinePattern.GetAt (E_Number) == 3 ) {
+								CPen pen;
+								pen.CreatePen( PS_DOT, pDoc -> G_Group.GetAt (G_Number).E_Thickness.GetAt (E_Number), pDoc -> G_Group.GetAt (G_Number).E_Color.GetAt (E_Number) ) ;
+								CPen* oldPen = pDC->SelectObject( &pen ) ;
+								CBrush brush;
+								if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 1 )
+									brush.CreateSolidBrush( pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 2 )
+									brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 3 )
+									brush.CreateHatchBrush ( HS_CROSS, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 4 )
+									brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 5 )
+									brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 6 )
+									brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 7 )
+									brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+
+								CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+								pDC -> Ellipse ( pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].left, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].top, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].right, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].bottom ) ;
+								pDC -> SelectObject ( oldPen ) ;
+								pDC -> SelectObject ( oldBrush ) ;
+							}
+							else if ( pDoc -> G_Group.GetAt (G_Number).E_LinePattern.GetAt (E_Number) == 4 ) {
+								CPen pen;
+								pen.CreatePen( PS_DASHDOT, pDoc -> G_Group.GetAt (G_Number).E_Thickness.GetAt (E_Number), pDoc -> G_Group.GetAt (G_Number).E_Color.GetAt (E_Number) ) ;
+								CPen* oldPen = pDC->SelectObject( &pen ) ;
+								CBrush brush;
+								if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 1 )
+									brush.CreateSolidBrush( pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 2 )
+									brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 3 )
+									brush.CreateHatchBrush ( HS_CROSS, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 4 )
+									brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 5 )
+									brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 6 )
+									brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 7 )
+									brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+
+								CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+								pDC -> Ellipse ( pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].left, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].top, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].right, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].bottom ) ;
+								pDC -> SelectObject ( oldPen ) ;
+								pDC -> SelectObject ( oldBrush ) ;
+							}
+							else if ( pDoc -> G_Group.GetAt (G_Number).E_LinePattern.GetAt (E_Number) == 5 ) {
+								CPen pen;
+								pen.CreatePen( PS_DASHDOTDOT, pDoc -> G_Group.GetAt (G_Number).E_Thickness.GetAt (E_Number), pDoc -> G_Group.GetAt (G_Number).E_Color.GetAt (E_Number) ) ;
+								CPen* oldPen = pDC->SelectObject( &pen ) ;
+								CBrush brush;
+								if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 1 )
+									brush.CreateSolidBrush( pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 2 )
+									brush.CreateHatchBrush ( HS_BDIAGONAL, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 3 )
+									brush.CreateHatchBrush ( HS_CROSS, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 4 )
+									brush.CreateHatchBrush ( HS_DIAGCROSS, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 5 )
+									brush.CreateHatchBrush ( HS_FDIAGONAL, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 6 )
+									brush.CreateHatchBrush ( HS_HORIZONTAL, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+								else if ( pDoc -> G_Group.GetAt (G_Number).E_FillPattern.GetAt (E_Number) == 7 )
+									brush.CreateHatchBrush ( HS_VERTICAL, pDoc -> G_Group.GetAt (G_Number).E_FillColor.GetAt (E_Number) ) ;
+
+								CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+								pDC -> Ellipse ( pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].left, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].top, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].right, pDoc -> G_Group.GetAt (G_Number).Ellipse [E_Number].bottom ) ;
+								pDC -> SelectObject ( oldPen ) ;
+								pDC -> SelectObject ( oldBrush ) ;
+							}
+						}
+					}
+					E_Number++ ;
+				}
+
+				// 그룹화 객체중 텍스트를 출력
+				else if ( pDoc -> G_Group.GetAt (G_Number).What.GetAt (i) == _T ("Text") ) {
+					// 폰트 지정한 경우
+					if ( pDoc -> G_Group.GetAt (G_Number).Text.GetAt ( Text_Number ).IsFont == 'o' ) {
+
+						CFont Font ;
+						Font.CreateFontIndirect ( &(pDoc -> G_Group.GetAt (G_Number).Text.GetAt ( Text_Number ).Font) ) ;
+						CFont* def_font = pDC -> SelectObject ( &Font ) ;
+						pDC -> SetTextColor ( pDoc -> G_Group.GetAt (G_Number).Text.GetAt ( Text_Number ).Color ) ;
+
+						// 배경색 추가한 경우
+						if ( pDoc -> G_Group.GetAt (G_Number).Text.GetAt ( Text_Number ).IsNoFill == 'x' ) {
+							pDC->SetBkMode(TRANSPARENT);
+							pDC -> SelectStockObject ( NULL_PEN ) ;
+							CBrush brush ;
+							brush.CreateSolidBrush ( pDoc -> G_Group.GetAt (G_Number).Text.GetAt ( Text_Number ).BGColor ) ;
+							CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+
+							pDC -> Rectangle ( pDoc -> G_Group.GetAt (G_Number).Text.GetAt (Text_Number).Text_Rect.left, pDoc -> G_Group.GetAt (G_Number).Text.GetAt (Text_Number).Text_Rect.top,
+								pDoc -> G_Group.GetAt (G_Number).Text.GetAt (Text_Number).Text_Rect.right, pDoc -> G_Group.GetAt (G_Number).Text.GetAt (Text_Number).Text_Rect.bottom ) ;
+							pDC -> SelectObject ( oldBrush ) ;
+						}
+
+						pDC -> TextOut ( pDoc ->  G_Group.GetAt (G_Number).Text.GetAt (Text_Number).Location.x, pDoc ->  G_Group.GetAt (G_Number).Text.GetAt (Text_Number).Location.y + pDoc ->  G_Group.GetAt (G_Number).Text.GetAt (Text_Number).Font.lfHeight,
+							pDoc ->  G_Group.GetAt (G_Number).Text.GetAt (Text_Number).Text ) ;
+						pDC -> SelectObject ( def_font ) ;
+					}
+					// 폰트 지정을 하지 않은 경우
+					else {
+
+						// 배경색 추가한 경우
+						if ( pDoc -> G_Group.GetAt (G_Number).Text.GetAt (Text_Number).IsNoFill == 'x' ) {
+							pDC->SetBkMode(TRANSPARENT);
+							pDC -> SelectStockObject ( NULL_PEN ) ;
+							CBrush brush ;
+							brush.CreateSolidBrush ( pDoc -> G_Group.GetAt (G_Number).Text.GetAt (Text_Number).BGColor ) ;
+							CBrush* oldBrush = pDC->SelectObject( &brush ) ;
+
+							pDC -> Rectangle ( pDoc -> G_Group.GetAt (G_Number).Text.GetAt (Text_Number).Text_Rect.left, pDoc -> G_Group.GetAt (G_Number).Text.GetAt (Text_Number).Text_Rect.top,
+								pDoc -> G_Group.GetAt (G_Number).Text.GetAt (Text_Number).Text_Rect.right, pDoc -> G_Group.GetAt (G_Number).Text.GetAt (Text_Number).Text_Rect.bottom ) ;
+							pDC -> SelectObject ( oldBrush ) ;
+						}
+
+						pDC -> TextOut ( pDoc ->  G_Group.GetAt (G_Number).Text.GetAt (Text_Number).Location.x, pDoc ->  G_Group.GetAt (G_Number).Text.GetAt (Text_Number).Location.y,
+							pDoc ->  G_Group.GetAt (G_Number).Text.GetAt (Text_Number).Text ) ;
+
+					}
+				}
+			}
+		}
 	}
 
-	if ( m_IsSelectGroup == 'o' ) {
+	if ( m_IsSelectGroup == 'o' || G_IsMakeGroup == 'o' ) {
 		CPen pen ( PS_DOT, 1.8, RGB (0, 0, 150) ) ;
 		CPen *Draw_Pen = pDC -> SelectObject(&pen);
 		pDC -> SelectStockObject ( NULL_BRUSH ) ;
@@ -3328,10 +4318,10 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 	}
 	// 텍스트를 입력 하는 경우
 	else if ( Text_IsText == 'o' && Text_IsKeyDown == 'x' ) {
-		Text_Current = pDoc -> Text_Text.GetSize () ;
-		pDoc -> Text_Text.SetSize ( pDoc -> Text_Text.GetSize () + 1 ) ;
+		Text_Current = pDoc -> Text_Text.GetCount () ;
+		pDoc -> Text_Text.SetSize ( pDoc -> Text_Text.GetCount () + 1 ) ;
 		pDoc -> What.Add ( _T("Text") ) ;
-		pDoc -> Text_Location.Add ( pDoc->What.GetSize () - 1 ) ;
+		pDoc -> Text_Location.Add ( pDoc->What.GetCount () - 1 ) ;
 		pDoc -> Text_Count++ ;
 		pDoc -> Text_Text.GetAt ( Text_Current ).Location = point ;
 
@@ -3584,7 +4574,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 				M_Start.x = point.x ;
 			}
 		}
-		else {
+		else if ( G_IsMakeGroup != 'o' ) {
 			M_IsLineSelect = 'x' ;
 			M_IsRectSelect = 'x' ;
 			M_IsEllipseSelect = 'x' ;
@@ -3622,6 +4612,7 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 			int LTRT_Number = pDoc -> LTRT_Count - 1;
 			int RTLT_Number = pDoc -> RTLT_Count - 1;
 			int Text_Number = pDoc -> Text_Count - 1;
+			int G_Number = pDoc -> G_Count - 1 ;
 
 			// 선택한 좌표에 객체가 있는지 전부 확인합니다.
 			// 늦게 그린 객체부터 확인합니다.
@@ -4007,6 +4998,22 @@ void CGraphicEditorView::OnLButtonDown(UINT nFlags, CPoint point)
 							Invalidate () ; Text_IsChange = 'o' ; Find = 'o' ; break ;
 					}
 					Text_Number-- ;
+				}
+				else if ( pDoc -> What.GetAt (i-1) == _T ("G") ) {
+					if ( pDoc -> G_Group.GetAt ( G_Number ).GroupBox.left - 2 <= point.x && pDoc -> G_Group.GetAt ( G_Number ).GroupBox.right + 2 >= point.x &&
+						pDoc -> G_Group.GetAt ( G_Number ).GroupBox.top - 2 <= point.y && pDoc -> G_Group.GetAt ( G_Number ).GroupBox.bottom + 2 >= point.y ) {
+
+							M_Rect.top = pDoc -> G_Group.GetAt ( G_Number ).GroupBox.top - 2 ;
+							M_Rect.bottom = pDoc -> G_Group.GetAt ( G_Number ).GroupBox.bottom + 2 ;
+							M_Rect.left = pDoc -> G_Group.GetAt ( G_Number ).GroupBox.left - 2 ;
+							M_Rect.right = pDoc -> G_Group.GetAt ( G_Number ).GroupBox.right + 2 ;
+
+							M_IsSelect = 'o' ;	M_Start.x = point.x ; M_Start.y = point.y ;
+							M_What.Format ( _T ("G") ) ; M_Number = G_Number ;
+							M_IsDraw = 'o' ; P_IsContinue = 'x' ; Text_IsChange = 'x' ;
+							Invalidate () ; Find = 'o' ; break ;
+					}
+					G_Number-- ;
 				}
 
 			}
@@ -4729,6 +5736,7 @@ void CGraphicEditorView::OnMouseMove(UINT nFlags, CPoint point)
 			M_Start.x = point.x ;
 			M_Start.y = point.y ;
 		}
+		// 텍스트를 이동하는 경우
 		else if ( M_What == _T ("Text") ) {
 			pDoc -> Text_Text.GetAt ( M_Number ).Text_Rect.top += point.y - M_Start.y ;
 			pDoc -> Text_Text.GetAt ( M_Number ).Text_Rect.bottom += point.y - M_Start.y ;
@@ -4741,10 +5749,50 @@ void CGraphicEditorView::OnMouseMove(UINT nFlags, CPoint point)
 			M_Start.x = point.x ;
 			M_Start.y = point.y ;
 		}
+		// 그룹화를 이동하는 경우
+		else if ( M_What == _T ("G") ) {
+
+			for ( int i = 0 ; i < pDoc -> G_Group.GetAt (M_Number).Line.GetCount () ; i++ ) {
+				pDoc -> G_Group.GetAt (M_Number).Line.GetAt (i).Start.x += point.x - M_Start.x ;
+				pDoc -> G_Group.GetAt (M_Number).Line.GetAt (i).Start.y += point.y - M_Start.y ;
+				pDoc -> G_Group.GetAt (M_Number).Line.GetAt (i).Last.x += point.x - M_Start.x ;
+				pDoc -> G_Group.GetAt (M_Number).Line.GetAt (i).Last.y += point.y - M_Start.y ;
+			}
+			for ( int i = 0 ; i < pDoc -> G_Group.GetAt (M_Number).Poly.GetCount () ; i++ ) {
+				for ( int j = 0 ; j < pDoc -> G_Group.GetAt (M_Number).Poly.GetAt (i).Poly_point.GetCount () ; j++ ) {
+					pDoc -> G_Group.GetAt (M_Number).Poly.GetAt (i).Poly_point.GetAt (j).x += point.x - M_Start.x ;
+					pDoc -> G_Group.GetAt (M_Number).Poly.GetAt (i).Poly_point.GetAt (j).y += point.y - M_Start.y ;
+				}
+			}
+			for ( int i = 0 ; i < pDoc -> G_Group.GetAt (M_Number).Rect.GetCount () ; i++ ) {
+				pDoc -> G_Group.GetAt (M_Number).Rect.GetAt (i).left += point.x - M_Start.x ;
+				pDoc -> G_Group.GetAt (M_Number).Rect.GetAt (i).top += point.y - M_Start.y ;
+				pDoc -> G_Group.GetAt (M_Number).Rect.GetAt (i).right += point.x - M_Start.x ;
+				pDoc -> G_Group.GetAt (M_Number).Rect.GetAt (i).bottom += point.y - M_Start.y ;
+			}
+			for ( int i = 0 ; i < pDoc -> G_Group.GetAt (M_Number).Ellipse.GetCount () ; i++ ) {
+				pDoc -> G_Group.GetAt (M_Number).Ellipse.GetAt (i).left += point.x - M_Start.x ;
+				pDoc -> G_Group.GetAt (M_Number).Ellipse.GetAt (i).top += point.y - M_Start.y ;
+				pDoc -> G_Group.GetAt (M_Number).Ellipse.GetAt (i).right += point.x - M_Start.x ;
+				pDoc -> G_Group.GetAt (M_Number).Ellipse.GetAt (i).bottom += point.y - M_Start.y ;
+			}
+			for ( int i = 0 ; i < pDoc -> G_Group.GetAt (M_Number).Text.GetCount () ; i++ ) {
+				pDoc -> G_Group.GetAt (M_Number).Text.GetAt (i).Text_Rect.left += point.x - M_Start.x ;
+				pDoc -> G_Group.GetAt (M_Number).Text.GetAt (i).Text_Rect.top += point.y - M_Start.y ;
+				pDoc -> G_Group.GetAt (M_Number).Text.GetAt (i).Text_Rect.right += point.x - M_Start.x ;
+				pDoc -> G_Group.GetAt (M_Number).Text.GetAt (i).Text_Rect.bottom += point.y - M_Start.y ;
+
+				pDoc -> G_Group.GetAt (M_Number).Text.GetAt (i).Location.x += point.x - M_Start.x ;
+				pDoc -> G_Group.GetAt (M_Number).Text.GetAt (i).Location.y += point.y - M_Start.y ;
+			}
+
+			M_Start.x = point.x ;
+			M_Start.y = point.y ;
+		}
 
 		Invalidate () ;
 	}
-	else if ( m_IsSelectGroup == 'o' ) {
+	else if ( m_IsSelectGroup == 'o' && G_IsMakeGroup == 'x' ) {
 		G_Include.right += point.x - G_Start.x ;
 		G_Include.bottom += point.y - G_Start.y ;
 
@@ -4964,6 +6012,12 @@ void CGraphicEditorView::OnLButtonUp(UINT nFlags, CPoint point)
 				for ( int i = 0 ; i < pDoc -> P_Poly.GetAt ( M_Number ).Poly_point.GetCount () ; i++ )
 					P_Insert.Poly_point.SetAt ( i, pDoc -> P_Poly.GetAt ( M_Number ).Poly_point.GetAt (i) ) ;
 			}
+		}
+		else if ( M_What == "G" ) {
+			pDoc -> G_Group.GetAt (M_Number).GroupBox.top = M_Rect.top + 2 ;
+			pDoc -> G_Group.GetAt (M_Number).GroupBox.bottom = M_Rect.bottom - 2 ;
+			pDoc -> G_Group.GetAt (M_Number).GroupBox.left = M_Rect.left + 2 ;
+			pDoc -> G_Group.GetAt (M_Number).GroupBox.right = M_Rect.right - 2 ;
 		}
 		Invalidate () ;
 		M_IsSelect = 'x' ;
@@ -5203,236 +6257,9 @@ void CGraphicEditorView::OnLButtonUp(UINT nFlags, CPoint point)
 			G_Include.top = temp ;
 		}
 
-		G_Current = pDoc -> G_Count ;
-		pDoc -> G_Group.SetSize ( pDoc -> G_Count + 1 ) ;
-		pDoc -> G_Count++ ;
-
-		int L_Number = 0 ;
-		int R_Number = 0 ;
-		int P_Number = 0 ;
-		int E_Number = 0 ;
-		int T_Number = 0 ;
-		int RT_Number = 0 ;
-		int RightT_Number = 0 ;
-		int RRightT_Number = 0 ;
-		int LTRT_Number = 0 ;
-		int RTLT_Number = 0 ;
-		int Text_Number = 0 ;
-
-		G_FindCount = 0 ;
-
-		for ( int i = 0 ; i < pDoc -> What.GetCount () ; i++ ) {
-			if ( pDoc -> What.GetAt (i) == _T ("L") ) {
-				if ( pDoc -> L_Line.GetAt ( L_Number ).Start.x >= G_Include.left && pDoc -> L_Line.GetAt ( L_Number ).Start.x <= G_Include.right &&
-					 pDoc -> L_Line.GetAt ( L_Number ).Last.x >= G_Include.left && pDoc -> L_Line.GetAt ( L_Number ).Last.x <= G_Include.right &&
-					 pDoc -> L_Line.GetAt ( L_Number ).Start.y >= G_Include.top && pDoc -> L_Line.GetAt ( L_Number ).Start.y <= G_Include.bottom &&
-					 pDoc -> L_Line.GetAt ( L_Number ).Last.y >= G_Include.top && pDoc -> L_Line.GetAt ( L_Number ).Last.y <= G_Include.bottom ) {
-
-						 pDoc -> G_Group.GetAt ( G_Current ).Line.Add ( pDoc -> L_Line.GetAt ( L_Number ) ) ;
-						 pDoc -> G_Group.GetAt ( G_Current ).L_Count++ ;
-						 G_FindCount++ ;
-
-						 if ( i == 0 ) {
-							 if ( pDoc -> L_Line.GetAt ( L_Number ).Start.x >= pDoc -> L_Line.GetAt ( L_Number ).Last.x ) {
-								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> L_Line.GetAt ( L_Number ).Last.x ;
-								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> L_Line.GetAt ( L_Number ).Start.x ;
-							 }
-							 else {
-								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> L_Line.GetAt ( L_Number ).Start.x ;
-								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> L_Line.GetAt ( L_Number ).Last.x ;
-							 }
-
-							 if ( pDoc -> L_Line.GetAt ( L_Number ).Start.y >= pDoc -> L_Line.GetAt ( L_Number ).Last.y ) {
-								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> L_Line.GetAt ( L_Number ).Last.y ;
-								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> L_Line.GetAt ( L_Number ).Start.y ;
-							 }
-							 else {
-								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> L_Line.GetAt ( L_Number ).Start.y ;
-								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> L_Line.GetAt ( L_Number ).Last.y ;
-							 }
-						 }
-						 else {
-							 if ( pDoc -> L_Line.GetAt ( L_Number ).Start.x > pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right )
-								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> L_Line.GetAt ( L_Number ).Start.x ;
-							 else if ( pDoc -> L_Line.GetAt ( L_Number ).Start.x < pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left )
-								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> L_Line.GetAt ( L_Number ).Start.x ;
-
-							 if ( pDoc -> L_Line.GetAt ( L_Number ).Last.x > pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right )
-								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> L_Line.GetAt ( L_Number ).Last.x ;
-							 else if ( pDoc -> L_Line.GetAt ( L_Number ).Last.x < pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left )
-								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> L_Line.GetAt ( L_Number ).Last.x ;
-
-							 if ( pDoc -> L_Line.GetAt ( L_Number ).Start.y > pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom )
-								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> L_Line.GetAt ( L_Number ).Start.y ;
-							 else if ( pDoc -> L_Line.GetAt ( L_Number ).Start.y < pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top )
-								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> L_Line.GetAt ( L_Number ).Start.y ;
-
-							 if ( pDoc -> L_Line.GetAt ( L_Number ).Last.y > pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom )
-								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> L_Line.GetAt ( L_Number ).Last.y ;
-							 else if ( pDoc -> L_Line.GetAt ( L_Number ).Last.y < pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top )
-								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> L_Line.GetAt ( L_Number ).Last.y ;
-						 }
-				}
-				L_Number++ ;
-			}
-			else if ( pDoc -> What.GetAt (i) == _T ("P") ) {
-				
-				int j ;
-				for ( j = 0 ; j < pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetCount () ; j++ ) {
-					if ( pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (j).x < G_Include.left || pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (j).x > G_Include.right ||
-						 pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (j).y < G_Include.top || pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (j).y > G_Include.bottom )
-						break ;
-				}
-
-				if ( j == pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetCount () ) {
-					pDoc -> G_Group.GetAt ( G_Current ).Poly.SetSize (P_Number+1) ;
-					pDoc -> G_Group.GetAt ( G_Current ).Poly.GetAt (P_Number).Poly_point.SetSize (j) ;
-
-					int Max_x = pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (0).x ;
-					int Max_y = pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (0).y ;
-					int Min_x = Max_x ;
-					int Min_y = Max_y ;
-
-					for ( int k = 0 ; k < j ; k++ ) {
-						pDoc -> G_Group.GetAt ( G_Current ).Poly.GetAt (P_Number).Poly_point.SetAt (k, pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt(k)) ;
-
-						if ( Max_x < pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (k).x )
-							Max_x = pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (k).x ;
-						else if ( Min_x > pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (k).x )
-							Min_x = pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (k).x ;
-
-						if ( Max_y < pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (k).y )
-							Max_y = pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (k).y ;
-						else if ( Min_y > pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (k).y )
-							Min_y = pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (k).y ;
-					}
-					pDoc -> G_Group.GetAt ( G_Current ).Poly.GetAt (P_Number).Pattern = pDoc -> P_Poly.GetAt (P_Number).Pattern ;
-					pDoc -> G_Group.GetAt ( G_Current ).Poly.GetAt (P_Number).P_Color = pDoc -> P_Poly.GetAt (P_Number).P_Color ;
-					pDoc -> G_Group.GetAt ( G_Current ).Poly.GetAt (P_Number).thickness = pDoc -> P_Poly.GetAt (P_Number).thickness ;
-					pDoc -> G_Group.GetAt ( G_Current ).P_Count++ ;
-					G_FindCount++ ;
-
-					if ( i == 0 ) {
-						pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = Min_y ;
-						pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = Max_y ;
-						pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = Min_x ;
-						pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = Max_x ;
-					}
-					else {
-						if ( Min_x < pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left )
-							pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = Min_x ;
-						if ( Max_x > pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right )
-							pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = Max_x ;
-						if ( Max_y > pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom )
-							pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = Max_y ;
-						if ( Min_y < pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top )
-							pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = Min_y ;
-					}
-				}
-				P_Number++ ;
-			}
-			else if ( pDoc -> What.GetAt (i) == _T ("R") ) {
-				if ( pDoc -> R_Rec.GetAt ( R_Number ).top >= G_Include.top && pDoc -> R_Rec.GetAt ( R_Number ).bottom <= G_Include.bottom &&
-					 pDoc -> R_Rec.GetAt ( R_Number ).left >= G_Include.left && pDoc -> R_Rec.GetAt ( R_Number ).right <= G_Include.right ) {
-
-						 pDoc -> G_Group.GetAt ( G_Current ).Rect.Add ( pDoc -> R_Rec.GetAt ( R_Number ) ) ;
-						 pDoc -> G_Group.GetAt ( G_Current ).R_Color.Add ( pDoc -> R_Color.GetAt (R_Number) ) ;
-						 pDoc -> G_Group.GetAt ( G_Current ).R_FillColor.Add ( pDoc -> R_FillColor.GetAt (R_Number) ) ;
-						 pDoc -> G_Group.GetAt ( G_Current ).R_Count++ ;
-						 pDoc -> G_Group.GetAt ( G_Current ).R_IsNoFill.Add ( pDoc -> R_IsNoFill.GetAt (R_Number) ) ;
-						 pDoc -> G_Group.GetAt ( G_Current ).R_FillPattern.Add ( pDoc -> R_FillPattern.GetAt (R_Number) ) ;
-						 pDoc -> G_Group.GetAt ( G_Current ).R_LinePattern.Add ( pDoc -> R_LinePattern.GetAt (R_Number) ) ;
-						 pDoc -> G_Group.GetAt ( G_Current ).R_Thickness.Add ( pDoc -> R_Thickness.GetAt (R_Number) ) ;
-						 G_FindCount++ ;
-
-						 if ( i == 0 ) {
-							 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> R_Rec.GetAt ( R_Number ).top ;
-							 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> R_Rec.GetAt ( R_Number ).bottom ;
-							 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> R_Rec.GetAt ( R_Number ).left ;
-							 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> R_Rec.GetAt ( R_Number ).right ;
-						 }
-						 else {
-							 if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top > pDoc -> R_Rec.GetAt ( R_Number ).top )
-								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> R_Rec.GetAt ( R_Number ).top ;
-							 if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom < pDoc -> R_Rec.GetAt ( R_Number ).bottom )
-								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> R_Rec.GetAt ( R_Number ).bottom ;
-							 if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left > pDoc -> R_Rec.GetAt ( R_Number ).left )
-								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> R_Rec.GetAt ( R_Number ).left ;
-							 if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right < pDoc -> R_Rec.GetAt ( R_Number ).right )
-								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> R_Rec.GetAt ( R_Number ).right ;
-						 }
-				}
-				R_Number++ ;
-			}
-			else if ( pDoc -> What.GetAt (i) == _T ("E") ) {
-				if ( pDoc -> E_Ellipse.GetAt ( E_Number ).top >= G_Include.top && pDoc -> E_Ellipse.GetAt ( E_Number ).bottom <= G_Include.bottom &&
-					 pDoc -> E_Ellipse.GetAt ( E_Number ).left >= G_Include.left && pDoc -> E_Ellipse.GetAt ( E_Number ).right <= G_Include.right ) {
-
-						 pDoc -> G_Group.GetAt ( G_Current ).Ellipse.Add ( pDoc -> E_Ellipse.GetAt ( E_Number ) ) ;
-						 pDoc -> G_Group.GetAt ( G_Current ).E_Color.Add ( pDoc -> E_Color.GetAt (E_Number) ) ;
-						 pDoc -> G_Group.GetAt ( G_Current ).E_FillColor.Add ( pDoc -> E_FillColor.GetAt (E_Number) ) ;
-						 pDoc -> G_Group.GetAt ( G_Current ).E_Count++ ;
-						 pDoc -> G_Group.GetAt ( G_Current ).E_IsNoFill.Add ( pDoc -> E_IsNoFill.GetAt (E_Number) ) ;
-						 pDoc -> G_Group.GetAt ( G_Current ).E_FillPattern.Add ( pDoc -> E_FillPattern.GetAt (E_Number) ) ;
-						 pDoc -> G_Group.GetAt ( G_Current ).E_LinePattern.Add ( pDoc -> E_LinePattern.GetAt (E_Number) ) ;
-						 pDoc -> G_Group.GetAt ( G_Current ).E_Thickness.Add ( pDoc -> E_Thickness.GetAt (E_Number) ) ;
-						 G_FindCount++ ;
-
-						 if ( i == 0 ) {
-							 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> E_Ellipse.GetAt ( E_Number ).top ;
-							 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> E_Ellipse.GetAt ( E_Number ).bottom ;
-							 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> E_Ellipse.GetAt ( E_Number ).left ;
-							 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> E_Ellipse.GetAt ( E_Number ).right ;
-						 }
-						 else {
-							 if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top > pDoc -> E_Ellipse.GetAt ( E_Number ).top )
-								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> E_Ellipse.GetAt ( E_Number ).top ;
-							 if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom < pDoc -> E_Ellipse.GetAt ( E_Number ).bottom )
-								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> E_Ellipse.GetAt ( E_Number ).bottom ;
-							 if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left > pDoc -> E_Ellipse.GetAt ( E_Number ).left )
-								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> E_Ellipse.GetAt ( E_Number ).left ;
-							 if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right < pDoc -> E_Ellipse.GetAt ( E_Number ).right )
-								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> E_Ellipse.GetAt ( E_Number ).right ;
-						 }
-				}
-				E_Number++ ;
-			}
-			else if ( pDoc -> What.GetAt (i) == _T ("Text") ) {
-				if ( pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.top >= G_Include.top && pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.bottom <= G_Include.bottom &&
-					 pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.left >= G_Include.left && pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.right <= G_Include.right ) {
-
-						 pDoc -> G_Group.GetAt ( G_Current ).Text.Add ( pDoc -> Text_Text.GetAt ( Text_Number ) ) ;
-						 pDoc -> G_Group.GetAt ( G_Current ).Text_Count++ ;
-						 G_FindCount++ ;
-
-						 if ( i == 0 ) {
-							 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.top ;
-							 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.bottom ;
-							 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.left ;
-							 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.right ;
-						 }
-						 else {
-							 if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top > pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.top )
-								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.top ;
-							 if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom < pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.bottom )
-								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.bottom ;
-							 if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left > pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.left )
-								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.left ;
-							 if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right < pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.right )
-								 pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.right ;
-						 }
-				}
-				Text_Number++ ;
-			}
-		}
-
-		if ( G_FindCount > 1 ) {
-			pDoc -> What.Add ( _T ("G") ) ;
-			pDoc -> G_Count++ ;
-			pDoc -> G_Location.Add ( pDoc -> What.GetCount () - 1 ) ;
-		}
-		Invalidate () ;
+		G_IsMakeGroup = 'o' ;
 		m_IsSelectGroup = 'x' ;
+		Invalidate () ;
 	}
 	
 	CScrollView::OnLButtonUp(nFlags, point);
@@ -5444,6 +6271,7 @@ void CGraphicEditorView::OnDrawline()
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 	
 	HideCaret () ;
+	G_IsMakeGroup = 'x' ;
 	Text_IsChange = 'x' ;
 	M_IsSelect = 'x' ;
 	M_IsDraw = 'x' ;
@@ -5994,6 +6822,7 @@ void CGraphicEditorView::OnDrawrec()
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 
 	HideCaret () ;
+	G_IsMakeGroup = 'x' ;
 	Text_IsChange = 'x' ;
 	M_IsSelect = 'x' ;
 	M_IsDraw = 'x' ;
@@ -6025,6 +6854,7 @@ void CGraphicEditorView::OnDrawpoly()
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 
 	HideCaret () ;
+	G_IsMakeGroup = 'x' ;
 	Text_IsChange = 'x' ;
 	M_IsSelect = 'x' ;
 	M_IsDraw = 'x' ;
@@ -6057,6 +6887,7 @@ void CGraphicEditorView::OnDrawellipse()
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 	
 	HideCaret () ;
+	G_IsMakeGroup = 'x' ;
 	Text_IsChange = 'x' ;
 	M_IsSelect = 'x' ;
 	M_IsDraw = 'x' ;
@@ -6087,6 +6918,7 @@ void CGraphicEditorView::OnSelectobject()
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 
 	HideCaret () ;
+	G_IsMakeGroup = 'x' ;
 	Text_IsChange = 'x' ;
 	M_IsSelect = 'x' ;
 	M_IsDraw = 'x' ;
@@ -6169,6 +7001,7 @@ void CGraphicEditorView::OnLButtonDblClk(UINT nFlags, CPoint point)
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
 
 	HideCaret () ;
+	G_IsMakeGroup = 'x' ;
 	Text_IsChange = 'x' ;
 	P_CanMove = 'x' ;
 	IsNormal = 'o' ;
@@ -6346,6 +7179,7 @@ void CGraphicEditorView::OnDrawtriangle()
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 	
 	HideCaret () ;
+	G_IsMakeGroup = 'x' ;
 	Text_IsChange = 'x' ;
 	M_IsSelect = 'x' ;
 	M_IsDraw = 'x' ;
@@ -6377,6 +7211,7 @@ void CGraphicEditorView::OnDrawreversetri()
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 
 	HideCaret () ;
+	G_IsMakeGroup = 'x' ;
 	Text_IsChange = 'x' ;
 	M_IsSelect = 'x' ;
 	M_IsDraw = 'x' ;
@@ -6536,6 +7371,7 @@ void CGraphicEditorView::OnRightangledtri()
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 
 	HideCaret () ;
+	G_IsMakeGroup = 'x' ;
 	Text_IsChange = 'x' ;
 	M_IsSelect = 'x' ;
 	M_IsDraw = 'x' ;
@@ -6567,6 +7403,7 @@ void CGraphicEditorView::OnRRrightangledtri()
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 
 	HideCaret () ;
+	G_IsMakeGroup = 'x' ;
 	Text_IsChange = 'x' ;
 	M_IsSelect = 'x' ;
 	M_IsDraw = 'x' ;
@@ -6598,6 +7435,7 @@ void CGraphicEditorView::OnRighttolefttri()
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 
 	HideCaret () ;
+	G_IsMakeGroup = 'x' ;
 	Text_IsChange = 'x' ;
 	M_IsSelect = 'x' ;
 	M_IsDraw = 'x' ;
@@ -6629,6 +7467,7 @@ void CGraphicEditorView::OnLefttorighttri()
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 
 	HideCaret () ;
+	G_IsMakeGroup = 'x' ;
 	Text_IsChange = 'x' ;
 	M_IsSelect = 'x' ;
 	M_IsDraw = 'x' ;
@@ -6696,6 +7535,7 @@ void CGraphicEditorView::OnText()
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 
 	M_IsSelect = 'x' ;
+	G_IsMakeGroup = 'x' ;
 	Text_IsChange = 'x' ;
 	M_IsDraw = 'x' ;
 	M_IsMove = 'x' ;
@@ -6744,6 +7584,7 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 				pDoc -> L_Count-- ;
 				pDoc -> What.RemoveAt ( pDoc -> L_Location.GetAt ( M_Number ) ) ;
 				pDoc -> L_Location.RemoveAt ( M_Number ) ;
+
 				for ( int i = M_Number ; i < pDoc -> L_Line.GetCount () ; i++ ) {
 					pDoc -> L_Location.GetAt (i)-- ;
 				}
@@ -6757,6 +7598,7 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 				int LTRT_For = 0 ;
 				int RTLT_For = 0 ;
 				int Text_For = 0 ;
+				int G_For = 0 ;
 
 				for ( int i = location ; i < pDoc -> What.GetCount () ; i++ ) {
 					if ( pDoc -> What.GetAt (i) == _T ("R") ) {
@@ -6849,6 +7691,15 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 							}
 						}
 					}
+					else if ( pDoc -> What.GetAt (i) == _T("G") ) {
+						for ( int j = G_For ; j < pDoc -> G_Location.GetCount () ; j++ ) {
+							if ( pDoc -> G_Location.GetAt (j) == i+1 ) {
+								pDoc -> G_Location.SetAt (j, i) ;
+								G_For = j ;
+								break ;
+							}
+						}
+					}
 				}
 				M_Number = 0 ;
 			}
@@ -6862,6 +7713,13 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 				pDoc -> What.RemoveAt ( pDoc -> R_Location.GetAt ( M_Number ) ) ;
 				pDoc -> R_Rec.RemoveAt ( M_Number ) ;
 				pDoc -> R_Location.RemoveAt ( M_Number ) ;
+				pDoc -> R_Color.RemoveAt ( M_Number ) ;
+				pDoc -> R_FillColor.RemoveAt ( M_Number ) ;
+				pDoc -> R_FillPattern.RemoveAt ( M_Number ) ;
+				pDoc -> R_IsNoFill.RemoveAt ( M_Number ) ;
+				pDoc -> R_LinePattern.RemoveAt ( M_Number ) ;
+				pDoc -> R_Thickness.RemoveAt ( M_Number ) ;
+
 				for ( int i = M_Number ; i < pDoc -> R_Rec.GetCount () ; i++ ) {
 					pDoc -> R_Location.GetAt (i)-- ;
 				}
@@ -6876,6 +7734,8 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 				int LTRT_For = 0 ;
 				int RTLT_For = 0 ;
 				int Text_For = 0 ;
+				int G_For = 0 ;
+
 				for ( int i = location ; i < pDoc -> What.GetCount () ; i++ ) {
 					if ( pDoc -> What.GetAt (i) == _T ("L") ) {
 						for ( int j = L_For ; j < pDoc -> L_Location.GetCount () ; j++ ) {
@@ -6967,6 +7827,15 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 							}
 						}
 					}
+					else if ( pDoc -> What.GetAt (i) == _T("G") ) {
+						for ( int j = G_For ; j < pDoc -> G_Location.GetCount () ; j++ ) {
+							if ( pDoc -> G_Location.GetAt (j) == i+1 ) {
+								pDoc -> G_Location.SetAt (j, i) ;
+								G_For = j ;
+								break ;
+							}
+						}
+					}
 				}
 				M_Number = 0 ;
 			}
@@ -6994,6 +7863,8 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 					int LTRT_For = 0 ;
 					int RTLT_For = 0 ;
 					int Text_For = 0 ;
+					int G_For = 0 ;
+
 					for ( int i = location ; i < pDoc -> What.GetCount () ; i++ ) {
 						if ( pDoc -> What.GetAt (i) == _T ("R") ) {
 							for ( int j = R_For ; j < pDoc -> R_Location.GetCount () ; j++ ) {
@@ -7085,6 +7956,15 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 								}
 							}
 						}
+						else if ( pDoc -> What.GetAt (i) == _T("G") ) {
+						for ( int j = G_For ; j < pDoc -> G_Location.GetCount () ; j++ ) {
+							if ( pDoc -> G_Location.GetAt (j) == i+1 ) {
+								pDoc -> G_Location.SetAt (j, i) ;
+								G_For = j ;
+								break ;
+							}
+						}
+					}
 					}
 				}
 				else {
@@ -7127,6 +8007,13 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 				pDoc -> E_Count-- ;
 				pDoc -> What.RemoveAt ( pDoc -> E_Location.GetAt ( M_Number ) ) ;
 				pDoc -> E_Location.RemoveAt ( M_Number ) ;
+				pDoc -> E_Color.RemoveAt ( M_Number ) ;
+				pDoc -> E_FillColor.RemoveAt ( M_Number ) ;
+				pDoc -> E_FillPattern.RemoveAt ( M_Number ) ;
+				pDoc -> E_IsNoFill.RemoveAt ( M_Number ) ;
+				pDoc -> E_LinePattern.RemoveAt ( M_Number ) ;
+				pDoc -> E_Thickness.RemoveAt ( M_Number ) ;
+
 				for ( int i = M_Number ; i < pDoc -> E_Ellipse.GetCount () ; i++ ) {
 					pDoc -> E_Location.GetAt (i)-- ;
 				}
@@ -7141,6 +8028,8 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 				int LTRT_For = 0 ;
 				int RTLT_For = 0 ;
 				int Text_For = 0 ;
+				int G_For = 0 ;
+
 				for ( int i = location ; i < pDoc -> What.GetCount () ; i++ ) {
 					if ( pDoc -> What.GetAt (i) == _T ("R") ) {
 						for ( int j = R_For ; j < pDoc -> R_Location.GetCount () ; j++ ) {
@@ -7228,6 +8117,15 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 							if ( pDoc -> Text_Location.GetAt (j) == i+1 ) {
 								pDoc -> Text_Location.SetAt (j, i) ;
 								Text_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("G") ) {
+						for ( int j = G_For ; j < pDoc -> G_Location.GetCount () ; j++ ) {
+							if ( pDoc -> G_Location.GetAt (j) == i+1 ) {
+								pDoc -> G_Location.SetAt (j, i) ;
+								G_For = j ;
 								break ;
 							}
 						}
@@ -7243,6 +8141,13 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 				pDoc -> T_Count-- ;
 				pDoc -> What.RemoveAt ( pDoc -> T_Location.GetAt ( M_Number ) ) ;
 				pDoc -> T_Location.RemoveAt ( M_Number ) ;
+				pDoc -> T_Color.RemoveAt ( M_Number ) ;
+				pDoc -> T_FillColor.RemoveAt ( M_Number ) ;
+				pDoc -> T_FillPattern.RemoveAt ( M_Number ) ;
+				pDoc -> T_IsNoFill.RemoveAt ( M_Number ) ;
+				pDoc -> T_LinePattern.RemoveAt ( M_Number ) ;
+				pDoc -> T_Thickness.RemoveAt ( M_Number ) ;
+
 				for ( int i = M_Number ; i < pDoc -> T_Triangle.GetCount () ; i++ ) {
 					pDoc -> T_Location.GetAt (i)-- ;
 				}
@@ -7257,6 +8162,8 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 				int LTRT_For = 0 ;
 				int RTLT_For = 0 ;
 				int Text_For = 0 ;
+				int G_For = 0 ;
+
 				for ( int i = location ; i < pDoc -> What.GetCount () ; i++ ) {
 					if ( pDoc -> What.GetAt (i) == _T ("R") ) {
 						for ( int j = R_For ; j < pDoc -> R_Location.GetCount () ; j++ ) {
@@ -7344,6 +8251,15 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 							if ( pDoc -> Text_Location.GetAt (j) == i+1 ) {
 								pDoc -> Text_Location.SetAt (j, i) ;
 								Text_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("G") ) {
+						for ( int j = G_For ; j < pDoc -> G_Location.GetCount () ; j++ ) {
+							if ( pDoc -> G_Location.GetAt (j) == i+1 ) {
+								pDoc -> G_Location.SetAt (j, i) ;
+								G_For = j ;
 								break ;
 							}
 						}
@@ -7359,6 +8275,13 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 				pDoc -> RT_Count-- ;
 				pDoc -> What.RemoveAt ( pDoc -> RT_Location.GetAt ( M_Number ) ) ;
 				pDoc -> RT_Location.RemoveAt ( M_Number ) ;
+				pDoc -> RT_Color.RemoveAt ( M_Number ) ;
+				pDoc -> RT_FillColor.RemoveAt ( M_Number ) ;
+				pDoc -> RT_FillPattern.RemoveAt ( M_Number ) ;
+				pDoc -> RT_IsNoFill.RemoveAt ( M_Number ) ;
+				pDoc -> RT_LinePattern.RemoveAt ( M_Number ) ;
+				pDoc -> RT_Thickness.RemoveAt ( M_Number ) ;
+
 				for ( int i = M_Number ; i < pDoc -> RT_Triangle.GetCount () ; i++ ) {
 					pDoc -> RT_Location.GetAt (i)-- ;
 				}
@@ -7373,6 +8296,8 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 				int LTRT_For = 0 ;
 				int RTLT_For = 0 ;
 				int Text_For = 0 ;
+				int G_For = 0 ;
+
 				for ( int i = location ; i < pDoc -> What.GetCount () ; i++ ) {
 					if ( pDoc -> What.GetAt (i) == _T ("R") ) {
 						for ( int j = R_For ; j < pDoc -> R_Location.GetCount () ; j++ ) {
@@ -7460,6 +8385,15 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 							if ( pDoc -> Text_Location.GetAt (j) == i+1 ) {
 								pDoc -> Text_Location.SetAt (j, i) ;
 								Text_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("G") ) {
+						for ( int j = G_For ; j < pDoc -> G_Location.GetCount () ; j++ ) {
+							if ( pDoc -> G_Location.GetAt (j) == i+1 ) {
+								pDoc -> G_Location.SetAt (j, i) ;
+								G_For = j ;
 								break ;
 							}
 						}
@@ -7475,6 +8409,13 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 				pDoc -> RightT_Count-- ;
 				pDoc -> What.RemoveAt ( pDoc -> RightT_Location.GetAt ( M_Number ) ) ;
 				pDoc -> RightT_Location.RemoveAt ( M_Number ) ;
+				pDoc -> RightT_Color.RemoveAt ( M_Number ) ;
+				pDoc -> RightT_FillColor.RemoveAt ( M_Number ) ;
+				pDoc -> RightT_FillPattern.RemoveAt ( M_Number ) ;
+				pDoc -> RightT_IsNoFill.RemoveAt ( M_Number ) ;
+				pDoc -> RightT_LinePattern.RemoveAt ( M_Number ) ;
+				pDoc -> RightT_Thickness.RemoveAt ( M_Number ) ;
+
 				for ( int i = M_Number ; i < pDoc -> RightT_Triangle.GetCount () ; i++ ) {
 					pDoc -> RightT_Location.GetAt (i)-- ;
 				}
@@ -7489,6 +8430,8 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 				int LTRT_For = 0 ;
 				int RTLT_For = 0 ;
 				int Text_For = 0 ;
+				int G_For = 0 ;
+
 				for ( int i = location ; i < pDoc -> What.GetCount () ; i++ ) {
 					if ( pDoc -> What.GetAt (i) == _T ("R") ) {
 						for ( int j = R_For ; j < pDoc -> R_Location.GetCount () ; j++ ) {
@@ -7576,6 +8519,15 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 							if ( pDoc -> Text_Location.GetAt (j) == i+1 ) {
 								pDoc -> Text_Location.SetAt (j, i) ;
 								Text_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("G") ) {
+						for ( int j = G_For ; j < pDoc -> G_Location.GetCount () ; j++ ) {
+							if ( pDoc -> G_Location.GetAt (j) == i+1 ) {
+								pDoc -> G_Location.SetAt (j, i) ;
+								G_For = j ;
 								break ;
 							}
 						}
@@ -7591,6 +8543,13 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 				pDoc -> RRightT_Count-- ;
 				pDoc -> What.RemoveAt ( pDoc -> RRightT_Location.GetAt ( M_Number ) ) ;
 				pDoc -> RRightT_Location.RemoveAt ( M_Number ) ;
+				pDoc -> RRightT_Color.RemoveAt ( M_Number ) ;
+				pDoc -> RRightT_FillColor.RemoveAt ( M_Number ) ;
+				pDoc -> RRightT_FillPattern.RemoveAt ( M_Number ) ;
+				pDoc -> RRightT_IsNoFill.RemoveAt ( M_Number ) ;
+				pDoc -> RRightT_LinePattern.RemoveAt ( M_Number ) ;
+				pDoc -> RRightT_Thickness.RemoveAt ( M_Number ) ;
+
 				for ( int i = M_Number ; i < pDoc -> RRightT_Triangle.GetCount () ; i++ ) {
 					pDoc -> RRightT_Location.GetAt (i)-- ;
 				}
@@ -7605,6 +8564,8 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 				int LTRT_For = 0 ;
 				int RTLT_For = 0 ;
 				int Text_For = 0 ;
+				int G_For = 0 ;
+
 				for ( int i = location ; i < pDoc -> What.GetCount () ; i++ ) {
 					if ( pDoc -> What.GetAt (i) == _T ("R") ) {
 						for ( int j = R_For ; j < pDoc -> R_Location.GetCount () ; j++ ) {
@@ -7692,6 +8653,15 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 							if ( pDoc -> Text_Location.GetAt (j) == i+1 ) {
 								pDoc -> Text_Location.SetAt (j, i) ;
 								Text_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("G") ) {
+						for ( int j = G_For ; j < pDoc -> G_Location.GetCount () ; j++ ) {
+							if ( pDoc -> G_Location.GetAt (j) == i+1 ) {
+								pDoc -> G_Location.SetAt (j, i) ;
+								G_For = j ;
 								break ;
 							}
 						}
@@ -7707,6 +8677,13 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 				pDoc -> LTRT_Count-- ;
 				pDoc -> What.RemoveAt ( pDoc -> LTRT_Location.GetAt ( M_Number ) ) ;
 				pDoc -> LTRT_Location.RemoveAt ( M_Number ) ;
+				pDoc -> LTRT_Color.RemoveAt ( M_Number ) ;
+				pDoc -> LTRT_FillColor.RemoveAt ( M_Number ) ;
+				pDoc -> LTRT_FillPattern.RemoveAt ( M_Number ) ;
+				pDoc -> LTRT_IsNoFill.RemoveAt ( M_Number ) ;
+				pDoc -> LTRT_LinePattern.RemoveAt ( M_Number ) ;
+				pDoc -> LTRT_Thickness.RemoveAt ( M_Number ) ;
+
 				for ( int i = M_Number ; i < pDoc -> LTRT_Triangle.GetCount () ; i++ ) {
 					pDoc -> LTRT_Location.GetAt (i)-- ;
 				}
@@ -7721,6 +8698,8 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 				int L_For = 0 ;
 				int RTLT_For = 0 ;
 				int Text_For = 0 ;
+				int G_For = 0 ;
+
 				for ( int i = location ; i < pDoc -> What.GetCount () ; i++ ) {
 					if ( pDoc -> What.GetAt (i) == _T ("R") ) {
 						for ( int j = R_For ; j < pDoc -> R_Location.GetCount () ; j++ ) {
@@ -7808,6 +8787,15 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 							if ( pDoc -> Text_Location.GetAt (j) == i+1 ) {
 								pDoc -> Text_Location.SetAt (j, i) ;
 								Text_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("G") ) {
+						for ( int j = G_For ; j < pDoc -> G_Location.GetCount () ; j++ ) {
+							if ( pDoc -> G_Location.GetAt (j) == i+1 ) {
+								pDoc -> G_Location.SetAt (j, i) ;
+								G_For = j ;
 								break ;
 							}
 						}
@@ -7823,6 +8811,13 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 				pDoc -> RTLT_Count-- ;
 				pDoc -> What.RemoveAt ( pDoc -> RTLT_Location.GetAt ( M_Number ) ) ;
 				pDoc -> RTLT_Location.RemoveAt ( M_Number ) ;
+				pDoc -> RTLT_Color.RemoveAt ( M_Number ) ;
+				pDoc -> RTLT_FillColor.RemoveAt ( M_Number ) ;
+				pDoc -> RTLT_FillPattern.RemoveAt ( M_Number ) ;
+				pDoc -> RTLT_IsNoFill.RemoveAt ( M_Number ) ;
+				pDoc -> RTLT_LinePattern.RemoveAt ( M_Number ) ;
+				pDoc -> RTLT_Thickness.RemoveAt ( M_Number ) ;
+
 				for ( int i = M_Number ; i < pDoc -> RTLT_Triangle.GetCount () ; i++ ) {
 					pDoc -> RTLT_Location.GetAt (i)-- ;
 				}
@@ -7837,6 +8832,8 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 				int LTRT_For = 0 ;
 				int L_For = 0 ;
 				int Text_For = 0 ;
+				int G_For = 0 ;
+
 				for ( int i = location ; i < pDoc -> What.GetCount () ; i++ ) {
 					if ( pDoc -> What.GetAt (i) == _T ("R") ) {
 						for ( int j = R_For ; j < pDoc -> R_Location.GetCount () ; j++ ) {
@@ -7928,6 +8925,15 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 							}
 						}
 					}
+					else if ( pDoc -> What.GetAt (i) == _T("G") ) {
+						for ( int j = G_For ; j < pDoc -> G_Location.GetCount () ; j++ ) {
+							if ( pDoc -> G_Location.GetAt (j) == i+1 ) {
+								pDoc -> G_Location.SetAt (j, i) ;
+								G_For = j ;
+								break ;
+							}
+						}
+					}
 				}
 				M_Number = 0 ;
 			}
@@ -7937,8 +8943,10 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 				int location = pDoc -> Text_Location.GetAt ( M_Number ) ;
 				pDoc -> Text_Text.RemoveAt ( M_Number ) ;
 				pDoc -> Text_Count-- ;
+				pDoc -> Text_Text.SetSize ( pDoc -> Text_Count ) ;
 				pDoc -> What.RemoveAt ( pDoc -> Text_Location.GetAt ( M_Number ) ) ;
 				pDoc -> Text_Location.RemoveAt ( M_Number ) ;
+
 				for ( int i = M_Number ; i < pDoc -> Text_Text.GetCount () ; i++ ) {
 					pDoc -> Text_Location.GetAt (i)-- ;
 				}
@@ -7953,6 +8961,8 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 				int LTRT_For = 0 ;
 				int L_For = 0 ;
 				int RTLT_For = 0 ;
+				int G_For = 0 ;
+
 				for ( int i = location ; i < pDoc -> What.GetCount () ; i++ ) {
 					if ( pDoc -> What.GetAt (i) == _T ("R") ) {
 						for ( int j = R_For ; j < pDoc -> R_Location.GetCount () ; j++ ) {
@@ -8044,8 +9054,145 @@ void CGraphicEditorView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 							}
 						}
 					}
+					else if ( pDoc -> What.GetAt (i) == _T("G") ) {
+						for ( int j = G_For ; j < pDoc -> G_Location.GetCount () ; j++ ) {
+							if ( pDoc -> G_Location.GetAt (j) == i+1 ) {
+								pDoc -> G_Location.SetAt (j, i) ;
+								G_For = j ;
+								break ;
+							}
+						}
+					}
 				}
-				M_Number = 0 ;
+			}
+			// 그룹화 객체를 삭제하는 경우
+			else if ( M_What == _T ("G") ) {
+				M_IsSelect = 'x' ;
+				M_IsDraw = 'x' ;
+				int location = pDoc -> G_Location.GetAt ( M_Number ) ;
+				pDoc -> G_Group.RemoveAt ( M_Number ) ;
+				pDoc -> G_Count-- ;
+				pDoc -> G_Group.SetSize ( pDoc -> Text_Count ) ;
+				pDoc -> What.RemoveAt ( pDoc -> G_Location.GetAt ( M_Number ) ) ;
+				pDoc -> G_Location.RemoveAt ( M_Number ) ;
+
+				for ( int i = M_Number ; i < pDoc -> Text_Text.GetCount () ; i++ ) {
+					pDoc -> G_Location.GetAt (i)-- ;
+				}
+
+				int R_For = 0 ;
+				int P_For = 0 ;
+				int E_For = 0 ;
+				int T_For = 0 ;
+				int RT_For = 0 ;
+				int RightT_For = 0 ;
+				int RRightT_For = 0 ;
+				int LTRT_For = 0 ;
+				int L_For = 0 ;
+				int RTLT_For = 0 ;
+				int Text_For = 0 ;
+
+				for ( int i = location ; i < pDoc -> What.GetCount () ; i++ ) {
+					if ( pDoc -> What.GetAt (i) == _T ("R") ) {
+						for ( int j = R_For ; j < pDoc -> R_Location.GetCount () ; j++ ) {
+							if ( pDoc -> R_Location.GetAt (j) == i+1 ) {
+								pDoc -> R_Location.SetAt (j, i) ;
+								R_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("P") ) {
+						for ( int j = P_For ; j < pDoc -> P_Location.GetCount () ; j++ ) {
+							if ( pDoc -> P_Location.GetAt (j) == i+1 ) {
+								pDoc -> P_Location.SetAt (j, i) ;
+								P_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("E") ) {
+						for ( int j = E_For ; j < pDoc -> E_Location.GetCount () ; j++ ) {
+							if ( pDoc -> E_Location.GetAt (j) == i+1 ) {
+								pDoc -> E_Location.SetAt (j, i) ;
+								E_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("T") ) {
+						for ( int j = T_For ; j < pDoc -> T_Location.GetCount () ; j++ ) {
+							if ( pDoc -> T_Location.GetAt (j) == i+1 ) {
+								pDoc -> T_Location.SetAt (j, i) ;
+								T_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("RT") ) {
+						for ( int j = RT_For ; j < pDoc -> RT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> RT_Location.GetAt (j) == i+1 ) {
+								pDoc -> RT_Location.SetAt (j, i) ;
+								RT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("RightT") ) {
+						for ( int j = RightT_For ; j < pDoc -> RightT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> RightT_Location.GetAt (j) == i+1 ) {
+								pDoc -> RightT_Location.SetAt (j, i) ;
+								RightT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("RRightT") ) {
+						for ( int j = RRightT_For ; j < pDoc -> RRightT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> RRightT_Location.GetAt (j) == i+1 ) {
+								pDoc -> RRightT_Location.SetAt (j, i) ;
+								RRightT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("LTRT") ) {
+						for ( int j = LTRT_For ; j < pDoc -> LTRT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> LTRT_Location.GetAt (j) == i+1 ) {
+								pDoc -> LTRT_Location.SetAt (j, i) ;
+								LTRT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("L") ) {
+						for ( int j = L_For ; j < pDoc -> L_Location.GetCount () ; j++ ) {
+							if ( pDoc -> L_Location.GetAt (j) == i+1 ) {
+								pDoc -> L_Location.SetAt (j, i) ;
+								L_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("RTLT") ) {
+						for ( int j = RTLT_For ; j < pDoc -> RTLT_Location.GetCount () ; j++ ) {
+							if ( pDoc -> RTLT_Location.GetAt (j) == i+1 ) {
+								pDoc -> RTLT_Location.SetAt (j, i) ;
+								RTLT_For = j ;
+								break ;
+							}
+						}
+					}
+					else if ( pDoc -> What.GetAt (i) == _T("Text") ) {
+						for ( int j = Text_For ; j < pDoc -> Text_Location.GetCount () ; j++ ) {
+							if ( pDoc -> Text_Location.GetAt (j) == i+1 ) {
+								pDoc -> Text_Location.SetAt (j, i) ;
+								Text_For = j ;
+								break ;
+							}
+						}
+					}
+				}
 			}
 
 			Invalidate () ;
@@ -8253,5 +9400,948 @@ void CGraphicEditorView::OnTextbgcolor()
 				Invalidate () ;
 			}
 		}
+	}
+}
+
+void CGraphicEditorView::OnGroup()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+
+	CGraphicEditorDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	if (!pDoc)
+		return;
+
+	if ( G_IsMakeGroup == 'o' ) {
+		G_Current = pDoc -> G_Count ;
+		pDoc -> G_Group.SetSize ( pDoc -> G_Count + 1 ) ;
+
+		int L_Number = 0 ;
+		int R_Number = 0 ;
+		int P_Number = 0 ;
+		int E_Number = 0 ;
+		int T_Number = 0 ;
+		int RT_Number = 0 ;
+		int RightT_Number = 0 ;
+		int RRightT_Number = 0 ;
+		int LTRT_Number = 0 ;
+		int RTLT_Number = 0 ;
+		int Text_Number = 0 ;
+		int P_Find = 0 ;
+		int flag = 0 ;
+
+		G_FindCount = 0 ;
+
+		for ( int i = 0 ; i < pDoc -> What.GetCount () ; i++ ) {
+			if ( pDoc -> What.GetAt (i) == _T ("L") ) {
+				if ( pDoc -> L_Line.GetAt ( L_Number ).Start.x >= G_Include.left && pDoc -> L_Line.GetAt ( L_Number ).Start.x <= G_Include.right &&
+					pDoc -> L_Line.GetAt ( L_Number ).Last.x >= G_Include.left && pDoc -> L_Line.GetAt ( L_Number ).Last.x <= G_Include.right &&
+					pDoc -> L_Line.GetAt ( L_Number ).Start.y >= G_Include.top && pDoc -> L_Line.GetAt ( L_Number ).Start.y <= G_Include.bottom &&
+					pDoc -> L_Line.GetAt ( L_Number ).Last.y >= G_Include.top && pDoc -> L_Line.GetAt ( L_Number ).Last.y <= G_Include.bottom ) {
+
+						flag++ ;
+				}
+			}
+			else if ( pDoc -> What.GetAt (i) == _T ("P") ) {
+				int j ;
+				for ( j = 0 ; j < pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetCount () ; j++ ) {
+					if ( pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (j).x < G_Include.left || pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (j).x > G_Include.right ||
+						pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (j).y < G_Include.top || pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (j).y > G_Include.bottom )
+						break ;
+				}
+
+				if ( j == pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetCount () ) {
+					flag++ ;
+				}
+			}
+			else if ( pDoc -> What.GetAt (i) == _T ("R") ) {
+				if ( pDoc -> R_Rec.GetAt ( R_Number ).top >= G_Include.top && pDoc -> R_Rec.GetAt ( R_Number ).bottom <= G_Include.bottom &&
+					pDoc -> R_Rec.GetAt ( R_Number ).left >= G_Include.left && pDoc -> R_Rec.GetAt ( R_Number ).right <= G_Include.right ) {
+						flag++ ;
+				}
+			}
+			else if ( pDoc -> What.GetAt (i) == _T ("E") ) {
+				if ( pDoc -> E_Ellipse.GetAt ( E_Number ).top >= G_Include.top && pDoc -> E_Ellipse.GetAt ( E_Number ).bottom <= G_Include.bottom &&
+					pDoc -> E_Ellipse.GetAt ( E_Number ).left >= G_Include.left && pDoc -> E_Ellipse.GetAt ( E_Number ).right <= G_Include.right ) {
+						flag++ ;
+				}
+			}
+			else if ( pDoc -> What.GetAt (i) == _T ("Text") ) {
+				if ( pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.top >= G_Include.top && pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.bottom <= G_Include.bottom &&
+					pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.left >= G_Include.left && pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.right <= G_Include.right ) {
+						flag++ ;
+				}
+			}
+
+			if ( flag == 2 )
+				break ;
+
+		}
+
+		if ( flag == 2 ) {
+			for ( int i = 0 ; i < pDoc -> What.GetCount () ; i++ ) {
+				if ( pDoc -> What.GetAt (i) == _T ("L") ) {
+					if ( pDoc -> L_Line.GetAt ( L_Number ).Start.x >= G_Include.left && pDoc -> L_Line.GetAt ( L_Number ).Start.x <= G_Include.right &&
+						pDoc -> L_Line.GetAt ( L_Number ).Last.x >= G_Include.left && pDoc -> L_Line.GetAt ( L_Number ).Last.x <= G_Include.right &&
+						pDoc -> L_Line.GetAt ( L_Number ).Start.y >= G_Include.top && pDoc -> L_Line.GetAt ( L_Number ).Start.y <= G_Include.bottom &&
+						pDoc -> L_Line.GetAt ( L_Number ).Last.y >= G_Include.top && pDoc -> L_Line.GetAt ( L_Number ).Last.y <= G_Include.bottom ) {
+
+							pDoc -> G_Group.GetAt ( G_Current ).Line.Add ( pDoc -> L_Line.GetAt ( L_Number ) ) ;
+							pDoc -> G_Group.GetAt ( G_Current ).What.Add ( _T ("L") ) ;
+							pDoc -> G_Group.GetAt ( G_Current ).L_Count++ ;
+
+							if ( G_FindCount == 0 ) {
+								if ( pDoc -> L_Line.GetAt ( L_Number ).Start.x >= pDoc -> L_Line.GetAt ( L_Number ).Last.x ) {
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> L_Line.GetAt ( L_Number ).Last.x ;
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> L_Line.GetAt ( L_Number ).Start.x ;
+								}
+								else {
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> L_Line.GetAt ( L_Number ).Start.x ;
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> L_Line.GetAt ( L_Number ).Last.x ;
+								}
+
+								if ( pDoc -> L_Line.GetAt ( L_Number ).Start.y >= pDoc -> L_Line.GetAt ( L_Number ).Last.y ) {
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> L_Line.GetAt ( L_Number ).Last.y ;
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> L_Line.GetAt ( L_Number ).Start.y ;
+								}
+								else {
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> L_Line.GetAt ( L_Number ).Start.y ;
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> L_Line.GetAt ( L_Number ).Last.y ;
+								}
+							}
+							else {
+								if ( pDoc -> L_Line.GetAt ( L_Number ).Start.x > pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right )
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> L_Line.GetAt ( L_Number ).Start.x ;
+								else if ( pDoc -> L_Line.GetAt ( L_Number ).Start.x < pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left )
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> L_Line.GetAt ( L_Number ).Start.x ;
+
+								if ( pDoc -> L_Line.GetAt ( L_Number ).Last.x > pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right )
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> L_Line.GetAt ( L_Number ).Last.x ;
+								else if ( pDoc -> L_Line.GetAt ( L_Number ).Last.x < pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left )
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> L_Line.GetAt ( L_Number ).Last.x ;
+
+								if ( pDoc -> L_Line.GetAt ( L_Number ).Start.y > pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom )
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> L_Line.GetAt ( L_Number ).Start.y ;
+								else if ( pDoc -> L_Line.GetAt ( L_Number ).Start.y < pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top )
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> L_Line.GetAt ( L_Number ).Start.y ;
+
+								if ( pDoc -> L_Line.GetAt ( L_Number ).Last.y > pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom )
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> L_Line.GetAt ( L_Number ).Last.y ;
+								else if ( pDoc -> L_Line.GetAt ( L_Number ).Last.y < pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top )
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> L_Line.GetAt ( L_Number ).Last.y ;
+							}
+							G_FindCount++ ;
+
+							pDoc -> L_Line.RemoveAt ( L_Number ) ;
+							int location = pDoc -> L_Location.GetAt ( L_Number ) ;
+							pDoc -> L_Count-- ;
+							pDoc -> What.RemoveAt ( pDoc -> L_Location.GetAt ( L_Number ) ) ;
+							pDoc -> L_Location.RemoveAt ( L_Number ) ;
+
+							for ( int i = L_Number ; i < pDoc -> L_Line.GetCount () ; i++ ) {
+								pDoc -> L_Location.GetAt (i)-- ;
+							}
+							int R_For = 0 ;
+							int P_For = 0 ;
+							int E_For = 0 ;
+							int T_For = 0 ;
+							int RT_For = 0 ;
+							int RightT_For = 0 ;
+							int RRightT_For = 0 ;
+							int LTRT_For = 0 ;
+							int RTLT_For = 0 ;
+							int Text_For = 0 ;
+							int G_For = 0 ;
+
+							for ( int i = location ; i < pDoc -> What.GetCount () ; i++ ) {
+								if ( pDoc -> What.GetAt (i) == _T ("R") ) {
+									for ( int j = R_For ; j < pDoc -> R_Location.GetCount () ; j++ ) {
+										if ( pDoc -> R_Location.GetAt (j) == i+1 ) {
+											pDoc -> R_Location.SetAt (j, i) ;
+											R_For = j ;
+											break ;
+										}
+									}
+								}
+								else if ( pDoc -> What.GetAt (i) == _T("P") ) {
+									for ( int j = P_For ; j < pDoc -> P_Location.GetCount () ; j++ ) {
+										if ( pDoc -> P_Location.GetAt (j) == i+1 ) {
+											pDoc -> P_Location.SetAt (j, i) ;
+											P_For = j ;
+											break ;
+										}
+									}
+								}
+								else if ( pDoc -> What.GetAt (i) == _T("E") ) {
+									for ( int j = E_For ; j < pDoc -> E_Location.GetCount () ; j++ ) {
+										if ( pDoc -> E_Location.GetAt (j) == i+1 ) {
+											pDoc -> E_Location.SetAt (j, i) ;
+											E_For = j ;
+											break ;
+										}
+									}
+								}
+								else if ( pDoc -> What.GetAt (i) == _T("T") ) {
+									for ( int j = T_For ; j < pDoc -> T_Location.GetCount () ; j++ ) {
+										if ( pDoc -> T_Location.GetAt (j) == i+1 ) {
+											pDoc -> T_Location.SetAt (j, i) ;
+											T_For = j ;
+											break ;
+										}
+									}
+								}
+								else if ( pDoc -> What.GetAt (i) == _T("RT") ) {
+									for ( int j = RT_For ; j < pDoc -> RT_Location.GetCount () ; j++ ) {
+										if ( pDoc -> RT_Location.GetAt (j) == i+1 ) {
+											pDoc -> RT_Location.SetAt (j, i) ;
+											RT_For = j ;
+											break ;
+										}
+									}
+								}
+								else if ( pDoc -> What.GetAt (i) == _T("RightT") ) {
+									for ( int j = RightT_For ; j < pDoc -> RightT_Location.GetCount () ; j++ ) {
+										if ( pDoc -> RightT_Location.GetAt (j) == i+1 ) {
+											pDoc -> RightT_Location.SetAt (j, i) ;
+											RightT_For = j ;
+											break ;
+										}
+									}
+								}
+								else if ( pDoc -> What.GetAt (i) == _T("RRightT") ) {
+									for ( int j = RRightT_For ; j < pDoc -> RRightT_Location.GetCount () ; j++ ) {
+										if ( pDoc -> RRightT_Location.GetAt (j) == i+1 ) {
+											pDoc -> RRightT_Location.SetAt (j, i) ;
+											RRightT_For = j ;
+											break ;
+										}
+									}
+								}
+								else if ( pDoc -> What.GetAt (i) == _T("LTRT") ) {
+									for ( int j = LTRT_For ; j < pDoc -> LTRT_Location.GetCount () ; j++ ) {
+										if ( pDoc -> LTRT_Location.GetAt (j) == i+1 ) {
+											pDoc -> LTRT_Location.SetAt (j, i) ;
+											LTRT_For = j ;
+											break ;
+										}
+									}
+								}
+								else if ( pDoc -> What.GetAt (i) == _T("RTLT") ) {
+									for ( int j = RTLT_For ; j < pDoc -> RTLT_Location.GetCount () ; j++ ) {
+										if ( pDoc -> RTLT_Location.GetAt (j) == i+1 ) {
+											pDoc -> RTLT_Location.SetAt (j, i) ;
+											RTLT_For = j ;
+											break ;
+										}
+									}
+								}
+								else if ( pDoc -> What.GetAt (i) == _T("Text") ) {
+									for ( int j = Text_For ; j < pDoc -> Text_Location.GetCount () ; j++ ) {
+										if ( pDoc -> Text_Location.GetAt (j) == i+1 ) {
+											pDoc -> Text_Location.SetAt (j, i) ;
+											Text_For = j ;
+											break ;
+										}
+									}
+								}
+								else if ( pDoc -> What.GetAt (i) == _T("G") ) {
+									for ( int j = G_For ; j < pDoc -> G_Location.GetCount () ; j++ ) {
+										if ( pDoc -> G_Location.GetAt (j) == i+1 ) {
+											pDoc -> G_Location.SetAt (j, i) ;
+											G_For = j ;
+											break ;
+										}
+									}
+								}
+							}
+							i-- ;
+							L_Number-- ;
+					}
+					L_Number++ ;
+				}
+				else if ( pDoc -> What.GetAt (i) == _T ("P") ) {
+
+					int j ;
+					for ( j = 0 ; j < pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetCount () ; j++ ) {
+						if ( pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (j).x < G_Include.left || pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (j).x > G_Include.right ||
+							pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (j).y < G_Include.top || pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (j).y > G_Include.bottom )
+							break ;
+					}
+
+					if ( j == pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetCount () ) {
+						pDoc -> G_Group.GetAt ( G_Current ).What.Add ( _T ("P") ) ;
+						pDoc -> G_Group.GetAt ( G_Current ).Poly.SetSize (P_Find+1) ;
+						pDoc -> G_Group.GetAt ( G_Current ).Poly.GetAt (P_Find).Poly_point.SetSize (j) ;
+
+						int Max_x = pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (0).x ;
+						int Max_y = pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (0).y ;
+						int Min_x = Max_x ;
+						int Min_y = Max_y ;
+
+						for ( int k = 0 ; k < j ; k++ ) {
+							pDoc -> G_Group.GetAt ( G_Current ).Poly.GetAt (P_Find).Poly_point.SetAt (k, pDoc -> P_Poly.GetAt (P_Number).Poly_point.GetAt(k)) ;
+
+							if ( Max_x < pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (k).x )
+								Max_x = pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (k).x ;
+							else if ( Min_x > pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (k).x )
+								Min_x = pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (k).x ;
+
+							if ( Max_y < pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (k).y )
+								Max_y = pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (k).y ;
+							else if ( Min_y > pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (k).y )
+								Min_y = pDoc -> P_Poly.GetAt ( P_Number ).Poly_point.GetAt (k).y ;
+						}
+						pDoc -> G_Group.GetAt ( G_Current ).Poly.GetAt (P_Find).Pattern = pDoc -> P_Poly.GetAt (P_Number).Pattern ;
+						pDoc -> G_Group.GetAt ( G_Current ).Poly.GetAt (P_Find).P_Color = pDoc -> P_Poly.GetAt (P_Number).P_Color ;
+						pDoc -> G_Group.GetAt ( G_Current ).Poly.GetAt (P_Find).thickness = pDoc -> P_Poly.GetAt (P_Number).thickness ;
+						pDoc -> G_Group.GetAt ( G_Current ).P_Count++ ;
+
+						if ( G_FindCount == 0 ) {
+							pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = Min_y ;
+							pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = Max_y ;
+							pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = Min_x ;
+							pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = Max_x ;
+						}
+						else {
+							if ( Min_x < pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left )
+								pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = Min_x ;
+							if ( Max_x > pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right )
+								pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = Max_x ;
+							if ( Max_y > pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom )
+								pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = Max_y ;
+							if ( Min_y < pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top )
+								pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = Min_y ;
+						}
+						G_FindCount++ ;
+
+						int location = pDoc -> P_Location.GetAt ( P_Number ) ;
+						pDoc -> P_Poly.RemoveAt ( P_Number ) ;
+						pDoc -> P_Count-- ;
+						pDoc -> What.RemoveAt ( pDoc -> P_Location.GetAt ( P_Number ) ) ;
+						pDoc -> P_Location.RemoveAt ( P_Number ) ;
+						for ( int i = P_Number ; i < pDoc -> P_Poly.GetCount () ; i++ ) {
+							pDoc -> P_Location.GetAt (i)-- ;
+						}
+
+						int R_For = 0 ;
+						int L_For = 0 ;
+						int E_For = 0 ;
+						int T_For = 0 ;
+						int RT_For = 0 ;
+						int RightT_For = 0 ;
+						int RRightT_For = 0 ;
+						int LTRT_For = 0 ;
+						int RTLT_For = 0 ;
+						int Text_For = 0 ;
+						int G_For = 0 ;
+
+						for ( int i = location ; i < pDoc -> What.GetCount () ; i++ ) {
+							if ( pDoc -> What.GetAt (i) == _T ("R") ) {
+								for ( int j = R_For ; j < pDoc -> R_Location.GetCount () ; j++ ) {
+									if ( pDoc -> R_Location.GetAt (j) == i+1 ) {
+										pDoc -> R_Location.SetAt (j, i) ;
+										R_For = j ;
+										break ;
+									}
+								}
+							}
+							else if ( pDoc -> What.GetAt (i) == _T("L") ) {
+								for ( int j = L_For ; j < pDoc -> L_Location.GetCount () ; j++ ) {
+									if ( pDoc -> L_Location.GetAt (j) == i+1 ) {
+										pDoc -> L_Location.SetAt (j, i) ;
+										L_For = j ;
+										break ;
+									}
+								}
+							}
+							else if ( pDoc -> What.GetAt (i) == _T("E") ) {
+								for ( int j = E_For ; j < pDoc -> E_Location.GetCount () ; j++ ) {
+									if ( pDoc -> E_Location.GetAt (j) == i+1 ) {
+										pDoc -> E_Location.SetAt (j, i) ;
+										E_For = j ;
+										break ;
+									}
+								}
+							}
+							else if ( pDoc -> What.GetAt (i) == _T("T") ) {
+								for ( int j = T_For ; j < pDoc -> T_Location.GetCount () ; j++ ) {
+									if ( pDoc -> T_Location.GetAt (j) == i+1 ) {
+										pDoc -> T_Location.SetAt (j, i) ;
+										T_For = j ;
+										break ;
+									}
+								}
+							}
+							else if ( pDoc -> What.GetAt (i) == _T("RT") ) {
+								for ( int j = RT_For ; j < pDoc -> RT_Location.GetCount () ; j++ ) {
+									if ( pDoc -> RT_Location.GetAt (j) == i+1 ) {
+										pDoc -> RT_Location.SetAt (j, i) ;
+										RT_For = j ;
+										break ;
+									}
+								}
+							}
+							else if ( pDoc -> What.GetAt (i) == _T("RightT") ) {
+								for ( int j = RightT_For ; j < pDoc -> RightT_Location.GetCount () ; j++ ) {
+									if ( pDoc -> RightT_Location.GetAt (j) == i+1 ) {
+										pDoc -> RightT_Location.SetAt (j, i) ;
+										RightT_For = j ;
+										break ;
+									}
+								}
+							}
+							else if ( pDoc -> What.GetAt (i) == _T("RRightT") ) {
+								for ( int j = RRightT_For ; j < pDoc -> RRightT_Location.GetCount () ; j++ ) {
+									if ( pDoc -> RRightT_Location.GetAt (j) == i+1 ) {
+										pDoc -> RRightT_Location.SetAt (j, i) ;
+										RRightT_For = j ;
+										break ;
+									}
+								}
+							}
+							else if ( pDoc -> What.GetAt (i) == _T("LTRT") ) {
+								for ( int j = LTRT_For ; j < pDoc -> LTRT_Location.GetCount () ; j++ ) {
+									if ( pDoc -> LTRT_Location.GetAt (j) == i+1 ) {
+										pDoc -> LTRT_Location.SetAt (j, i) ;
+										LTRT_For = j ;
+										break ;
+									}
+								}
+							}
+							else if ( pDoc -> What.GetAt (i) == _T("RTLT") ) {
+								for ( int j = RTLT_For ; j < pDoc -> RTLT_Location.GetCount () ; j++ ) {
+									if ( pDoc -> RTLT_Location.GetAt (j) == i+1 ) {
+										pDoc -> RTLT_Location.SetAt (j, i) ;
+										RTLT_For = j ;
+										break ;
+									}
+								}
+							}
+							else if ( pDoc -> What.GetAt (i) == _T("Text") ) {
+								for ( int j = Text_For ; j < pDoc -> Text_Location.GetCount () ; j++ ) {
+									if ( pDoc -> Text_Location.GetAt (j) == i+1 ) {
+										pDoc -> Text_Location.SetAt (j, i) ;
+										Text_For = j ;
+										break ;
+									}
+								}
+							}
+							else if ( pDoc -> What.GetAt (i) == _T("G") ) {
+								for ( int j = G_For ; j < pDoc -> G_Location.GetCount () ; j++ ) {
+									if ( pDoc -> G_Location.GetAt (j) == i+1 ) {
+										pDoc -> G_Location.SetAt (j, i) ;
+										G_For = j ;
+										break ;
+									}
+								}
+							}
+						}
+						P_Find++ ;
+						i-- ;
+						P_Number-- ;
+					}
+					P_Number++ ;
+				}
+				else if ( pDoc -> What.GetAt (i) == _T ("R") ) {
+					if ( pDoc -> R_Rec.GetAt ( R_Number ).top >= G_Include.top && pDoc -> R_Rec.GetAt ( R_Number ).bottom <= G_Include.bottom &&
+						pDoc -> R_Rec.GetAt ( R_Number ).left >= G_Include.left && pDoc -> R_Rec.GetAt ( R_Number ).right <= G_Include.right ) {
+
+							pDoc -> G_Group.GetAt ( G_Current ).Rect.Add ( pDoc -> R_Rec.GetAt ( R_Number ) ) ;
+							pDoc -> G_Group.GetAt ( G_Current ).R_Color.Add ( pDoc -> R_Color.GetAt (R_Number) ) ;
+							pDoc -> G_Group.GetAt ( G_Current ).R_FillColor.Add ( pDoc -> R_FillColor.GetAt (R_Number) ) ;
+							pDoc -> G_Group.GetAt ( G_Current ).R_Count++ ;
+							pDoc -> G_Group.GetAt ( G_Current ).R_IsNoFill.Add ( pDoc -> R_IsNoFill.GetAt (R_Number) ) ;
+							pDoc -> G_Group.GetAt ( G_Current ).R_FillPattern.Add ( pDoc -> R_FillPattern.GetAt (R_Number) ) ;
+							pDoc -> G_Group.GetAt ( G_Current ).R_LinePattern.Add ( pDoc -> R_LinePattern.GetAt (R_Number) ) ;
+							pDoc -> G_Group.GetAt ( G_Current ).R_Thickness.Add ( pDoc -> R_Thickness.GetAt (R_Number) ) ;
+							pDoc -> G_Group.GetAt ( G_Current ).What.Add ( _T ("R") ) ;
+
+							if ( G_FindCount == 0 ) {
+								pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> R_Rec.GetAt ( R_Number ).top ;
+								pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> R_Rec.GetAt ( R_Number ).bottom ;
+								pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> R_Rec.GetAt ( R_Number ).left ;
+								pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> R_Rec.GetAt ( R_Number ).right ;
+							}
+							else {
+								if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top > pDoc -> R_Rec.GetAt ( R_Number ).top )
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> R_Rec.GetAt ( R_Number ).top ;
+								if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom < pDoc -> R_Rec.GetAt ( R_Number ).bottom )
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> R_Rec.GetAt ( R_Number ).bottom ;
+								if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left > pDoc -> R_Rec.GetAt ( R_Number ).left )
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> R_Rec.GetAt ( R_Number ).left ;
+								if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right < pDoc -> R_Rec.GetAt ( R_Number ).right )
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> R_Rec.GetAt ( R_Number ).right ;
+							}
+							G_FindCount++ ;
+
+							pDoc -> R_Count-- ;
+							int location = pDoc -> R_Location.GetAt ( R_Number ) ;
+							pDoc -> What.RemoveAt ( pDoc -> R_Location.GetAt ( R_Number ) ) ;
+							pDoc -> R_Rec.RemoveAt ( R_Number ) ;
+							pDoc -> R_Location.RemoveAt ( R_Number ) ;
+							pDoc -> R_Color.RemoveAt ( R_Number ) ;
+							pDoc -> R_FillColor.RemoveAt ( R_Number ) ;
+							pDoc -> R_FillPattern.RemoveAt ( R_Number ) ;
+							pDoc -> R_IsNoFill.RemoveAt ( R_Number ) ;
+							pDoc -> R_LinePattern.RemoveAt ( R_Number ) ;
+							pDoc -> R_Thickness.RemoveAt ( R_Number ) ;
+
+							for ( int i = R_Number ; i < pDoc -> R_Rec.GetCount () ; i++ ) {
+								pDoc -> R_Location.GetAt (i)-- ;
+							}
+
+							int L_For = 0 ;
+							int P_For = 0 ;
+							int E_For = 0 ;
+							int T_For = 0 ;
+							int RT_For = 0 ;
+							int RightT_For = 0 ;
+							int RRightT_For = 0 ;
+							int LTRT_For = 0 ;
+							int RTLT_For = 0 ;
+							int Text_For = 0 ;
+							int G_For = 0 ;
+
+							for ( int i = location ; i < pDoc -> What.GetCount () ; i++ ) {
+								if ( pDoc -> What.GetAt (i) == _T ("L") ) {
+									for ( int j = L_For ; j < pDoc -> L_Location.GetCount () ; j++ ) {
+										if ( pDoc -> L_Location.GetAt (j) == i+1 ) {
+											pDoc -> L_Location.SetAt (j, i) ;
+											L_For = j ;
+											break ;
+										}
+									}
+								}
+								else if ( pDoc -> What.GetAt (i) == _T("P") ) {
+									for ( int j = P_For ; j < pDoc -> P_Location.GetCount () ; j++ ) {
+										if ( pDoc -> P_Location.GetAt (j) == i+1 ) {
+											pDoc -> P_Location.SetAt (j, i) ;
+											P_For = j ;
+											break ;
+										}
+									}
+								}
+								else if ( pDoc -> What.GetAt (i) == _T("E") ) {
+									for ( int j = E_For ; j < pDoc -> E_Location.GetCount () ; j++ ) {
+										if ( pDoc -> E_Location.GetAt (j) == i+1 ) {
+											pDoc -> E_Location.SetAt (j, i) ;
+											E_For = j ;
+											break ;
+										}
+									}
+								}
+								else if ( pDoc -> What.GetAt (i) == _T("T") ) {
+									for ( int j = T_For ; j < pDoc -> T_Location.GetCount () ; j++ ) {
+										if ( pDoc -> T_Location.GetAt (j) == i+1 ) {
+											pDoc -> T_Location.SetAt (j, i) ;
+											T_For = j ;
+											break ;
+										}
+									}
+								}
+								else if ( pDoc -> What.GetAt (i) == _T("RT") ) {
+									for ( int j = RT_For ; j < pDoc -> RT_Location.GetCount () ; j++ ) {
+										if ( pDoc -> RT_Location.GetAt (j) == i+1 ) {
+											pDoc -> RT_Location.SetAt (j, i) ;
+											RT_For = j ;
+											break ;
+										}
+									}
+								}
+								else if ( pDoc -> What.GetAt (i) == _T("RightT") ) {
+									for ( int j = RightT_For ; j < pDoc -> RightT_Location.GetCount () ; j++ ) {
+										if ( pDoc -> RightT_Location.GetAt (j) == i+1 ) {
+											pDoc -> RightT_Location.SetAt (j, i) ;
+											RightT_For = j ;
+											break ;
+										}
+									}
+								}
+								else if ( pDoc -> What.GetAt (i) == _T("RRightT") ) {
+									for ( int j = RRightT_For ; j < pDoc -> RRightT_Location.GetCount () ; j++ ) {
+										if ( pDoc -> RRightT_Location.GetAt (j) == i+1 ) {
+											pDoc -> RRightT_Location.SetAt (j, i) ;
+											RRightT_For = j ;
+											break ;
+										}
+									}
+								}
+								else if ( pDoc -> What.GetAt (i) == _T("LTRT") ) {
+									for ( int j = LTRT_For ; j < pDoc -> LTRT_Location.GetCount () ; j++ ) {
+										if ( pDoc -> LTRT_Location.GetAt (j) == i+1 ) {
+											pDoc -> LTRT_Location.SetAt (j, i) ;
+											LTRT_For = j ;
+											break ;
+										}
+									}
+								}
+								else if ( pDoc -> What.GetAt (i) == _T("RTLT") ) {
+									for ( int j = RTLT_For ; j < pDoc -> RTLT_Location.GetCount () ; j++ ) {
+										if ( pDoc -> RTLT_Location.GetAt (j) == i+1 ) {
+											pDoc -> RTLT_Location.SetAt (j, i) ;
+											RTLT_For = j ;
+											break ;
+										}
+									}
+								}
+								else if ( pDoc -> What.GetAt (i) == _T("Text") ) {
+									for ( int j = Text_For ; j < pDoc -> Text_Location.GetCount () ; j++ ) {
+										if ( pDoc -> Text_Location.GetAt (j) == i+1 ) {
+											pDoc -> Text_Location.SetAt (j, i) ;
+											Text_For = j ;
+											break ;
+										}
+									}
+								}
+								else if ( pDoc -> What.GetAt (i) == _T("G") ) {
+									for ( int j = G_For ; j < pDoc -> G_Location.GetCount () ; j++ ) {
+										if ( pDoc -> G_Location.GetAt (j) == i+1 ) {
+											pDoc -> G_Location.SetAt (j, i) ;
+											G_For = j ;
+											break ;
+										}
+									}
+								}
+							}
+							i-- ;
+							R_Number-- ;
+					}
+					R_Number++ ;
+				}
+				else if ( pDoc -> What.GetAt (i) == _T ("E") ) {
+					if ( pDoc -> E_Ellipse.GetAt ( E_Number ).top >= G_Include.top && pDoc -> E_Ellipse.GetAt ( E_Number ).bottom <= G_Include.bottom &&
+						pDoc -> E_Ellipse.GetAt ( E_Number ).left >= G_Include.left && pDoc -> E_Ellipse.GetAt ( E_Number ).right <= G_Include.right ) {
+
+							pDoc -> G_Group.GetAt ( G_Current ).Ellipse.Add ( pDoc -> E_Ellipse.GetAt ( E_Number ) ) ;
+							pDoc -> G_Group.GetAt ( G_Current ).E_Color.Add ( pDoc -> E_Color.GetAt (E_Number) ) ;
+							pDoc -> G_Group.GetAt ( G_Current ).E_FillColor.Add ( pDoc -> E_FillColor.GetAt (E_Number) ) ;
+							pDoc -> G_Group.GetAt ( G_Current ).E_Count++ ;
+							pDoc -> G_Group.GetAt ( G_Current ).E_IsNoFill.Add ( pDoc -> E_IsNoFill.GetAt (E_Number) ) ;
+							pDoc -> G_Group.GetAt ( G_Current ).E_FillPattern.Add ( pDoc -> E_FillPattern.GetAt (E_Number) ) ;
+							pDoc -> G_Group.GetAt ( G_Current ).E_LinePattern.Add ( pDoc -> E_LinePattern.GetAt (E_Number) ) ;
+							pDoc -> G_Group.GetAt ( G_Current ).E_Thickness.Add ( pDoc -> E_Thickness.GetAt (E_Number) ) ;
+							pDoc -> G_Group.GetAt ( G_Current ).What.Add ( _T ("E") ) ;
+
+							if ( G_FindCount == 0 ) {
+								pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> E_Ellipse.GetAt ( E_Number ).top ;
+								pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> E_Ellipse.GetAt ( E_Number ).bottom ;
+								pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> E_Ellipse.GetAt ( E_Number ).left ;
+								pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> E_Ellipse.GetAt ( E_Number ).right ;
+							}
+							else {
+								if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top > pDoc -> E_Ellipse.GetAt ( E_Number ).top )
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> E_Ellipse.GetAt ( E_Number ).top ;
+								if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom < pDoc -> E_Ellipse.GetAt ( E_Number ).bottom )
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> E_Ellipse.GetAt ( E_Number ).bottom ;
+								if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left > pDoc -> E_Ellipse.GetAt ( E_Number ).left )
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> E_Ellipse.GetAt ( E_Number ).left ;
+								if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right < pDoc -> E_Ellipse.GetAt ( E_Number ).right )
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> E_Ellipse.GetAt ( E_Number ).right ;
+							}
+							G_FindCount++ ;
+
+							int location = pDoc -> E_Location.GetAt ( E_Number ) ;
+							pDoc -> E_Ellipse.RemoveAt ( E_Number ) ;
+							pDoc -> E_Count-- ;
+							pDoc -> What.RemoveAt ( pDoc -> E_Location.GetAt ( E_Number ) ) ;
+							pDoc -> E_Location.RemoveAt ( E_Number ) ;
+							pDoc -> E_Color.RemoveAt ( E_Number ) ;
+							pDoc -> E_FillColor.RemoveAt ( E_Number ) ;
+							pDoc -> E_FillPattern.RemoveAt ( E_Number ) ;
+							pDoc -> E_IsNoFill.RemoveAt ( E_Number ) ;
+							pDoc -> E_LinePattern.RemoveAt ( E_Number ) ;
+							pDoc -> E_Thickness.RemoveAt ( E_Number ) ;
+
+							for ( int i = E_Number ; i < pDoc -> E_Ellipse.GetCount () ; i++ ) {
+								pDoc -> E_Location.GetAt (i)-- ;
+							}
+
+							int R_For = 0 ;
+							int P_For = 0 ;
+							int L_For = 0 ;
+							int T_For = 0 ;
+							int RT_For = 0 ;
+							int RightT_For = 0 ;
+							int RRightT_For = 0 ;
+							int LTRT_For = 0 ;
+							int RTLT_For = 0 ;
+							int Text_For = 0 ;
+							int G_For = 0 ;
+
+							for ( int i = location ; i < pDoc -> What.GetCount () ; i++ ) {
+								if ( pDoc -> What.GetAt (i) == _T ("R") ) {
+									for ( int j = R_For ; j < pDoc -> R_Location.GetCount () ; j++ ) {
+										if ( pDoc -> R_Location.GetAt (j) == i+1 ) {
+											pDoc -> R_Location.SetAt (j, i) ;
+											R_For = j ;
+											break ;
+										}
+									}
+								}
+								else if ( pDoc -> What.GetAt (i) == _T("P") ) {
+									for ( int j = P_For ; j < pDoc -> P_Location.GetCount () ; j++ ) {
+										if ( pDoc -> P_Location.GetAt (j) == i+1 ) {
+											pDoc -> P_Location.SetAt (j, i) ;
+											P_For = j ;
+											break ;
+										}
+									}
+								}
+								else if ( pDoc -> What.GetAt (i) == _T("L") ) {
+									for ( int j = L_For ; j < pDoc -> L_Location.GetCount () ; j++ ) {
+										if ( pDoc -> L_Location.GetAt (j) == i+1 ) {
+											pDoc -> L_Location.SetAt (j, i) ;
+											L_For = j ;
+											break ;
+										}
+									}
+								}
+								else if ( pDoc -> What.GetAt (i) == _T("T") ) {
+									for ( int j = T_For ; j < pDoc -> T_Location.GetCount () ; j++ ) {
+										if ( pDoc -> T_Location.GetAt (j) == i+1 ) {
+											pDoc -> T_Location.SetAt (j, i) ;
+											T_For = j ;
+											break ;
+										}
+									}
+								}
+								else if ( pDoc -> What.GetAt (i) == _T("RT") ) {
+									for ( int j = RT_For ; j < pDoc -> RT_Location.GetCount () ; j++ ) {
+										if ( pDoc -> RT_Location.GetAt (j) == i+1 ) {
+											pDoc -> RT_Location.SetAt (j, i) ;
+											RT_For = j ;
+											break ;
+										}
+									}
+								}
+								else if ( pDoc -> What.GetAt (i) == _T("RightT") ) {
+									for ( int j = RightT_For ; j < pDoc -> RightT_Location.GetCount () ; j++ ) {
+										if ( pDoc -> RightT_Location.GetAt (j) == i+1 ) {
+											pDoc -> RightT_Location.SetAt (j, i) ;
+											RightT_For = j ;
+											break ;
+										}
+									}
+								}
+								else if ( pDoc -> What.GetAt (i) == _T("RRightT") ) {
+									for ( int j = RRightT_For ; j < pDoc -> RRightT_Location.GetCount () ; j++ ) {
+										if ( pDoc -> RRightT_Location.GetAt (j) == i+1 ) {
+											pDoc -> RRightT_Location.SetAt (j, i) ;
+											RRightT_For = j ;
+											break ;
+										}
+									}
+								}
+								else if ( pDoc -> What.GetAt (i) == _T("LTRT") ) {
+									for ( int j = LTRT_For ; j < pDoc -> LTRT_Location.GetCount () ; j++ ) {
+										if ( pDoc -> LTRT_Location.GetAt (j) == i+1 ) {
+											pDoc -> LTRT_Location.SetAt (j, i) ;
+											LTRT_For = j ;
+											break ;
+										}
+									}
+								}
+								else if ( pDoc -> What.GetAt (i) == _T("RTLT") ) {
+									for ( int j = RTLT_For ; j < pDoc -> RTLT_Location.GetCount () ; j++ ) {
+										if ( pDoc -> RTLT_Location.GetAt (j) == i+1 ) {
+											pDoc -> RTLT_Location.SetAt (j, i) ;
+											RTLT_For = j ;
+											break ;
+										}
+									}
+								}
+								else if ( pDoc -> What.GetAt (i) == _T("Text") ) {
+									for ( int j = Text_For ; j < pDoc -> Text_Location.GetCount () ; j++ ) {
+										if ( pDoc -> Text_Location.GetAt (j) == i+1 ) {
+											pDoc -> Text_Location.SetAt (j, i) ;
+											Text_For = j ;
+											break ;
+										}
+									}
+								}
+								else if ( pDoc -> What.GetAt (i) == _T("G") ) {
+									for ( int j = G_For ; j < pDoc -> G_Location.GetCount () ; j++ ) {
+										if ( pDoc -> G_Location.GetAt (j) == i+1 ) {
+											pDoc -> G_Location.SetAt (j, i) ;
+											G_For = j ;
+											break ;
+										}
+									}
+								}
+							}
+							i-- ;
+							E_Number-- ;
+					}
+					E_Number++ ;
+				}
+				else if ( pDoc -> What.GetAt (i) == _T ("Text") ) {
+					if ( pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.top >= G_Include.top && pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.bottom <= G_Include.bottom &&
+						pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.left >= G_Include.left && pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.right <= G_Include.right ) {
+
+							pDoc -> G_Group.GetAt ( G_Current ).Text_Count++ ;
+							pDoc -> G_Group.GetAt ( G_Current ).Text.Add ( pDoc -> Text_Text.GetAt (Text_Number) ) ;
+							pDoc -> G_Group.GetAt ( G_Current ).What.Add ( _T ("Text") ) ;
+							
+							if ( G_FindCount == 0 ) {
+								pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.top ;
+								pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.bottom ;
+								pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.left ;
+								pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.right ;
+							}
+							else {
+								if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top > pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.top )
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.top = pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.top ;
+								if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom < pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.bottom )
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.bottom = pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.bottom ;
+								if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left > pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.left )
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.left = pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.left ;
+								if ( pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right < pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.right )
+									pDoc -> G_Group.GetAt ( G_Current ).GroupBox.right = pDoc -> Text_Text.GetAt ( Text_Number ).Text_Rect.right ;
+							}
+							G_FindCount++ ;
+
+							int location = pDoc -> Text_Location.GetAt ( Text_Number ) ;
+							pDoc -> Text_Text.RemoveAt ( Text_Number ) ;
+							pDoc -> Text_Count-- ;
+							pDoc -> Text_Text.SetSize ( pDoc -> Text_Count ) ;
+							pDoc -> What.RemoveAt ( pDoc -> Text_Location.GetAt ( Text_Number ) ) ;
+							pDoc -> Text_Location.RemoveAt ( Text_Number ) ;
+							for ( int i = Text_Number ; i < pDoc -> Text_Text.GetCount () ; i++ ) {
+								pDoc -> Text_Location.GetAt (i)-- ;
+							}
+
+							int R_For = 0 ;
+							int P_For = 0 ;
+							int E_For = 0 ;
+							int T_For = 0 ;
+							int RT_For = 0 ;
+							int RightT_For = 0 ;
+							int RRightT_For = 0 ;
+							int LTRT_For = 0 ;
+							int L_For = 0 ;
+							int RTLT_For = 0 ;
+							int G_For = 0 ;
+
+							for ( int i = location ; i < pDoc -> What.GetCount () ; i++ ) {
+								if ( pDoc -> What.GetAt (i) == _T ("R") ) {
+									for ( int j = R_For ; j < pDoc -> R_Location.GetCount () ; j++ ) {
+										if ( pDoc -> R_Location.GetAt (j) == i+1 ) {
+											pDoc -> R_Location.SetAt (j, i) ;
+											R_For = j ;
+											break ;
+										}
+									}
+								}
+								else if ( pDoc -> What.GetAt (i) == _T("P") ) {
+									for ( int j = P_For ; j < pDoc -> P_Location.GetCount () ; j++ ) {
+										if ( pDoc -> P_Location.GetAt (j) == i+1 ) {
+											pDoc -> P_Location.SetAt (j, i) ;
+											P_For = j ;
+											break ;
+										}
+									}
+								}
+								else if ( pDoc -> What.GetAt (i) == _T("E") ) {
+									for ( int j = E_For ; j < pDoc -> E_Location.GetCount () ; j++ ) {
+										if ( pDoc -> E_Location.GetAt (j) == i+1 ) {
+											pDoc -> E_Location.SetAt (j, i) ;
+											E_For = j ;
+											break ;
+										}
+									}
+								}
+								else if ( pDoc -> What.GetAt (i) == _T("T") ) {
+									for ( int j = T_For ; j < pDoc -> T_Location.GetCount () ; j++ ) {
+										if ( pDoc -> T_Location.GetAt (j) == i+1 ) {
+											pDoc -> T_Location.SetAt (j, i) ;
+											T_For = j ;
+											break ;
+										}
+									}
+								}
+								else if ( pDoc -> What.GetAt (i) == _T("RT") ) {
+									for ( int j = RT_For ; j < pDoc -> RT_Location.GetCount () ; j++ ) {
+										if ( pDoc -> RT_Location.GetAt (j) == i+1 ) {
+											pDoc -> RT_Location.SetAt (j, i) ;
+											RT_For = j ;
+											break ;
+										}
+									}
+								}
+								else if ( pDoc -> What.GetAt (i) == _T("RightT") ) {
+									for ( int j = RightT_For ; j < pDoc -> RightT_Location.GetCount () ; j++ ) {
+										if ( pDoc -> RightT_Location.GetAt (j) == i+1 ) {
+											pDoc -> RightT_Location.SetAt (j, i) ;
+											RightT_For = j ;
+											break ;
+										}
+									}
+								}
+								else if ( pDoc -> What.GetAt (i) == _T("RRightT") ) {
+									for ( int j = RRightT_For ; j < pDoc -> RRightT_Location.GetCount () ; j++ ) {
+										if ( pDoc -> RRightT_Location.GetAt (j) == i+1 ) {
+											pDoc -> RRightT_Location.SetAt (j, i) ;
+											RRightT_For = j ;
+											break ;
+										}
+									}
+								}
+								else if ( pDoc -> What.GetAt (i) == _T("LTRT") ) {
+									for ( int j = LTRT_For ; j < pDoc -> LTRT_Location.GetCount () ; j++ ) {
+										if ( pDoc -> LTRT_Location.GetAt (j) == i+1 ) {
+											pDoc -> LTRT_Location.SetAt (j, i) ;
+											LTRT_For = j ;
+											break ;
+										}
+									}
+								}
+								else if ( pDoc -> What.GetAt (i) == _T("L") ) {
+									for ( int j = L_For ; j < pDoc -> L_Location.GetCount () ; j++ ) {
+										if ( pDoc -> L_Location.GetAt (j) == i+1 ) {
+											pDoc -> L_Location.SetAt (j, i) ;
+											L_For = j ;
+											break ;
+										}
+									}
+								}
+								else if ( pDoc -> What.GetAt (i) == _T("RTLT") ) {
+									for ( int j = RTLT_For ; j < pDoc -> RTLT_Location.GetCount () ; j++ ) {
+										if ( pDoc -> RTLT_Location.GetAt (j) == i+1 ) {
+											pDoc -> RTLT_Location.SetAt (j, i) ;
+											RTLT_For = j ;
+											break ;
+										}
+									}
+								}
+								else if ( pDoc -> What.GetAt (i) == _T("G") ) {
+									for ( int j = G_For ; j < pDoc -> G_Location.GetCount () ; j++ ) {
+										if ( pDoc -> G_Location.GetAt (j) == i+1 ) {
+											pDoc -> G_Location.SetAt (j, i) ;
+											G_For = j ;
+											break ;
+										}
+									}
+								}
+							}
+							i-- ;
+							Text_Number--;
+					}
+					Text_Number++ ;
+				}
+			}
+
+			if ( G_FindCount > 1 ) {
+				pDoc -> What.Add ( _T ("G") ) ;
+				pDoc -> G_Count++ ;
+				pDoc -> G_Location.Add ( pDoc -> What.GetCount () - 1 ) ;
+			}
+			else {
+				pDoc -> G_Group.RemoveAt ( pDoc -> G_Count ) ;
+			}
+
+		}
+		Invalidate () ;
+		m_IsSelectGroup = 'x' ;
+		G_IsMakeGroup = 'x' ;
 	}
 }

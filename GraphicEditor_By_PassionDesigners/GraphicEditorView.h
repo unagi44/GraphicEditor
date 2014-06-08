@@ -232,6 +232,7 @@ public:
 	afx_msg void OnFillpattern();
 	afx_msg void OnLinepattern();
 	afx_msg void OnTextbgcolor();
+	afx_msg void OnGroup();
 };
 
 #ifndef _DEBUG  // GraphicEditorView.cpp의 디버그 버전

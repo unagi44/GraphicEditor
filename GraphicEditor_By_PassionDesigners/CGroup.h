@@ -9,6 +9,7 @@ class CGroup {
 public:
 	CGroup () ;
 	CRect GroupBox ;
+	CArray < CString, CString > What ;
 
 	CArray < CLine, CLine& > Line ;
 	CArray < CPolyLine, CPolyLine& > Poly ;
