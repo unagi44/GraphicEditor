@@ -10701,7 +10701,7 @@ void CGraphicEditorView::OnFillpattern()
 					}
 
 					for ( int j = 0 ; j < pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).R_FillColor.GetCount () ; j++ ) {
-						pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).R_FillColor.GetAt (j) = dlg.GetPattern () ;
+						pDoc -> G_InGroup.GetAt ( pDoc -> G_Group.GetAt ( M_Number ).Index.GetAt (i) ).R_FillPattern.GetAt (j) = dlg.GetPattern () ;
 					}
 				}
 			}
