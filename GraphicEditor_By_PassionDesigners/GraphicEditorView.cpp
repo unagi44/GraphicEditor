@@ -63,6 +63,7 @@ ON_COMMAND(ID_LinePattern, &CGraphicEditorView::OnLinepattern)
 ON_COMMAND(ID_TextBGColor, &CGraphicEditorView::OnTextbgcolor)
 ON_COMMAND(ID_Group, &CGraphicEditorView::OnGroup)
 ON_COMMAND(ID_GroupX, &CGraphicEditorView::OnGroupx)
+//ON_WM_KEYUP()
 END_MESSAGE_MAP()
 
 // CGraphicEditorView 생성/소멸
@@ -12363,4 +12364,239 @@ void CGraphicEditorView::OnGroupx()
 		M_What = _T ("x") ;
 		Invalidate () ;
 	}
+}
+
+BOOL CGraphicEditorView::PreTranslateMessage(MSG* pMsg)
+{
+	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
+
+	CGraphicEditorDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	if (!pDoc)
+		return CScrollView::PreTranslateMessage(pMsg);
+
+	BOOL bShift = ((GetKeyState(VK_SHIFT) & 0x8000) != 0); // Shift 키가 눌렸는지의 여부 저장
+	BOOL bControl = ((GetKeyState(VK_CONTROL) & 0x8000) != 0); // Control 키가 눌렸는지의 여부 저장
+	BOOL bAlt = ((GetKeyState(VK_MENU) & 0x8000) != 0);
+
+	if(bControl && !bShift && !bAlt)	// ctrl 키만을 걸러냄
+	{
+		if(pMsg->wParam == 'v' || pMsg->wParam == 'V')
+		{
+			if ( m_Copy == 'o' ) {
+				if ( m_WhatCopy == _T ("L") ) {
+					pDoc -> L_Line.Add ( pDoc -> L_Line.GetAt ( m_CopyLocation ) ) ;
+					pDoc -> L_Line.GetAt ( pDoc -> L_Count ).L_Color = pDoc -> L_Line.GetAt ( m_CopyLocation ).L_Color ;
+					pDoc -> L_Line.GetAt ( pDoc -> L_Count ).Pattern = pDoc -> L_Line.GetAt ( m_CopyLocation ).Pattern ;
+					pDoc -> L_Line.GetAt ( pDoc -> L_Count ).Thickness = pDoc -> L_Line.GetAt ( m_CopyLocation ).Thickness ;
+					pDoc -> What.Add ( _T ("L") ) ;
+					pDoc -> L_Location.Add ( pDoc -> What.GetCount () - 1 ) ;
+					pDoc -> L_Count++ ;
+					pDoc -> L_Line.GetAt ( pDoc -> L_Count - 1 ).Start.x = pDoc -> L_Line.GetAt ( m_CopyLocation ).Start.x + 10 ;
+					pDoc -> L_Line.GetAt ( pDoc -> L_Count - 1 ).Start.y = pDoc -> L_Line.GetAt ( m_CopyLocation ).Start.y + 10 ;
+					pDoc -> L_Line.GetAt ( pDoc -> L_Count - 1 ).Last.x = pDoc -> L_Line.GetAt ( m_CopyLocation ).Last.x + 10 ;
+					pDoc -> L_Line.GetAt ( pDoc -> L_Count - 1 ).Last.y = pDoc -> L_Line.GetAt ( m_CopyLocation ).Last.y + 10 ;
+				}
+			}
+			else if ( m_Cut == 'o' ) {
+				if ( m_WhatCopy == _T ("L") ) {
+					pDoc -> L_Line.Add ( pDoc -> L_Line.GetAt ( m_CopyLocation ) ) ;
+					pDoc -> What.Add ( _T ("L") );
+					pDoc -> L_Line.GetAt ( pDoc -> L_Count ).L_Color = pDoc -> L_Line.GetAt ( m_CopyLocation ).L_Color ;
+					pDoc -> L_Line.GetAt ( pDoc -> L_Count ).Pattern = pDoc -> L_Line.GetAt ( m_CopyLocation ).Pattern ;
+					pDoc -> L_Line.GetAt ( pDoc -> L_Count ).Thickness = pDoc -> L_Line.GetAt ( m_CopyLocation ).Thickness ;
+					pDoc -> L_Location.Add ( pDoc -> What.GetCount () - 1 ) ;
+					pDoc -> L_Count++ ;
+					pDoc -> L_Line.GetAt ( pDoc->L_Count-1 ).Start.x = pDoc -> L_Line.GetAt ( m_CopyLocation ).Start.x - 100000 ;
+					pDoc -> L_Line.GetAt ( pDoc->L_Count-1 ).Start.y = pDoc -> L_Line.GetAt ( m_CopyLocation ).Start.y - 100000 ;
+					pDoc -> L_Line.GetAt ( pDoc->L_Count-1 ).Last.x = pDoc -> L_Line.GetAt ( m_CopyLocation ).Last.x - 100000 ;
+					pDoc -> L_Line.GetAt ( pDoc->L_Count-1 ).Last.y = pDoc -> L_Line.GetAt ( m_CopyLocation ).Last.y - 100000 ;
+
+					m_Cut = 'x' ;
+				}
+				else if ( m_WhatCopy == _T ("P") ) {
+					pDoc -> P_Count++ ;
+					pDoc -> P_Poly.SetSize ( pDoc -> P_Count ) ;
+					for ( int i = 0 ; i < pDoc -> P_Poly.GetAt ( m_CopyLocation ).Poly_point.GetCount () ; i++ ) {
+						pDoc -> P_Poly.GetAt ( pDoc -> P_Count - 1 ).Poly_point.Add ( pDoc -> P_Poly.GetAt ( m_CopyLocation ).Poly_point.GetAt (i) ) ;
+						pDoc -> P_Poly.GetAt ( pDoc -> P_Count - 1 ).Poly_point.GetAt (i).x -= 100000 ;
+						pDoc -> P_Poly.GetAt ( pDoc -> P_Count - 1 ).Poly_point.GetAt (i).y -= 100000 ;
+					}
+					pDoc -> P_Poly.GetAt ( pDoc -> P_Count - 1 ).Pattern = pDoc -> P_Poly.GetAt ( m_CopyLocation ).Pattern ;
+					pDoc -> P_Poly.GetAt ( pDoc -> P_Count - 1 ).P_Color = pDoc -> P_Poly.GetAt ( m_CopyLocation ).P_Color ;
+					pDoc -> P_Poly.GetAt ( pDoc -> P_Count - 1 ).thickness = pDoc -> P_Poly.GetAt ( m_CopyLocation ).thickness ;
+					pDoc -> What.Add ( _T ("P") ) ;
+					pDoc -> P_Location.Add ( pDoc -> What.GetCount () - 1 ) ;
+
+					m_Cut = 'x' ;
+				}
+				else if ( m_WhatCopy == _T ("R") ) {
+					pDoc -> R_Count++ ;
+					pDoc -> R_Rec.SetSize ( pDoc -> R_Count ) ;
+					pDoc -> R_Rec.GetAt ( pDoc -> R_Count - 1 ).top = pDoc -> R_Rec.GetAt ( m_CopyLocation ).top - 100000 ;
+					pDoc -> R_Rec.GetAt ( pDoc -> R_Count - 1 ).bottom = pDoc -> R_Rec.GetAt ( m_CopyLocation ).bottom - 100000 ;
+					pDoc -> R_Rec.GetAt ( pDoc -> R_Count - 1 ).left = pDoc -> R_Rec.GetAt ( m_CopyLocation ).left - 100000 ;
+					pDoc -> R_Rec.GetAt ( pDoc -> R_Count - 1 ).right = pDoc -> R_Rec.GetAt ( m_CopyLocation ).right - 100000 ;
+					pDoc -> What.Add ( _T ("R") ) ;
+					pDoc -> R_Location.Add ( pDoc -> What.GetCount () - 1 ) ;
+					pDoc -> R_Color.Add ( pDoc -> R_Color.GetAt ( m_CopyLocation ) ) ;
+					pDoc -> R_FillColor.Add ( pDoc -> R_FillColor.GetAt ( m_CopyLocation ) ) ;
+					pDoc -> R_FillPattern.Add ( pDoc -> R_FillPattern.GetAt ( m_CopyLocation ) ) ;
+					pDoc -> R_IsNoFill.Add ( pDoc -> R_IsNoFill.GetAt ( m_CopyLocation ) ) ;
+					pDoc -> R_LinePattern.Add ( pDoc -> R_LinePattern.GetAt ( m_CopyLocation ) ) ;
+					pDoc -> R_Thickness.Add ( pDoc -> R_Thickness.GetAt ( m_CopyLocation ) ) ;
+
+					m_Cut = 'x' ;
+				}
+				else if ( m_WhatCopy == _T ("E") ) {
+					pDoc -> E_Count++ ;
+					pDoc -> E_Ellipse.SetSize ( pDoc -> E_Count ) ;
+					pDoc -> E_Ellipse.GetAt ( pDoc -> E_Count - 1 ).top = pDoc -> E_Ellipse.GetAt ( m_CopyLocation ).top - 100000 ;
+					pDoc -> E_Ellipse.GetAt ( pDoc -> E_Count - 1 ).bottom = pDoc -> E_Ellipse.GetAt ( m_CopyLocation ).bottom - 100000 ;
+					pDoc -> E_Ellipse.GetAt ( pDoc -> E_Count - 1 ).left = pDoc -> E_Ellipse.GetAt ( m_CopyLocation ).left - 100000 ;
+					pDoc -> E_Ellipse.GetAt ( pDoc -> E_Count - 1 ).right = pDoc -> E_Ellipse.GetAt ( m_CopyLocation ).right - 100000 ;
+					pDoc -> What.Add ( _T ("E") ) ;
+					pDoc -> E_Location.Add ( pDoc -> What.GetCount () - 1 ) ;
+					pDoc -> E_Color.Add ( pDoc -> E_Color.GetAt ( m_CopyLocation ) ) ;
+					pDoc -> E_FillColor.Add ( pDoc -> E_FillColor.GetAt ( m_CopyLocation ) ) ;
+					pDoc -> E_FillPattern.Add ( pDoc -> E_FillPattern.GetAt ( m_CopyLocation ) ) ;
+					pDoc -> E_IsNoFill.Add ( pDoc -> E_IsNoFill.GetAt ( m_CopyLocation ) ) ;
+					pDoc -> E_LinePattern.Add ( pDoc -> E_LinePattern.GetAt ( m_CopyLocation ) ) ;
+					pDoc -> E_Thickness.Add ( pDoc -> E_Thickness.GetAt ( m_CopyLocation ) ) ;
+
+					m_Cut = 'x' ;
+				}
+				else if ( m_WhatCopy == _T ("Text") ) {
+					pDoc -> Text_Count++ ;
+					pDoc -> Text_Text.SetSize ( pDoc -> Text_Count ) ;
+					pDoc -> What.Add ( _T ("Text") ) ;
+					pDoc -> Text_Location.Add ( pDoc -> What.GetCount () - 1 ) ;
+					pDoc -> Text_Text.GetAt ( pDoc -> Text_Count - 1 ).Text_Rect.top = pDoc -> Text_Text.GetAt ( m_CopyLocation ).Text_Rect.top - 100000 ;
+					pDoc -> Text_Text.GetAt ( pDoc -> Text_Count - 1 ).Text_Rect.bottom = pDoc -> Text_Text.GetAt ( m_CopyLocation ).Text_Rect.bottom - 100000 ;
+					pDoc -> Text_Text.GetAt ( pDoc -> Text_Count - 1 ).Text_Rect.left = pDoc -> Text_Text.GetAt ( m_CopyLocation ).Text_Rect.left - 100000 ;
+					pDoc -> Text_Text.GetAt ( pDoc -> Text_Count - 1 ).Text_Rect.right = pDoc -> Text_Text.GetAt ( m_CopyLocation ).Text_Rect.right - 100000 ;
+					pDoc -> Text_Text.GetAt ( pDoc -> Text_Count - 1 ).Location.x = pDoc -> Text_Text.GetAt ( m_CopyLocation ).Location.x - 100000 ;
+					pDoc -> Text_Text.GetAt ( pDoc -> Text_Count - 1 ).Location.y = pDoc -> Text_Text.GetAt ( m_CopyLocation ).Location.y - 100000 ;
+					pDoc -> Text_Text.GetAt ( pDoc -> Text_Count - 1 ).BGColor = pDoc -> Text_Text.GetAt ( m_CopyLocation ).BGColor ;
+					pDoc -> Text_Text.GetAt ( pDoc -> Text_Count - 1 ).Color = pDoc -> Text_Text.GetAt ( m_CopyLocation ).Color ;
+					pDoc -> Text_Text.GetAt ( pDoc -> Text_Count - 1 ).Font = pDoc -> Text_Text.GetAt ( m_CopyLocation ).Font ;
+					pDoc -> Text_Text.GetAt ( pDoc -> Text_Count - 1 ).IsFont = pDoc -> Text_Text.GetAt ( m_CopyLocation ).IsFont ;
+					pDoc -> Text_Text.GetAt ( pDoc -> Text_Count - 1 ).IsNoFill = pDoc -> Text_Text.GetAt ( m_CopyLocation ).IsNoFill ;
+
+					
+				}
+			}
+		}
+		// 특정 객체를 선택한 경우
+		if ( M_IsDraw == 'o' && Text_IsChange == 'x' ) {
+			if(pMsg->wParam == 'c' || pMsg->wParam == 'C')
+			{
+				if ( M_What == _T ("L") ) {
+					m_Cut = 'x' ;
+					m_Copy = 'o' ;
+					m_WhatCopy = _T ("L") ;
+					m_CopyLocation = M_Number ;
+				}
+			}
+			if(pMsg->wParam == 'X' || pMsg->wParam == 'x')
+			{
+				if ( M_What == _T ("L") ) {
+					pDoc -> L_Line.GetAt ( M_Number ).Start.x += 100000 ;
+					pDoc -> L_Line.GetAt ( M_Number ).Start.y += 100000 ;
+					pDoc -> L_Line.GetAt ( M_Number ).Last.x += 100000 ;
+					pDoc -> L_Line.GetAt ( M_Number ).Last.y += 100000 ;
+					M_Rect.top = 100000 ;	M_Rect.bottom = 100000 ;
+					M_Rect.left = 100000 ;  M_Rect.right = 100000 ;
+
+					m_Cut = 'o' ;
+					m_Copy = 'x' ;
+					m_WhatCopy = _T ("L") ;
+					m_CopyLocation = M_Number ;
+				}
+				else if ( M_What == _T ("P") ) {
+					for ( int i = 0 ; i < pDoc -> P_Poly.GetAt ( M_Number ).Poly_point.GetCount () ; i++ ) {
+						pDoc -> P_Poly.GetAt ( M_Number ).Poly_point.GetAt (i).x += 100000 ;
+						pDoc -> P_Poly.GetAt ( M_Number ).Poly_point.GetAt (i).y += 100000 ;
+					}
+					M_Rect.top = 100000 ;	M_Rect.bottom = 100000 ;
+					M_Rect.left = 100000 ;  M_Rect.right = 100000 ;
+
+					m_Cut = 'o' ;
+					m_Copy = 'x' ;
+					m_WhatCopy = _T ("P") ;
+					m_CopyLocation = M_Number ;
+				}
+				else if ( M_What == _T ("R") ) {
+					pDoc -> R_Rec.GetAt (M_Number).top += 100000 ;
+					pDoc -> R_Rec.GetAt (M_Number).bottom += 100000 ;
+					pDoc -> R_Rec.GetAt (M_Number).left += 100000 ;
+					pDoc -> R_Rec.GetAt (M_Number).right += 100000 ;
+
+					M_Rect.top = 100000 ;	M_Rect.bottom = 100000 ;
+					M_Rect.left = 100000 ;  M_Rect.right = 100000 ;
+
+					m_Cut = 'o' ;
+					m_Copy = 'x' ;
+					m_WhatCopy = _T ("R") ;
+					m_CopyLocation = M_Number ;
+				}
+				else if ( M_What == _T ("E") ) {
+					pDoc -> E_Ellipse.GetAt (M_Number).top += 100000 ;
+					pDoc -> E_Ellipse.GetAt (M_Number).bottom += 100000 ;
+					pDoc -> E_Ellipse.GetAt (M_Number).left += 100000 ;
+					pDoc -> E_Ellipse.GetAt (M_Number).right += 100000 ;
+
+					M_Rect.top = 100000 ;	M_Rect.bottom = 100000 ;
+					M_Rect.left = 100000 ;  M_Rect.right = 100000 ;
+
+					m_Cut = 'o' ;
+					m_Copy = 'x' ;
+					m_WhatCopy = _T ("E") ;
+					m_CopyLocation = M_Number ;
+				}
+				else if ( M_What == _T ("Text") ) {
+					pDoc -> Text_Text.GetAt (M_Number).Text_Rect.top += 100000 ;
+					pDoc -> Text_Text.GetAt (M_Number).Text_Rect.bottom += 100000 ;
+					pDoc -> Text_Text.GetAt (M_Number).Text_Rect.left += 100000 ;
+					pDoc -> Text_Text.GetAt (M_Number).Text_Rect.right += 100000 ;
+					pDoc -> Text_Text.GetAt (M_Number).Location.x += 100000 ;
+					pDoc -> Text_Text.GetAt (M_Number).Location.y += 100000 ;
+
+					M_Rect.top = 100000 ;	M_Rect.bottom = 100000 ;
+					M_Rect.left = 100000 ;  M_Rect.right = 100000 ;
+
+					m_Cut = 'o' ;
+					m_Copy = 'x' ;
+					m_WhatCopy = _T ("Text") ;
+					m_CopyLocation = M_Number ;
+				}
+			}
+		}
+		Invalidate () ;
+	}
+
+
+
+
+
+
+	/*else if ( nChar == 'X' ) {
+			
+		}
+		else if ( nChar == 'C' ) {
+			if ( M_What == _T ("L") ) {
+				pDoc -> L_Line.GetAt ( M_Number ).Start.x = 100000 ;
+				pDoc -> L_Line.GetAt ( M_Number ).Start.y = 100000 ;
+				pDoc -> L_Line.GetAt ( M_Number ).Last.x = 100000 ;
+				pDoc -> L_Line.GetAt ( M_Number ).Last.y = 100000 ;
+
+				m_Cut = 'x' ;
+				m_Copy = 'o' ;
+				m_WhatCopy = _T ("L") ;
+				m_CopyLocation = M_Number ;
+				Invalidate () ;
+			}
+		}*/
+
+	return CScrollView::PreTranslateMessage(pMsg);
 }

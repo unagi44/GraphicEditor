@@ -39,6 +39,11 @@ public:
 	char m_PSkeleton ;
 	int m_FillPattern ;
 	int m_LinePattern ;
+	char m_Control ;
+	char m_Cut ;
+	char m_Copy ;
+	CString m_WhatCopy ;
+	int m_CopyLocation ;
 
 	// 그룹화에 필요한 변수
 	CRect G_Include ;
@@ -235,6 +240,8 @@ public:
 	afx_msg void OnTextbgcolor();
 	afx_msg void OnGroup();
 	afx_msg void OnGroupx();
+//	afx_msg void OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags);
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 };
 
 #ifndef _DEBUG  // GraphicEditorView.cpp의 디버그 버전
